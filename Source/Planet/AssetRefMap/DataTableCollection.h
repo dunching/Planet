@@ -13,7 +13,7 @@
 #include "CharactersInfo.h"
 #include "PAD_ItemProxyCollection.h"
 
-#include "SceneProxyExtendInfo.generated.h"
+#include "DataTableCollection.generated.h"
 
 class UDataTable;
 class UPAD_Talent_Property;
@@ -36,31 +36,31 @@ PLANET_API FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInf
  * DataTables
  */
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API USceneProxyExtendInfoMap : public UPrimaryDataAsset
+class PLANET_API UDataTableCollection : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	USceneProxyExtendInfoMap();
+	UDataTableCollection();
 
 	virtual void PostCDOContruct() override;
 
-	static USceneProxyExtendInfoMap* GetInstance();
+	static UDataTableCollection* GetInstance();
 
 	template <typename ItemProxy_DescriptionType>
-	TObjectPtr<ItemProxy_DescriptionType> GetTableRowProxyDescription(
+	const TObjectPtr<ItemProxy_DescriptionType> GetTableRowProxyDescription(
 		FGameplayTag UnitType
 		) const;
 
-	FTableRowProxy_TagExtendInfo* GetTableRowProxy_TagExtendInfo(
+	const FTableRowProxy_TagExtendInfo* GetTableRowProxy_TagExtendInfo(
 		FGameplayTag UnitType
 		) const;
 
-	const UPAD_Talent_Property* GetTalent_Property(
-		EPointPropertyType PointPropertyType
+	const FTableRow_Regions* GetTableRow_Region(
+		FGameplayTag UnitType
 		) const;
 
-	FTableRow_Regions* GetTableRow_Region(
+	const FTableRow_TalenSocket* GetTableRow_TalenSocket(
 		FGameplayTag UnitType
 		) const;
 
@@ -92,11 +92,11 @@ public:
 	TSoftObjectPtr<UDataTable> DataTable_Regions;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Talent")
-	TMap<EPointPropertyType, UPAD_Talent_Property*> PAD_Talent_PropertyMap;
+	TSoftObjectPtr<UDataTable> TableRow_TalenSocket;
 };
 
 template <typename ItemProxy_DescriptionType>
-TObjectPtr<ItemProxy_DescriptionType> USceneProxyExtendInfoMap::GetTableRowProxyDescription(
+const TObjectPtr<ItemProxy_DescriptionType> UDataTableCollection::GetTableRowProxyDescription(
 	FGameplayTag UnitType
 	) const
 {
@@ -109,7 +109,7 @@ TObjectPtr<ItemProxy_DescriptionType> USceneProxyExtendInfoMap::GetTableRowProxy
 }
 
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API USceneUnitExtendInfoMap : public USceneProxyExtendInfoMap
+class PLANET_API USceneUnitExtendInfoMap : public UDataTableCollection
 {
 	GENERATED_BODY()
 

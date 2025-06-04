@@ -4,7 +4,7 @@
 #include "GuideInteraction.h"
 #include "HumanCharacter_Player.h"
 #include "HumanRegularProcessor.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 
 void USTE_Interaction_HumanCharacter_AI::TreeStart(FStateTreeExecutionContext& Context)
 {

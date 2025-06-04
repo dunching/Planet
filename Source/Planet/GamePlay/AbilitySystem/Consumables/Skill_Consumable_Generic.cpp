@@ -12,7 +12,7 @@
 #include "GameplayTagsLibrary.h"
 #include "GroupManagger.h"
 #include "ItemProxy_Consumable.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "SceneProxyTable.h"
 
 USkill_Consumable_Generic::USkill_Consumable_Generic() :

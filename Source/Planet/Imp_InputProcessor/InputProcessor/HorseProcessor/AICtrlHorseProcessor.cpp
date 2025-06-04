@@ -34,7 +34,7 @@
 #include "UIManagerSubSystem.h"
 #include "AnimInstanceHorse.h"
 #include "DestroyProgress.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HorseViewBackpackProcessor.h"
 #include "HorseProcessor.h"
 #include "HumanProcessor.h"

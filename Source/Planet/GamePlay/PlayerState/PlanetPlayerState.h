@@ -29,6 +29,13 @@ public:
 
 	APlanetPlayerState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+	bool GetIsInChallenge()const;
+
+#pragma region RPC
+	UFUNCTION(Server, Reliable)
+	void SetEntryChanlleng(bool bIsEntryChanlleng);
+#pragma endregion
+	
 protected:
 
 	virtual void BeginPlay() override;
@@ -37,8 +44,12 @@ protected:
 
 	virtual void PostInitializeComponents() override;
 
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+		) const override;
+
 	void InitialData();
-	
+
 private:
 
 	void UpdatePosition();
@@ -52,4 +63,7 @@ private:
 	FString PlayerName;
 
 	FGameplayTag CurrentRegionTag;
+
+	UPROPERTY(Replicated)
+	bool bIsInChallenge = false;
 };

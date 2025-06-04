@@ -336,8 +336,10 @@ public:
 	*													  TargetTalent.Value								// 值
 	*													  );
 	*/
-	static FGameplayTag GEData_ModifyType_Temporary;
-
+	static FGameplayTag GEData_ModifyType_Temporary_Data;
+	
+	static FGameplayTag GEData_ModifyType_Temporary_Percent;
+	
 	/**
 	* 移除临时值
 	* SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary);		
@@ -347,7 +349,9 @@ public:
 	*													  0													// 值
 	*													  );
 	*/
-	static FGameplayTag GEData_ModifyType_RemoveTemporary;
+	static FGameplayTag GEData_ModifyType_RemoveTemporary_Data;
+	
+	static FGameplayTag GEData_ModifyType_RemoveTemporary_Percent;
 
 
 	static FGameplayTag GEData_ModifyItem_CriticalDamage;

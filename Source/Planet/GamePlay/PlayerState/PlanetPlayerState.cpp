@@ -9,6 +9,7 @@
 #include "Components/AudioComponent.h"
 #include "Components/SplineComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 #include "CharacterAttributesComponent.h"
 #include "GameOptions.h"
@@ -19,7 +20,7 @@
 #include "RegionPromt.h"
 #include "MainHUDLayout.h"
 #include "Regions.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "SplineMesh.h"
 #include "UIManagerSubSystem.h"
 
@@ -32,6 +33,18 @@ APlanetPlayerState::APlanetPlayerState(
 	PrimaryActorTick.TickInterval = 1.f;
 
 	AudioComponentPtr = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+}
+
+bool APlanetPlayerState::GetIsInChallenge() const
+{
+	return bIsInChallenge;
+}
+
+void APlanetPlayerState::SetEntryChanlleng_Implementation(
+	bool bIsEntryChanlleng
+	)
+{
+	bIsInChallenge = bIsEntryChanlleng;
 }
 
 void APlanetPlayerState::BeginPlay()
@@ -60,6 +73,15 @@ void APlanetPlayerState::PostInitializeComponents()
 	Super::PostInitializeComponents();
 }
 
+void APlanetPlayerState::GetLifetimeReplicatedProps(
+	TArray<FLifetimeProperty>& OutLifetimeProps
+	) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ThisClass, bIsInChallenge, COND_None);
+}
+
 void APlanetPlayerState::InitialData()
 {
 }
@@ -82,7 +104,7 @@ void APlanetPlayerState::UpdatePosition()
 		}
 	}
 
-	auto AllRegionsPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRow_AllRegions();
+	auto AllRegionsPtr = UDataTableCollection::GetInstance()->GetTableRow_AllRegions();
 	for (auto RegionPtr : AllRegionsPtr)
 	{
 		if (!RegionAirWallsMap.Contains(RegionPtr->RegionTag))
@@ -130,7 +152,7 @@ void APlanetPlayerState::UpdateCurrentPosition_Implementation(
 
 	CurrentRegionTag = NewCurrentRegionTag;
 
-	auto TableRow_RegionsPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRow_Region(NewCurrentRegionTag);
+	auto TableRow_RegionsPtr = UDataTableCollection::GetInstance()->GetTableRow_Region(NewCurrentRegionTag);
 	if (TableRow_RegionsPtr)
 	{
 #if UE_EDITOR || UE_SERVER

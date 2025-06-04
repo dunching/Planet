@@ -5,13 +5,14 @@
 #include "GuideInteraction.h"
 #include "HumanInteractionWithChallengeEntry.h"
 #include "HumanInteractionWithNPC.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "MainHUD.h"
 #include "OptionList.h"
 #include "ChallengeEntry.h"
 #include "PlayerConversationBorder.h"
 #include "HumanRegularProcessor.h"
 #include "HumanCharacter_Player.h"
+#include "InputProcessorSubSystem_Imp.h"
 
 class AMainHUD;
 
@@ -61,7 +62,7 @@ void UInteractionOptionsLayout::Enable()
 	{
 		auto CurrentActionSPtr =
 			DynamicCastSharedPtr<HumanProcessor::FHumanInteractionWithNPCProcessor>(
-				UInputProcessorSubSystem::GetInstance()->GetCurrentAction()
+				UInputProcessorSubSystem_Imp::GetInstance()->GetCurrentAction()
 			);
 
 		if (CurrentActionSPtr)
@@ -85,7 +86,7 @@ void UInteractionOptionsLayout::Enable()
 	{
 		auto CurrentActionSPtr =
 			DynamicCastSharedPtr<HumanProcessor::FHumanInteractionWithChallengeEntryProcessor>(
-				UInputProcessorSubSystem::GetInstance()->GetCurrentAction()
+				UInputProcessorSubSystem_Imp::GetInstance()->GetCurrentAction()
 			);
 
 		if (CurrentActionSPtr)
@@ -161,5 +162,5 @@ void UInteractionOptionsLayout::SelectedInteractionItem(
 
 void UInteractionOptionsLayout::OnQuitBtnClicked()
 {
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
 }

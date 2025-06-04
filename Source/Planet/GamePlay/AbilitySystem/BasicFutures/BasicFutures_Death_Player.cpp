@@ -11,8 +11,9 @@
 #include "GameplayTagsLibrary.h"
 #include "Planet_Tools.h"
 #include "HumanEndangeredProcessor.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HumanCharacter_Player.h"
+#include "InputProcessorSubSystem_Imp.h"
 
 struct FBasicFutures_Death_Player : public TStructVariable<FBasicFutures_Death_Player>
 {
@@ -36,7 +37,7 @@ void UBasicFutures_Death_Player::ActivateAbility(
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 	)
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanEndangeredProcessor>();
+		UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanEndangeredProcessor>();
 	}
 }
 

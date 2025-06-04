@@ -5,8 +5,33 @@
 #include "STT_GuideThread.h"
 
 #include "GuideSystemStateTreeComponent.h"
+#include "PlanetPlayerController.h"
+#include "PlanetPlayerState.h"
 
 #include "STT_GuideThread_Challenge.h"
+
+void AGuideThread_Challenge::Destroyed()
+{
+	auto PCPtr = Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
+	if (PCPtr)
+	{
+		PCPtr->GetPlayerState<APlanetPlayerState>()->SetEntryChanlleng(false);
+	}
+	
+	Super::Destroyed();
+}
+
+void AGuideThread_Challenge::ActiveGuide()
+{
+	Super::ActiveGuide();
+	
+	// 确认是否在挑战模式
+	auto PCPtr = Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
+	if (PCPtr)
+	{
+		PCPtr->GetPlayerState<APlanetPlayerState>()->SetEntryChanlleng(true);
+	}
+}
 
 AGuideThread_Challenge::AGuideThread_Challenge(
 	const FObjectInitializer& ObjectInitializer

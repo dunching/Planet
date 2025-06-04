@@ -1,4 +1,4 @@
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 
 #include "Subsystems/SubsystemBlueprintLibrary.h"
 #include <GameDelegates.h>
@@ -7,7 +7,7 @@
 
 #include "InputProcessor.h"
 
-void UInputProcessorSubSystem::Initialize(
+void UInputProcessorSubSystemBase::Initialize(
 	FSubsystemCollectionBase& Collection
 )
 {
@@ -59,26 +59,19 @@ void UInputProcessorSubSystem::Initialize(
 #endif
 }
 
-void UInputProcessorSubSystem::Deinitialize()
+void UInputProcessorSubSystemBase::Deinitialize()
 {
 	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
 
 	Super::Deinitialize();
 }
 
-UInputProcessorSubSystem* UInputProcessorSubSystem::GetInstance()
-{
-	return Cast<UInputProcessorSubSystem>(
-		USubsystemBlueprintLibrary::GetGameInstanceSubsystem(GetWorldImp(), UInputProcessorSubSystem::StaticClass())
-	);
-}
-
-TSharedPtr<FInputProcessor>& UInputProcessorSubSystem::GetCurrentAction()
+TSharedPtr<FInputProcessor>& UInputProcessorSubSystemBase::GetCurrentAction()
 {
 	return CurrentProcessorSPtr;
 }
 
-bool UInputProcessorSubSystem::Tick(
+bool UInputProcessorSubSystemBase::Tick(
 	float DeltaTime
 )
 {
@@ -107,7 +100,7 @@ bool UInputProcessorSubSystem::Tick(
 	return true;
 }
 
-void UInputProcessorSubSystem::ResetProcessor()
+void UInputProcessorSubSystemBase::ResetProcessor()
 {
 	if (CurrentProcessorSPtr)
 	{
@@ -115,7 +108,7 @@ void UInputProcessorSubSystem::ResetProcessor()
 	}
 }
 
-FDelegateHandle UInputProcessorSubSystem::AddKeyEvent(
+FDelegateHandle UInputProcessorSubSystemBase::AddKeyEvent(
 	FKey Key,
 	const std::function<void(
 		EInputEvent
@@ -135,7 +128,7 @@ FDelegateHandle UInputProcessorSubSystem::AddKeyEvent(
 	}
 }
 
-void UInputProcessorSubSystem::RemoveKeyEvent(
+void UInputProcessorSubSystemBase::RemoveKeyEvent(
 	FDelegateHandle DelegateHandle
 )
 {
@@ -145,7 +138,7 @@ void UInputProcessorSubSystem::RemoveKeyEvent(
 	}
 }
 
-bool UInputProcessorSubSystem::InputKey(
+bool UInputProcessorSubSystemBase::InputKey(
 	const FInputKeyEventArgs& EventArgs
 )
 {
@@ -159,7 +152,7 @@ bool UInputProcessorSubSystem::InputKey(
 	}
 }
 
-bool UInputProcessorSubSystem::InputAxis(
+bool UInputProcessorSubSystemBase::InputAxis(
 	FViewport* Viewport,
 	FInputDeviceId InputDevice,
 	FKey Key,

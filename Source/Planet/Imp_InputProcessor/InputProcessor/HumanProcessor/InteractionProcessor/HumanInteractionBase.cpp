@@ -4,11 +4,12 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
 #include "CreateMenu.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HumanRegularProcessor.h"
 #include "HorseProcessor.h"
 #include "HumanCharacter_AI.h"
 #include "HumanCharacter_Player.h"
+#include "InputProcessorSubSystem_Imp.h"
 #include "InteractionList.h"
 #include "MainHUD.h"
 #include "MainHUDLayout.h"
@@ -61,6 +62,6 @@ namespace HumanProcessor
 
 	void FHumanInteractionBaseProcessor::Switch2RegularProcessor()
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
+		UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
 	}
 }

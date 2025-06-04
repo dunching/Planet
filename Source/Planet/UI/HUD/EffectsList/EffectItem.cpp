@@ -10,7 +10,7 @@
 #include "CharacterStateInfo.h"
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Description.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "StateTagExtendInfo.h"
 
 namespace EffectItem

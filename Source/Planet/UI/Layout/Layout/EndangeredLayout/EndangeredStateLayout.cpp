@@ -11,6 +11,7 @@
 #include "GuideThreadChallenge.h"
 #include "LayoutCommon.h"
 #include "PlanetPlayerController.h"
+#include "PlanetPlayerState.h"
 #include "PlayerGameplayTasks.h"
 
 struct FEndangeredStateLayout : public TStructVariable<FEndangeredStateLayout>
@@ -21,7 +22,7 @@ struct FEndangeredStateLayout : public TStructVariable<FEndangeredStateLayout>
 void UEndangeredStateLayout::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
+
 	auto UIPtr = Cast<UButton>(GetWidgetFromName(FEndangeredStateLayout::Get().RespawnBtn));
 	if (UIPtr)
 	{
@@ -45,28 +46,25 @@ ELayoutCommon UEndangeredStateLayout::GetLayoutType() const
 void UEndangeredStateLayout::OnClicked()
 {
 	// 确认是否在挑战模式
-	if (auto GuideThreadPtr = UGuideSubSystem::GetInstance()->IsActivedGuideThread(AGuideThread_Challenge::StaticClass()))
+	auto PCPtr = Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
+	if (PCPtr)
 	{
-		auto GuideThread_ChallengePtr = Cast<AGuideThread_Challenge>(GuideThreadPtr );
-		if (GuideThread_ChallengePtr )
+		if (PCPtr->GetPlayerState<APlanetPlayerState>()->GetIsInChallenge())
 		{
-			auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
-			if (!PCPtr)
+			if (auto GuideThreadPtr = UGuideSubSystem::GetInstance()->IsActivedGuideThread(
+				 AGuideThread_Challenge::StaticClass()
+				))
 			{
-				return;
+				auto GuideThread_ChallengePtr = Cast<AGuideThread_Challenge>(GuideThreadPtr);
+				if (GuideThread_ChallengePtr)
+				{
+					PCPtr->GetGameplayTasksComponent()->EntryChallengeLevel(GuideThread_ChallengePtr->CurrentTeleport);
+				}
 			}
-	
-			PCPtr->GetGameplayTasksComponent()->EntryChallengeLevel(GuideThread_ChallengePtr->CurrentTeleport);
 		}
-	}
-	else
-	{
-		auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
-		if (!PCPtr)
+		else
 		{
-			return;
+			PCPtr->GetGameplayTasksComponent()->TeleportPlayerToNearest();
 		}
-	
-		PCPtr->GetGameplayTasksComponent()->TeleportPlayerToNearest();
 	}
 }

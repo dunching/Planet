@@ -12,7 +12,7 @@
 #include "UI/UIManagerSubSystem.h"
 #include "BackpackMenu.h"
 #include "CreateMenu.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HumanRegularProcessor.h"
 #include "HorseProcessor.h"
 #include "HumanProcessor.h"
@@ -20,6 +20,7 @@
 #include "BuildingBaseProcessor.h"
 #include "CharacterAttributesComponent.h"
 #include "HumanCharacter_Player.h"
+#include "InputProcessorSubSystem_Imp.h"
 #include "MainHUD.h"
 #include "MainHUDLayout.h"
 #include "MainMenuLayout.h"
@@ -50,7 +51,7 @@ namespace HumanProcessor
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
 		//
-		UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kEmptyLayout);
+		// UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kEmptyLayout);
 		
 		Super::QuitAction();
 	}
@@ -61,7 +62,7 @@ namespace HumanProcessor
 
 	void FHumanViewAlloctionSkillsProcessor::QuitCurrentState()
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
+		UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
 	}
 
 }

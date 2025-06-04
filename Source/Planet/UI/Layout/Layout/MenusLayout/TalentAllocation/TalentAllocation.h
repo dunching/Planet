@@ -40,11 +40,16 @@ protected:
 	virtual void DisEnableMenu()override;
 
 	virtual EMenuType GetMenuType()const override final;
+
+	void UpdateTalenIconState();
 	
 	void OnUsedTalentNumChanged(int32 UsedNum, int32 TatolNum);
 
 	UFUNCTION()
 	bool OnAddPoint(UTalentIcon* TalentIconPtr, bool bIsAdd);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSet<UTalentIcon*> EnableSocletIconSet;
 
 private:
 	void OnSelectedCharacterProxy(

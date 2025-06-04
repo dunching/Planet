@@ -3,7 +3,7 @@
 #include "AbilitySystemComponent.h"
 
 #include "CharacterBase.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAttibutes.h"
 #include "AllocationSkills.h"
@@ -506,7 +506,7 @@ UItemProxy_Description_PassiveSkill* FPassiveSkillProxy::GetTableRowProxy_Passiv
 
 FTableRowProxy_PropertyEntrys* FPassiveSkillProxy::GetMainPropertyEntry() const
 {
-	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto SceneProxyExtendInfoMapPtr = UDataTableCollection::GetInstance();
 	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
 
 	// 

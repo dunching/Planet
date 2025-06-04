@@ -4,11 +4,12 @@
 #include "Dynamic_Weather.h"
 #include "GameplayTagsLibrary.h"
 #include "HumanRegularProcessor.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "OpenWorldSystem.h"
 #include "PlanetPlayerController.h"
 #include "Teleport.h"
 #include "HumanCharacter_Player.h"
+#include "InputProcessorSubSystem_Imp.h"
 #include "TransitionProcessor.h"
 #include "WeatherSystem.h"
 
@@ -16,7 +17,7 @@ FName UPlayerControllerGameplayTasksComponent::ComponentName = TEXT("PlayerContr
 
 void UPlayerControllerGameplayTasksComponent::TeleportPlayerToNearest()
 {
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FTransitionProcessor>();
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FTransitionProcessor>();
 
 	TeleportPlayerToNearest_Server();
 }
@@ -25,7 +26,7 @@ void UPlayerControllerGameplayTasksComponent::EntryChallengeLevel(
 	ETeleport Teleport
 	)
 {
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FTransitionProcessor>();
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FTransitionProcessor>();
 
 	EntryChallengeLevel_Server(Teleport);
 }
@@ -112,7 +113,7 @@ void UPlayerControllerGameplayTasksComponent::EntryLevelEnd(
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+		UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
 	}
 #endif
 }
@@ -146,7 +147,7 @@ void UPlayerControllerGameplayTasksComponent::WaitPlayerLoad()
 
 void UPlayerControllerGameplayTasksComponent::TeleportPlayerToOpenWorld()
 {
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FTransitionProcessor>();
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FTransitionProcessor>();
 
 	TeleportPlayerToOpenWorld_Server();
 }
@@ -281,7 +282,7 @@ void UGameplayTask_WaitLoadComplete::Activate()
 {
 	Super::Activate();
 
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FTransitionProcessor>();
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FTransitionProcessor>();
 
 	auto CharacterPtr = Cast<ACharacterBase>(TargetPCPtr->GetPawn<ACharacterBase>());
 	if (CharacterPtr)
@@ -318,7 +319,7 @@ void UGameplayTask_WaitLoadComplete::OnDestroy(
 		CharacterPtr->LandedDelegate.RemoveDynamic(this, &ThisClass::OnLanded);
 	}
 	
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
 
 	Super::OnDestroy(bInOwnerFinished);
 }

@@ -2,11 +2,12 @@
 
 #include "Components/Button.h"
 
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "MainHUD.h"
 #include "PlayerConversationBorder.h"
 #include "HumanRegularProcessor.h"
 #include "HumanCharacter_Player.h"
+#include "InputProcessorSubSystem_Imp.h"
 
 class AMainHUD;
 
@@ -62,5 +63,5 @@ ELayoutCommon UInteractionConversationLayout::GetLayoutType() const
 
 void UInteractionConversationLayout::OnQuitBtnClicked()
 {
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
 }

@@ -9,7 +9,8 @@
 #include "ArticleSharedData.h"
 #include "AssetRefMap.h"
 #include "PlanetModule.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
+#include "InputProcessorSubSystem_Imp.h"
 
 void UPlanetGameInstance::Init()
 {
@@ -38,7 +39,7 @@ void UPlanetGameInstance::Shutdown()
 //	check(TestMap1.IsEmpty());
 #endif
 
-	UInputProcessorSubSystem::GetInstance()->ResetProcessor();
+	UInputProcessorSubSystem_Imp::GetInstance()->ResetProcessor();
 
 	Super::Shutdown();
 	PRINTFUNC();

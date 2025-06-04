@@ -4,10 +4,11 @@
 
 #include "AssetRefMap.h"
 #include "RewardsTD.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "GuideSubSystem.h"
 #include "GuideSubSystem_Imp.h"
 #include "ModifyItemProxyStrategy.h"
+#include "InputProcessorSubSystem_Imp.h"
 
 void APlanetWorldSettings::PostInitializeComponents()
 {
@@ -31,7 +32,7 @@ UAssetRefMap* APlanetWorldSettings::GetAssetRefMapInstance() const
 	return AssetRefMapRef.LoadSynchronous();
 }
 
-USceneProxyExtendInfoMap* APlanetWorldSettings::GetSceneProxyExtendInfoMap() const
+UDataTableCollection* APlanetWorldSettings::GetSceneProxyExtendInfoMap() const
 {
 	return SceneProxyExtendInfoMapPtr.LoadSynchronous();
 }

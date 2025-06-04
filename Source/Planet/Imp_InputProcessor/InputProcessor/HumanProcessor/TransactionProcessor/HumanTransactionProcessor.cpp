@@ -12,9 +12,10 @@
 #include <DestroyProgress.h>
 
 #include "GameOptions.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HumanCharacter_Player.h"
 #include "HumanRegularProcessor.h"
+#include "InputProcessorSubSystem_Imp.h"
 
 namespace HumanProcessor
 {
@@ -57,7 +58,7 @@ namespace HumanProcessor
 				
 				if (EventArgs.Key == GameOptionsPtr->Return)
 				{
-					UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
+					UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
 					return true;
 				}
 				

@@ -12,7 +12,7 @@
 #include "UI/UIManagerSubSystem.h"
 #include "BackpackMenu.h"
 #include "CreateMenu.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HumanRegularProcessor.h"
 #include "HorseProcessor.h"
 #include "HumanProcessor.h"

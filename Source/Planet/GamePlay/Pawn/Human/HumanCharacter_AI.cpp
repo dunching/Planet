@@ -12,7 +12,7 @@
 #include "HumanCharacter.h"
 #include "InventoryComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "CharactersInfo.h"
 #include "HumanAIController.h"
 #include "GroupManagger.h"

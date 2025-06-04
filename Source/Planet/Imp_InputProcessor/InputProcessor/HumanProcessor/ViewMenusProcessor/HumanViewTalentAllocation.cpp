@@ -12,7 +12,7 @@
 #include "UI/UIManagerSubSystem.h"
 #include "BackpackMenu.h"
 #include "CreateMenu.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HumanRegularProcessor.h"
 #include "HorseProcessor.h"
 #include "HumanProcessor.h"
@@ -20,6 +20,7 @@
 #include "BuildingBaseProcessor.h"
 #include "HumanViewAlloctionSkillsProcessor.h"
 #include "HumanCharacter_Player.h"
+#include "InputProcessorSubSystem_Imp.h"
 
 namespace HumanProcessor
 {
@@ -34,18 +35,38 @@ namespace HumanProcessor
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
-		// UUIManagerSubSystem::GetInstance()->ViewTalentAllocation(true);
 		UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kMenuLayout);
-		UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kGroupManagger);
+		UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kAllocationTalent);
+	}
+
+	bool FHumanViewTalentAllocation::InputKey(
+		const FInputKeyEventArgs& EventArgs
+		)
+	{
+		switch (EventArgs.Event)
+		{
+		case IE_Pressed:
+			{
+			}
+			break;
+		case IE_Released:
+			{
+				auto GameOptionsPtr = UGameOptions::GetInstance();
+
+				if (EventArgs.Key == GameOptionsPtr->Return)
+				{
+					// 这个菜单下不要处理这个事件，因为我们“可能”需要【右键】去减少【天赋点】分配
+					return true;
+				}
+			}
+			break;
+		}
+
+		return Super::InputKey(EventArgs);
 	}
 
 	void FHumanViewTalentAllocation::QuitAction()
 	{
-		// UUIManagerSubSystem::GetInstance()->ViewTalentAllocation(false);
-
-		//
-		UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kEmptyLayout);
-
 		Super::QuitAction();
 	}
 	
@@ -55,7 +76,7 @@ namespace HumanProcessor
 
 	void FHumanViewTalentAllocation::QuitCurrentState()
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
+		UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
 	}
 
 }

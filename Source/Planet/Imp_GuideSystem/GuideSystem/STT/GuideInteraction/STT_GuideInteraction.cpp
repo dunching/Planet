@@ -2,9 +2,10 @@
 
 #include "GuideInteractionBase.h"
 #include "HumanRegularProcessor.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "STE_Interaction.h"
 #include "HumanCharacter_Player.h"
+#include "InputProcessorSubSystem_Imp.h"
 
 EStateTreeRunStatus FSTT_GuideInteraction::EnterState(
 	FStateTreeExecutionContext& Context,
@@ -37,7 +38,7 @@ EStateTreeRunStatus FSTT_GuideInteraction_BackToRegularProcessor::EnterState(
 		return EStateTreeRunStatus::Failed;
 	}
 
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
 
 	return EStateTreeRunStatus::Succeeded;
 }

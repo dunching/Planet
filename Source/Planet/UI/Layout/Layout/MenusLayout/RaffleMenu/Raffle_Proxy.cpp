@@ -15,7 +15,7 @@
 #include "TalentAllocationComponent.h"
 #include "TalentIcon.h"
 #include "UICommon.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 
 struct FRaffle_Proxy : public TStructVariable<FRaffle_Proxy>
 {

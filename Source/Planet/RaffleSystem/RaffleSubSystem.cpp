@@ -8,7 +8,7 @@
 #include "CharacterBase.h"
 #include "PlanetPlayerState.h"
 #include "InventoryComponent.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
 #include "Tools.h"
@@ -108,5 +108,5 @@ void URaffleSubSystem::RafflePermanentComplete(
 		return;
 	}
 
-	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto SceneProxyExtendInfoMapPtr = UDataTableCollection::GetInstance();
 }

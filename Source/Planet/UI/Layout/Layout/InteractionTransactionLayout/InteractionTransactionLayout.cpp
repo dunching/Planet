@@ -16,7 +16,7 @@
 #include "GuideThreadChallenge.h"
 #include "HumanInteractionWithNPC.h"
 #include "HumanRegularProcessor.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "InventoryComponent.h"
 #include "LayoutCommon.h"
 #include "PlanetPlayerController.h"
@@ -26,6 +26,7 @@
 #include "AssetRefMap.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CoinList.h"
+#include "InputProcessorSubSystem_Imp.h"
 #include "ItemProxy_Coin.h"
 
 struct FTransactionLayout : public TStructVariable<FTransactionLayout>
@@ -126,7 +127,7 @@ void UInteractionTransactionLayout::Enable()
 	}
 	auto CurrentActionSPtr =
 		DynamicCastSharedPtr<HumanProcessor::FHumanInteractionWithNPCProcessor>(
-		                                                                        UInputProcessorSubSystem::GetInstance()
+		                                                                        UInputProcessorSubSystem_Imp::GetInstance()
 		                                                                        ->GetCurrentAction()
 		                                                                       );
 
@@ -294,7 +295,7 @@ void UInteractionTransactionLayout::OnQuitClicked()
 {
 	auto CurrentActionSPtr =
 		DynamicCastSharedPtr<HumanProcessor::FHumanInteractionBaseProcessor>(
-		                                                                     UInputProcessorSubSystem::GetInstance()->
+		                                                                     UInputProcessorSubSystem_Imp::GetInstance()->
 		                                                                     GetCurrentAction()
 		                                                                    );
 
@@ -302,7 +303,7 @@ void UInteractionTransactionLayout::OnQuitClicked()
 	{
 		CurrentActionSPtr->StopInteraciton();
 	}
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
 }
 
 void UInteractionTransactionLayout::OnBuyClicked()

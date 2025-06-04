@@ -1,5 +1,5 @@
 ﻿
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 
 #include <Kismet/GameplayStatics.h>
 
@@ -15,7 +15,7 @@ FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInfo(
 	const FGameplayTag& CommonCooldownTag
 	)
 {
-	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto SceneProxyExtendInfoMapPtr = UDataTableCollection::GetInstance();
 	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_CommonCooldownInfo.LoadSynchronous();
 
 	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_CommonCooldownInfo>(
@@ -25,25 +25,25 @@ FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInfo(
 	return SceneProxyExtendInfoPtr;
 }
 
-USceneProxyExtendInfoMap::USceneProxyExtendInfoMap() :
+UDataTableCollection::UDataTableCollection() :
 	Super()
 {
 }
 
-void USceneProxyExtendInfoMap::PostCDOContruct()
+void UDataTableCollection::PostCDOContruct()
 {
 	Super::PostCDOContruct();
 
 	InitialData();
 }
 
-USceneProxyExtendInfoMap* USceneProxyExtendInfoMap::GetInstance()
+UDataTableCollection* UDataTableCollection::GetInstance()
 {
 	auto WorldSetting = Cast<APlanetWorldSettings>(GetWorldImp()->GetWorldSettings());
 	return WorldSetting->GetSceneProxyExtendInfoMap();
 }
 
-FTableRowProxy_TagExtendInfo* USceneProxyExtendInfoMap::GetTableRowProxy_TagExtendInfo(FGameplayTag UnitType) const
+const FTableRowProxy_TagExtendInfo* UDataTableCollection::GetTableRowProxy_TagExtendInfo(FGameplayTag UnitType) const
 {
 	auto DataTablePtr = DataTable_TagExtendInfo.LoadSynchronous();
 
@@ -52,17 +52,7 @@ FTableRowProxy_TagExtendInfo* USceneProxyExtendInfoMap::GetTableRowProxy_TagExte
 	return SceneUnitExtendInfoPtr;
 }
 
-const UPAD_Talent_Property* USceneProxyExtendInfoMap::GetTalent_Property(EPointPropertyType PointPropertyType) const
-{
-	if (PAD_Talent_PropertyMap.Contains(PointPropertyType))
-	{
-		return PAD_Talent_PropertyMap[PointPropertyType];
-	}
-
-	return nullptr;
-}
-
-FTableRow_Regions* USceneProxyExtendInfoMap::GetTableRow_Region(
+const FTableRow_Regions* UDataTableCollection::GetTableRow_Region(
 	FGameplayTag UnitType
 	) const
 {
@@ -85,7 +75,22 @@ FTableRow_Regions* USceneProxyExtendInfoMap::GetTableRow_Region(
 	return nullptr;
 }
 
-TArray<FTableRow_Regions*> USceneProxyExtendInfoMap::GetTableRow_AllRegions() const
+const FTableRow_TalenSocket* UDataTableCollection::GetTableRow_TalenSocket(
+	FGameplayTag UnitType
+	) const
+{
+	auto DataTablePtr = TableRow_TalenSocket.LoadSynchronous();
+
+	auto RegionsPtr = DataTablePtr->FindRow<FTableRow_TalenSocket>(*UnitType.ToString(), TEXT("GetUnit"));
+	if (RegionsPtr)
+	{
+		return RegionsPtr;
+	}
+
+	return nullptr;
+}
+
+TArray<FTableRow_Regions*> UDataTableCollection::GetTableRow_AllRegions() const
 {
 	auto DataTablePtr = DataTable_Regions.LoadSynchronous();
 
@@ -95,7 +100,7 @@ TArray<FTableRow_Regions*> USceneProxyExtendInfoMap::GetTableRow_AllRegions() co
 	return Result;
 }
 
-TArray<FTableRowProxy_CharacterGrowthAttribute*> USceneProxyExtendInfoMap::GetTableRow_CharacterGrowthAttribute() const
+TArray<FTableRowProxy_CharacterGrowthAttribute*> UDataTableCollection::GetTableRow_CharacterGrowthAttribute() const
 {
 	auto DataTablePtr = DataTable_Character_GrowthAttribute.LoadSynchronous();
 
@@ -105,7 +110,7 @@ TArray<FTableRowProxy_CharacterGrowthAttribute*> USceneProxyExtendInfoMap::GetTa
 	return Result;
 }
 
-void USceneProxyExtendInfoMap::InitialData()
+void UDataTableCollection::InitialData()
 {
 }
 

@@ -447,11 +447,17 @@ FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive =
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.BaseValue.Override")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Temporary =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Temporary")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Temporary.Data")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.RemoveTemporary")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Temporary.Percent")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.RemoveTemporary.Data")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Percent =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.RemoveTemporary.Percent")));
 
 
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_CriticalDamage =

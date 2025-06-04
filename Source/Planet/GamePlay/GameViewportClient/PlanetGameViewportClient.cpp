@@ -4,7 +4,8 @@
 
 #include "WidgetScreenLayer.h"
 
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
+#include "InputProcessorSubSystem_Imp.h"
 
 void UPlanetGameViewportClient::Init(
 	struct FWorldContext& WorldContext,
@@ -56,7 +57,7 @@ void UPlanetGameViewportClient::NotifyPlayerAdded(
 {
 	Super::NotifyPlayerAdded(PlayerIndex, AddedPlayer);
 
-	InputProcessorSubSystemPtr = UInputProcessorSubSystem::GetInstance();
+	InputProcessorSubSystemPtr = UInputProcessorSubSystem_Imp::GetInstance();
 }
 
 ULocalPlayer* UPlanetGameViewportClient::SetupInitialLocalPlayer(

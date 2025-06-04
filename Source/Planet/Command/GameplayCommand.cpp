@@ -2,7 +2,7 @@
 
 #include "Kismet/KismetMathLibrary.h"
 
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HumanViewAlloctionSkillsProcessor.h"
 #include "HumanCharacter_Player.h"
 #include "HumanRegularProcessor.h"
@@ -12,6 +12,7 @@
 #include "GuideSubSystem.h"
 #include "HumanViewSetting.h"
 #include "HumanViewTalentAllocation.h"
+#include "InputProcessorSubSystem_Imp.h"
 #include "OpenWorldDataLayer.h"
 #include "OpenWorldSystem.h"
 #include "TeamMatesHelperComponent.h"
@@ -24,22 +25,22 @@ void GameplayCommand::ActiveGuideMainThread()
 
 void GameplayCommand::ViewAllocationMenu()
 {
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanViewAlloctionSkillsProcessor>();
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanViewAlloctionSkillsProcessor>();
 }
 
 void GameplayCommand::EntryActionProcessor()
 {
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
 }
 
 void GameplayCommand::ViewGroupmateMenu()
 {
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanViewTalentAllocation>();
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanViewTalentAllocation>();
 }
 
 void GameplayCommand::ViewSetting()
 {
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanViewSetting>();
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanViewSetting>();
 }
 
 void GameplayCommand::EntryChallengeLevel(

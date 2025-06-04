@@ -11,7 +11,7 @@
 
 #include "PlanetGameViewportClient.generated.h"
 
-class UInputProcessorSubSystem;
+class UInputProcessorSubSystem_Imp;
 class UWidgetComponent;
 class UFocusIcon;
 class UMainHUDLayout;
@@ -52,5 +52,5 @@ public:
 private:
 	
 	UPROPERTY(Transient)
-	UInputProcessorSubSystem* InputProcessorSubSystemPtr = nullptr;
+	UInputProcessorSubSystem_Imp* InputProcessorSubSystemPtr = nullptr;
 };

@@ -12,7 +12,7 @@
 #include "UI/UIManagerSubSystem.h"
 #include "BackpackMenu.h"
 #include "CreateMenu.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HumanRegularProcessor.h"
 #include "HorseProcessor.h"
 #include "HumanProcessor.h"
@@ -20,6 +20,7 @@
 #include "BuildingBaseProcessor.h"
 #include "HumanViewAlloctionSkillsProcessor.h"
 #include "HumanCharacter_Player.h"
+#include "InputProcessorSubSystem_Imp.h"
 
 namespace HumanProcessor
 {
@@ -44,7 +45,7 @@ namespace HumanProcessor
 		// UUIManagerSubSystem::GetInstance()->ViewTalentAllocation(false);
 
 		//
-		UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kEmptyLayout);
+		// UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kEmptyLayout);
 
 		Super::QuitAction();
 	}
@@ -55,7 +56,7 @@ namespace HumanProcessor
 
 	void FHumanViewSetting::QuitCurrentState()
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
+		UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
 	}
 
 }

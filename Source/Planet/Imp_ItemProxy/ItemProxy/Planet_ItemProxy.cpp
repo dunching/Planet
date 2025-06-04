@@ -3,7 +3,7 @@
 #include "InventoryComponent.h"
 #include "ItemProxy.h"
 #include "PlanetWorldSettings.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "Tools.h"
 
 inline void FPlanet_BasicProxy::SetInventoryComponent(

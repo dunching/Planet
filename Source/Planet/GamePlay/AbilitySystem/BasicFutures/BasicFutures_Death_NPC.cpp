@@ -11,7 +11,7 @@
 #include "GameplayTagsLibrary.h"
 #include "Planet_Tools.h"
 #include "HumanEndangeredProcessor.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HumanCharacter_Player.h"
 
 struct FBasicFutures_Death : public TStructVariable<FBasicFutures_Death>

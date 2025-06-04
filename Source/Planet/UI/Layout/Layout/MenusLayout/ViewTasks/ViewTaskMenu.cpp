@@ -11,10 +11,11 @@
 
 #include "GuideThread.h"
 #include "HumanRegularProcessor.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "TaskItemCategory.h"
 #include "ProxyIcon.h"
 #include "HumanCharacter_Player.h"
+#include "InputProcessorSubSystem_Imp.h"
 
 struct FUViewTaskMenu : public TStructVariable<FUViewTaskMenu>
 {
@@ -204,7 +205,7 @@ void UViewTaskMenu::OnActiveGuideThread()
 		UGuideSubSystem::GetInstance()->ActiveBrandGuideThread(TaskItemPtr->BrandGuideThreadClass);
 	}
 
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
 }
 
 void UViewTaskMenu::ModifyTaskText()

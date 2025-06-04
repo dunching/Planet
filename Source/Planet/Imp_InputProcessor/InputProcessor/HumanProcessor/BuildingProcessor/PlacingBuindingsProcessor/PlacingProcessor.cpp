@@ -18,7 +18,7 @@
 #include "LogHelper/LogWriter.h"
 #include "UIManagerSubSystem.h"
 #include "ToolsMenu.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HumanRegularProcessor.h"
 #include "HorseProcessor.h"
 #include "HumanProcessor.h"

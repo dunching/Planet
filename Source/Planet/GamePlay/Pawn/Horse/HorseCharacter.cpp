@@ -37,7 +37,7 @@
 #include "ProxyProcessComponent.h"
 #include "InventoryComponent.h"
 #include "InputActions.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "PlanetPlayerController.h"
 #include "HumanCharacter.h"
 #include "BasicFutures_Mount.h"

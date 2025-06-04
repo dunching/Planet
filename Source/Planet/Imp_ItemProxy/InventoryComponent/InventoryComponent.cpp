@@ -8,7 +8,7 @@
 #include "GameplayTagsLibrary.h"
 #include "CharacterBase.h"
 #include "PlanetPlayerState.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "ItemProxy_Container.h"
 #include "PlanetControllerInterface.h"
 #include "ItemProxy_Character.h"

@@ -1,24 +1,13 @@
 
 #include "HumanViewBackpackProcessor.h"
 
-#include <Kismet/GameplayStatics.h>
-
-#include "GenerateTypes.h"
-#include "PlanetPlayerState.h"
-#include "CharacterBase.h"
 #include "GameFramework/PlayerController.h"
-#include "Blueprint/WidgetBlueprintLibrary.h"
-#include "HumanCharacter.h"
-#include "UI/UIManagerSubSystem.h"
-#include "BackpackMenu.h"
+
 #include "CreateMenu.h"
-#include "InputProcessorSubSystem.h"
-#include "HumanRegularProcessor.h"
-#include "HorseProcessor.h"
-#include "HumanProcessor.h"
-#include "InventoryComponent.h"
+#include "InputProcessorSubSystemBase.h"
 #include "BuildingBaseProcessor.h"
 #include "HumanViewAlloctionSkillsProcessor.h"
+#include "InputProcessorSubSystem_Imp.h"
 #include "HumanCharacter_Player.h"
 
 namespace HumanProcessor
@@ -44,7 +33,7 @@ namespace HumanProcessor
 
 	void FViewBackpackProcessor::QuitCurrentState()
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FBuildingBaseProcessor>();
+		UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<FBuildingBaseProcessor>();
 	}
 
 }

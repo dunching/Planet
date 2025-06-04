@@ -4,7 +4,7 @@
 
 #include "CharacterBase.h"
 #include "HumanCharacter_AI.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "AllocationSkills.h"
 #include "ItemProxy_Container.h"
 #include "PropertyEntrys.h"
@@ -132,7 +132,7 @@ void FWeaponProxy::UnAllocation()
 
 FTableRowProxy_PropertyEntrys* FWeaponProxy::GetMainPropertyEntry() const
 {
-	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto SceneProxyExtendInfoMapPtr = UDataTableCollection::GetInstance();
 	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
 
 	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_PropertyEntrys>(

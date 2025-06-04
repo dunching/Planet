@@ -39,10 +39,9 @@ class PLANET_API AGuideThread_Challenge : public AGuideThread_Immediate
 
 public:
 	
-	/**
-	 * 当前在哪个挑战关卡入口
-	 */
-	ETeleport CurrentTeleport = ETeleport::kChallenge_LevelType_1;
+	virtual void Destroyed() override;
+
+	virtual void ActiveGuide() override;
 	
 	/**
 	 * 每多少层进入一个指定关卡
@@ -53,11 +52,16 @@ public:
 	
 	AGuideThread_Challenge(const FObjectInitializer& ObjectInitializer);
 
-	virtual FString GetGuideThreadTitle() const;
+	virtual FString GetGuideThreadTitle() const override;
 
 	void SetCurrentLevel(int32 NewCurrentLevel );
 	
 	int32 GetCurrentLevel()const;
+	
+	/**
+	 * 当前在哪个挑战关卡入口
+	 */
+	ETeleport CurrentTeleport = ETeleport::kChallenge_LevelType_1;
 	
 protected:
 	

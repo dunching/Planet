@@ -6,7 +6,7 @@
 
 
 #include "GuideActorBase.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "InteractionList.h"
 #include "MainHUD.h"
 #include "MainHUDLayout.h"

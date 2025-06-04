@@ -28,7 +28,7 @@ class USkeletalMeshComponent;
 class UAnimInstanceBase;
 class UEquipmentInteractionComponent;
 class UHoldItemComponent;
-class UInputProcessorSubSystem;
+class UInputProcessorSubSystem_Imp;
 class UZYInputComponent;
 class USceneActorPropertyComponent;
 class UPlanetGameplayAbility;

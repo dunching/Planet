@@ -44,6 +44,7 @@ void UTalentAllocation::EnableMenu()
 		}
 
 		OnUsedTalentNumChanged(Num, TalentNum);
+		UpdateTalenIconState();
 	}
 }
 
@@ -62,6 +63,47 @@ void UTalentAllocation::DisEnableMenu()
 EMenuType UTalentAllocation::GetMenuType() const
 {
 	return EMenuType::kAllocationTalent;
+}
+
+void UTalentAllocation::UpdateTalenIconState()
+{
+	auto& CharacterTalentRef = CurrentProxyPtr->GetCharacterTalent();
+	const auto TalentNum = CurrentProxyPtr->GetTalentNum();
+
+	// 总使用
+	int32 TotalNum = 0;
+
+	// 当前插槽使用
+	for (const auto& Iter : CharacterTalentRef.AllocationMap)
+	{
+		TotalNum += Iter.Value;
+	}
+
+	for (auto Iter : EnableSocletIconSet)
+	{
+		if (Iter)
+		{
+			Iter->bPreviousIsOK = true;
+		}
+	}
+
+	WidgetTree->ForEachWidget(
+	                          [this](
+	                          UWidget* Widget
+	                          )
+	                          {
+		                          if (Widget && Widget->IsA<UTalentIcon>())
+		                          {
+			                          auto UIPtr = Cast<UTalentIcon>(Widget);
+			                          if (!UIPtr)
+			                          {
+				                          return;
+			                          }
+
+			                          UIPtr->SetIsEnabled(UIPtr->bPreviousIsOK);
+		                          }
+	                          }
+	                         );
 }
 
 void UTalentAllocation::OnUsedTalentNumChanged(
@@ -98,13 +140,40 @@ bool UTalentAllocation::OnAddPoint(
 				TotalNum += Iter.Value;
 			}
 
+			auto Lambda = [&CurrentNum, TalentIconPtr, this]
+			{
+				//
+				if (CurrentNum >= TalentIconPtr->MaxNum)
+				{
+					for (auto Iter :TalentIconPtr->NextSocletIconSet)
+					{
+						if (Iter)
+						{
+							Iter->bPreviousIsOK = true;
+						}
+					}
+				}
+				else
+				{
+					for (auto Iter :TalentIconPtr->NextSocletIconSet)
+					{
+						if (Iter)
+						{
+							Iter->bPreviousIsOK = false;
+						}
+					}
+				}
+
+				UpdateTalenIconState();
+			};
+
 			if (bIsAdd)
 			{
 				TotalNum++;
 
-				if (CharacterTalentRef.AllocationMap.Contains(TalentIconPtr->IconSocket))
+				if (CharacterTalentRef.AllocationMap.Contains(TalentIconPtr->TalentSocket))
 				{
-					CurrentNum = CharacterTalentRef.AllocationMap[TalentIconPtr->IconSocket] + 1;
+					CurrentNum = CharacterTalentRef.AllocationMap[TalentIconPtr->TalentSocket] + 1;
 				}
 				else
 				{
@@ -114,36 +183,49 @@ bool UTalentAllocation::OnAddPoint(
 				if (TotalNum <= TalentNum && CurrentNum <= TalentIconPtr->MaxNum)
 				{
 					// 本地先更新
-					CurrentProxyPtr->UpdateTalentSocket(TalentIconPtr->IconSocket, CurrentNum);
+					CurrentProxyPtr->UpdateTalentSocket(TalentIconPtr->TalentSocket, CurrentNum);
 
 					// 更新服务器上的数据
 					auto PCPtr = Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
 					if (PCPtr)
 					{
-						PCPtr->UpdateCharacterTalent(CurrentProxyPtr->GetID(), TalentIconPtr->IconSocket, CurrentNum);
+						PCPtr->UpdateCharacterTalent(CurrentProxyPtr->GetID(), TalentIconPtr->TalentSocket, CurrentNum);
 					}
 
 					OnUsedTalentNumChanged(TotalNum, TalentNum);
+					Lambda();
 					return true;
 				}
 			}
 			else
 			{
-				if (CharacterTalentRef.AllocationMap.Contains(TalentIconPtr->IconSocket))
+				for (auto Iter :TalentIconPtr->NextSocletIconSet)
 				{
-					CurrentNum = CharacterTalentRef.AllocationMap[TalentIconPtr->IconSocket] - 1;
+					if (Iter)
+					{
+						if (CharacterTalentRef.AllocationMap.Contains(Iter->TalentSocket))
+						{
+							// 如果这个Icon的下一级有被分配的点，则此Icon上分配的点无法被减少
+							return false;
+						}
+					}
+				}
+				if (CharacterTalentRef.AllocationMap.Contains(TalentIconPtr->TalentSocket))
+				{
+					CurrentNum = CharacterTalentRef.AllocationMap[TalentIconPtr->TalentSocket] - 1;
 
 					// 本地先更新
-					CurrentProxyPtr->UpdateTalentSocket(TalentIconPtr->IconSocket, CurrentNum);
+					CurrentProxyPtr->UpdateTalentSocket(TalentIconPtr->TalentSocket, CurrentNum);
 
 					// 更新服务器上的数据
 					auto PCPtr = Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
 					if (PCPtr)
 					{
-						PCPtr->UpdateCharacterTalent(CurrentProxyPtr->GetID(), TalentIconPtr->IconSocket, CurrentNum);
+						PCPtr->UpdateCharacterTalent(CurrentProxyPtr->GetID(), TalentIconPtr->TalentSocket, CurrentNum);
 					}
 
 					OnUsedTalentNumChanged(TotalNum, TalentNum);
+					Lambda();
 					return true;
 				}
 			}

@@ -17,7 +17,7 @@
 #include "KismetCollisionHelper.h"
 #include "PlanetPlayerCameraManager.h"
 #include "GravityPlayerController.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "PlanetPlayerController.h"
 #include "Tools.h"
 

@@ -10,6 +10,7 @@
 #include "ItemProxy_Skills.h"
 #include "ItemProxy_Weapon.h"
 #include "AIComponent.h"
+#include "DataTableCollection.h"
 
 UItemProxy_Description_Character::UItemProxy_Description_Character(
 	const FObjectInitializer& ObjectInitializer
@@ -604,18 +605,7 @@ void FCharacterProxy::UpdateTalentSocket(
 	int32 Num
 	)
 {
-	auto TableRowProxy_CharacterPtr = GetTableRowProxy_Character();
-	if (!TableRowProxy_CharacterPtr)
-	{
-		return;
-	}
-
-	if (!TableRowProxy_CharacterPtr->TalentSocketModifyMap.Contains(TalentSocketTag))
-	{
-		return;
-	}
-
-	const auto TargetTalent = TableRowProxy_CharacterPtr->TalentSocketModifyMap[TalentSocketTag];
+	const auto TargetTalent = UDataTableCollection::GetInstance()->GetTableRow_TalenSocket(TalentSocketTag);
 
 	ON_SCOPE_EXIT
 	{
@@ -638,47 +628,97 @@ void FCharacterProxy::UpdateTalentSocket(
 			CharacterTalent.AllocationMap.Add(TalentSocketTag, Num);
 		}
 
-		auto CharacterPtr = GetCharacterActor();
-		if (CharacterPtr.IsValid())
+#if UE_EDITOR || UE_SERVER
+		if (GetInventoryComponent()->GetNetMode() == NM_DedicatedServer)
 		{
-			auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
-			auto SpecHandle = GASPtr->MakeOutgoingSpec(
-			                                           UAssetRefMap::GetInstance()->OnceGEClass,
-			                                           1,
-			                                           GASPtr->MakeEffectContext()
-			                                          );
+			auto CharacterPtr = GetCharacterActor();
+			if (CharacterPtr.IsValid())
+			{
+				auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
+				auto SpecHandle = GASPtr->MakeOutgoingSpec(
+				                                           UAssetRefMap::GetInstance()->OnceGEClass,
+				                                           1,
+				                                           GASPtr->MakeEffectContext()
+				                                          );
 
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary);
-			SpecHandle.Data.Get()->AddDynamicAssetTag(TargetTalent.ModifyDataTypeTag);
-			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-			                                               TalentSocketTag,
-			                                               Num * TargetTalent.Value
-			                                              );
+				switch (TargetTalent->TalentType)
+				{
+				case ETalentType::kData:
+					{
+						SpecHandle.Data.Get()->AddDynamicAssetTag(
+						                                          UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data
+						                                         );
 
-			GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+						SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+						                                               TalentSocketTag,
+						                                               Num * TargetTalent->Value
+						                                              );
+					}
+					break;
+				case ETalentType::kPercent:
+					{
+						SpecHandle.Data.Get()->AddDynamicAssetTag(
+						                                          UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent
+						                                         );
+
+						SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+						                                               TalentSocketTag,
+						                                               Num * TargetTalent->Value
+						                                              );
+					}
+					break;
+				}
+
+				SpecHandle.Data.Get()->AddDynamicAssetTag(TargetTalent->ModifyDataTypeTag);
+
+				GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			}
 		}
+#endif
 	}
 	else
 	{
-		auto CharacterPtr = GetCharacterActor();
-		if (CharacterPtr.IsValid())
+#if UE_EDITOR || UE_SERVER
+		if (GetInventoryComponent()->GetNetMode() == NM_DedicatedServer)
 		{
-			auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
-			auto SpecHandle = GASPtr->MakeOutgoingSpec(
-			                                           UAssetRefMap::GetInstance()->OnceGEClass,
-			                                           1,
-			                                           GASPtr->MakeEffectContext()
-			                                          );
+			auto CharacterPtr = GetCharacterActor();
+			if (CharacterPtr.IsValid())
+			{
+				auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
+				auto SpecHandle = GASPtr->MakeOutgoingSpec(
+				                                           UAssetRefMap::GetInstance()->OnceGEClass,
+				                                           1,
+				                                           GASPtr->MakeEffectContext()
+				                                          );
 
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary);
-			SpecHandle.Data.Get()->AddDynamicAssetTag(TargetTalent.ModifyDataTypeTag);
-			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-			                                               TalentSocketTag,
-			                                               0
-			                                              );
+				switch (TargetTalent->TalentType)
+				{
+				case ETalentType::kData:
+					{
+						SpecHandle.Data.Get()->AddDynamicAssetTag(
+						                                          UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data
+						                                         );
+					}
+					break;
+				case ETalentType::kPercent:
+					{
+						SpecHandle.Data.Get()->AddDynamicAssetTag(
+						                                          UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Percent
+						                                         );
+					}
+					break;
+				}
 
-			GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+				SpecHandle.Data.Get()->AddDynamicAssetTag(TargetTalent->ModifyDataTypeTag);
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                               TalentSocketTag,
+				                                               0
+				                                              );
+
+				GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			}
 		}
+#endif
 
 		CharacterTalent.AllocationMap.Remove(TalentSocketTag);
 	}

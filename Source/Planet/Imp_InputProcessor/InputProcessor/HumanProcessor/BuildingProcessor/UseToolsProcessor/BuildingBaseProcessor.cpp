@@ -8,7 +8,7 @@
 
 #include "HumanCharacter_Player.h"
 
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HumanProcessor.h"
 
 namespace HumanProcessor

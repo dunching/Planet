@@ -66,24 +66,6 @@ struct PLANET_API FCharacterGrowthAttribute : public FTableRowBase
 	int32 Max_Mana = 100;
 };
 
-USTRUCT(BlueprintType, Blueprintable)
-struct PLANET_API FTalentHelper final
-{
-	GENERATED_USTRUCT_BODY()
-
-	/**
-	 * 属性Tag
-	 */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
-	FGameplayTag ModifyDataTypeTag;
-
-	/**
-	 * 
-	 */
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
-	int32 Value = 1;
-};
-
 UCLASS()
 class PLANET_API UItemProxy_Description_Character : public UItemProxy_Description
 {
@@ -105,12 +87,6 @@ public:
 	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TArray<FCharacterGrowthAttribute> CharacterGrowthAttributeAry;
-
-	/**
-	 * 天赋属性槽对应修改的属性
-	 */
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TMap<FGameplayTag, FTalentHelper> TalentSocketModifyMap;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<AHumanCharacter_AI> CharacterClass;

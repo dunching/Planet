@@ -14,7 +14,7 @@
 #include "ProxyProcessComponent.h"
 #include "UIManagerSubSystem.h"
 #include <DestroyProgress.h>
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HumanProcessor.h"
 #include "HumanViewAlloctionSkillsProcessor.h"
 #include "ViewGroupsProcessor.h"
@@ -26,6 +26,7 @@
 #include "GroupManagger.h"
 #include "HumanCharacter_AI.h"
 #include "HumanViewSetting.h"
+#include "InputProcessorSubSystem_Imp.h"
 #include "ItemProxy_Character.h"
 #include "TeamMatesHelperComponent.h"
 
@@ -210,19 +211,19 @@ namespace HumanProcessor
 
 				if (EventArgs.Key == GameOptionsPtr->ViewSetting)
 				{
-					UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewSetting>();
+					UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<FHumanViewSetting>();
 					return true;
 				}
 
 				if (EventArgs.Key == GameOptionsPtr->ViewGroupmateMenu)
 				{
-					UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FViewGroupsProcessor>();
+					UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<FViewGroupsProcessor>();
 					return true;
 				}
 
 				if (EventArgs.Key == GameOptionsPtr->ViewAllocationMenu)
 				{
-					UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
+					UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
 					return true;
 				}
 

@@ -9,7 +9,7 @@
 #include "LogWriter.h"
 
 #include "Planet_Tools.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "PlanetPlayerController.h"
 #include "OpenWorldDataLayer.h"
 #include "PlayerGameplayTasks.h"
@@ -50,7 +50,7 @@ ETeleport UOpenWorldSubSystem::GetTeleportLastPtInOpenWorld(
 	{
 		if (auto DataLayerManagerPtr = UDataLayerManager::GetDataLayerManager(this))
 		{
-			auto DT_TeleportPtr = USceneProxyExtendInfoMap::GetInstance()->DataTable_Teleport.LoadSynchronous();
+			auto DT_TeleportPtr = UDataTableCollection::GetInstance()->DataTable_Teleport.LoadSynchronous();
 
 			TArray<FTableRow_Teleport*> Result;
 			DT_TeleportPtr->GetAllRows<FTableRow_Teleport>(TEXT("GetChallenge"), Result);
@@ -97,7 +97,7 @@ void UOpenWorldSubSystem::SwitchDataLayer(
 	APlanetPlayerController* PCPtr
 	)
 {
-	auto DT_TeleportPtr = USceneProxyExtendInfoMap::GetInstance()->DataTable_Teleport.LoadSynchronous();
+	auto DT_TeleportPtr = UDataTableCollection::GetInstance()->DataTable_Teleport.LoadSynchronous();
 
 	TArray<FTableRow_Teleport*> Result;
 	DT_TeleportPtr->GetAllRows<FTableRow_Teleport>(TEXT("GetChallenge"), Result);
@@ -144,7 +144,7 @@ void UOpenWorldSubSystem::TeleportPlayer(
 	}
 	else
 	{
-		auto DT_TeleportPtr = USceneProxyExtendInfoMap::GetInstance()->DataTable_Teleport.LoadSynchronous();
+		auto DT_TeleportPtr = UDataTableCollection::GetInstance()->DataTable_Teleport.LoadSynchronous();
 
 		TArray<FTableRow_Teleport*> Result;
 		DT_TeleportPtr->GetAllRows<FTableRow_Teleport>(TEXT("GetChallenge"), Result);
@@ -181,7 +181,7 @@ bool UOpenWorldSubSystem::CheckTeleportPlayerComplete(
 	ETeleport ChallengeLevelType
 	) const
 {
-	auto DT_TeleportPtr = USceneProxyExtendInfoMap::GetInstance()->DataTable_Teleport.LoadSynchronous();
+	auto DT_TeleportPtr = UDataTableCollection::GetInstance()->DataTable_Teleport.LoadSynchronous();
 
 	TArray<FTableRow_Teleport*> Result;
 	DT_TeleportPtr->GetAllRows<FTableRow_Teleport>(TEXT("GetChallenge"), Result);
@@ -219,7 +219,7 @@ ETeleport UOpenWorldSubSystem::GetTeleportPlayerToNearest(
 	{
 		if (auto DataLayerManagerPtr = UDataLayerManager::GetDataLayerManager(this))
 		{
-			auto DT_TeleportPtr = USceneProxyExtendInfoMap::GetInstance()->DataTable_Teleport.LoadSynchronous();
+			auto DT_TeleportPtr = UDataTableCollection::GetInstance()->DataTable_Teleport.LoadSynchronous();
 
 			TArray<FTableRow_Teleport*> Result;
 			DT_TeleportPtr->GetAllRows<FTableRow_Teleport>(TEXT("GetChallenge"), Result);
@@ -265,7 +265,7 @@ bool UOpenWorldSubSystem::CheckSwitchDataLayerComplete(
 	ETeleport ChallengeLevelType
 	) const
 {
-	auto DT_TeleportPtr = USceneProxyExtendInfoMap::GetInstance()->DataTable_Teleport.LoadSynchronous();
+	auto DT_TeleportPtr = UDataTableCollection::GetInstance()->DataTable_Teleport.LoadSynchronous();
 
 	TArray<FTableRow_Teleport*> Result;
 	DT_TeleportPtr->GetAllRows<FTableRow_Teleport>(TEXT("GetChallenge"), Result);
@@ -343,7 +343,7 @@ TSoftObjectPtr<ATeleport> UOpenWorldSubSystem::GetTeleport(
 	ETeleport ChallengeLevelType
 	) const
 {
-	auto DT_TeleportPtr = USceneProxyExtendInfoMap::GetInstance()->DataTable_Teleport.LoadSynchronous();
+	auto DT_TeleportPtr = UDataTableCollection::GetInstance()->DataTable_Teleport.LoadSynchronous();
 
 	TArray<FTableRow_Teleport*> Result;
 	DT_TeleportPtr->GetAllRows<>(TEXT("GetChallenge"), Result);
@@ -363,7 +363,7 @@ FTableRow_Teleport* UOpenWorldSubSystem::GetTeleportDT(
 	ETeleport ChallengeLevelType
 	) const
 {
-	auto DT_TeleportPtr = USceneProxyExtendInfoMap::GetInstance()->DataTable_Teleport.LoadSynchronous();
+	auto DT_TeleportPtr = UDataTableCollection::GetInstance()->DataTable_Teleport.LoadSynchronous();
 
 	TArray<FTableRow_Teleport*> TeleportResult;
 	DT_TeleportPtr->GetAllRows<>(TEXT("GetChallenge"), TeleportResult);
@@ -413,7 +413,7 @@ TArray<FTransform> UOpenWorldSubSystem::GetChallengeSpawnPts(
 {
 	TArray<FTransform> Result;
 
-	auto DT_TeleportPtr = USceneProxyExtendInfoMap::GetInstance()->DataTable_Teleport.LoadSynchronous();
+	auto DT_TeleportPtr = UDataTableCollection::GetInstance()->DataTable_Teleport.LoadSynchronous();
 
 	TArray<FTableRow_Teleport*> TeleportResult;
 	DT_TeleportPtr->GetAllRows<>(TEXT("GetChallenge"), TeleportResult);

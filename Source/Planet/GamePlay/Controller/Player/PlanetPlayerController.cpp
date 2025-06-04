@@ -13,7 +13,7 @@
 #include "Engine/OverlapResult.h"
 #include "Kismet/KismetStringLibrary.h"
 
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HorseCharacter.h"
 #include "HumanCharacter.h"
 #include "HumanRegularProcessor.h"
@@ -51,7 +51,8 @@
 #include "OpenWorldSystem.h"
 #include "PlanetGameViewportClient.h"
 #include "PlayerGameplayTasks.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
+#include "InputProcessorSubSystem_Imp.h"
 #include "TeamMatesHelperComponent.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
@@ -197,7 +198,7 @@ inline void APlanetPlayerController::ServerSpawnCharacterByProxyType_Implementat
 	const FTransform& Transform
 	)
 {
-	auto ItemProxy_Description_CharacterPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxyDescription<
+	auto ItemProxy_Description_CharacterPtr = UDataTableCollection::GetInstance()->GetTableRowProxyDescription<
 		UItemProxy_Description_Character>(CharacterProxyType);
 
 	if (ItemProxy_Description_CharacterPtr)
@@ -488,9 +489,9 @@ void APlanetPlayerController::OnPossess(
 		}
 		else if (InPawn->IsA(AHorseCharacter::StaticClass()))
 		{
-			auto PreviousPawnPtr = UInputProcessorSubSystem::GetInstance()->GetCurrentAction()->GetOwnerActor();
+			auto PreviousPawnPtr = UInputProcessorSubSystem_Imp::GetInstance()->GetCurrentAction()->GetOwnerActor();
 
-			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HorseProcessor::FHorseRegularProcessor>(
+			UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HorseProcessor::FHorseRegularProcessor>(
 				 [this, InPawn](
 				 auto NewProcessor
 				 )
@@ -932,7 +933,7 @@ void APlanetPlayerController::AddShieldToTarget_Implementation(
 				                                           GASPtr->MakeEffectContext()
 				                                          );
 
-				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data);
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield);
 				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 				                                               UGameplayTagsLibrary::DataSource_Character,
@@ -960,7 +961,7 @@ void APlanetPlayerController::AddShieldToTarget_Implementation(
 						                                                        );
 
 					                                                        SpecHandle.Data.Get()->AddDynamicAssetTag(
-						                                                         UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary
+						                                                         UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data
 						                                                        );
 					                                                        SpecHandle.Data.Get()->AddDynamicAssetTag(
 						                                                         UGameplayTagsLibrary::GEData_ModifyItem_Shield
@@ -1073,7 +1074,7 @@ void APlanetPlayerController::AddShield_Implementation(
 		                                           GASPtr->MakeEffectContext()
 		                                          );
 
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data);
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield);
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 		                                               UGameplayTagsLibrary::DataSource_Character,
@@ -1100,7 +1101,7 @@ void APlanetPlayerController::AddShield_Implementation(
 				                                                        );
 
 			                                                        SpecHandle.Data.Get()->AddDynamicAssetTag(
-				                                                         UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary
+				                                                         UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data
 				                                                        );
 			                                                        SpecHandle.Data.Get()->AddDynamicAssetTag(
 				                                                         UGameplayTagsLibrary::GEData_ModifyItem_Shield

@@ -39,7 +39,7 @@ public:
 
 	virtual void Destroyed() override;
 
-	void ActiveGuide();
+	virtual void ActiveGuide();
 	
 	UGameplayTasksComponent* GetGameplayTasksComponent() const;
 

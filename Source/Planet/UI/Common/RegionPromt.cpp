@@ -11,7 +11,7 @@ struct FRegionPromt : public TStructVariable<FRegionPromt>
 
 
 inline void URegionPromt::SetRegionPromt(
-	FTableRow_Regions* TableRow_RegionsPtr
+	const FTableRow_Regions* TableRow_RegionsPtr
 	)
 {
 	if (!TableRow_RegionsPtr)

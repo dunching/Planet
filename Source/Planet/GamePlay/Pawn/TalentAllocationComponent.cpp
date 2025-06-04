@@ -14,7 +14,7 @@
 #include "ItemProxy_Container.h"
 #include "PlanetControllerInterface.h"
 #include "CharacterAbilitySystemComponent.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "TalentInfo.h"
 
 FName UTalentAllocationComponent::ComponentName = TEXT("TalentAllocationComponent");

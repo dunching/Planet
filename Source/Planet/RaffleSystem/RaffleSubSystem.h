@@ -10,7 +10,7 @@
 #include "UICommon.h"
 #include "RaffleCommon.h"
 #include "ItemProxy_Minimal.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 
 #include "RaffleSubSystem.generated.h"
 

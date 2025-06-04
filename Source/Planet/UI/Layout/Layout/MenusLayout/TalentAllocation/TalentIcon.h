@@ -13,6 +13,9 @@ struct FStreamableHandle;
 
 struct FCharacterProxy;
 
+class UTextBlock;
+class UBorder;
+
 /**
  *
  */
@@ -30,10 +33,20 @@ public:
 		UTalentIcon*,
 		bool
 		)>;
-
-	void Reset();
 	
+	virtual void SetIsEnabled(bool bInIsEnabled) override;
+	
+	void Reset();
+
 	TSharedPtr<FCharacterProxy> CurrentProxyPtr = nullptr;
+
+	/**
+	 * 前置条件是否满足
+	 */
+	bool bPreviousIsOK = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSet<UTalentIcon*> NextSocletIconSet;
 
 protected:
 	virtual void NativeConstruct() override;
@@ -44,11 +57,17 @@ protected:
 		) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTalentIcon* NextSocletIcon = nullptr;
+	FString DescriptionStr = TEXT("Value+{Value}");
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* DescriptionText = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
+	UBorder* DisEnable = nullptr;
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FGameplayTag IconSocket;
+	FGameplayTag TalentSocket;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 MaxNum = 3;

@@ -4,7 +4,7 @@
 #include "Engine/AssetManager.h"
 #include "Blueprint/SlateBlueprintLibrary.h"
 
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "ItemDecription.h"
 #include "ItemProxy_Description.h"
 #include "UICommon.h"

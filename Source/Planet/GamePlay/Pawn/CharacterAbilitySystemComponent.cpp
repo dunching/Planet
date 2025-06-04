@@ -834,14 +834,18 @@ void UCharacterAbilitySystemComponent::UpdateMapBaseValue(
 
 	if (!ValueMap.Contains(GameplayAttributeDataPtr))
 	{
+		FDataComposition DataComposition;
+
+		DataComposition.DataMap = {
+			{
+				UGameplayTagsLibrary::DataSource_Character,
+				FMath::Clamp(GameplayAttributeDataPtr->GetCurrentValue(), MinValue, MaxValue)
+			}
+		};
+
 		ValueMap.Add(
 		             GameplayAttributeDataPtr,
-		             {
-			             {
-				             UGameplayTagsLibrary::DataSource_Character,
-				             FMath::Clamp(GameplayAttributeDataPtr->GetCurrentValue(), MinValue, MaxValue)
-			             }
-		             }
+		             DataComposition
 		            );
 	}
 
@@ -849,33 +853,41 @@ void UCharacterAbilitySystemComponent::UpdateMapBaseValue(
 	{
 		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
 
-		if (GameplayAttributeDataMap.Contains(UGameplayTagsLibrary::DataSource_Character))
+		if (GameplayAttributeDataMap.DataMap.Contains(UGameplayTagsLibrary::DataSource_Character))
 		{
-			GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Character] += Value;
+			GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character] += Value;
 		}
 		else
 		{
-			GameplayAttributeDataMap.Add(UGameplayTagsLibrary::DataSource_Character, Value);
+			GameplayAttributeDataMap.DataMap.Add(UGameplayTagsLibrary::DataSource_Character, Value);
 		}
 
-		GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Character] =
-			FMath::Clamp(GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Character], MinValue, MaxValue);
+		GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character] =
+			FMath::Clamp(
+			             GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character],
+			             MinValue,
+			             MaxValue
+			            );
 	}
 	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override))
 	{
 		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
 
-		if (GameplayAttributeDataMap.Contains(UGameplayTagsLibrary::DataSource_Character))
+		if (GameplayAttributeDataMap.DataMap.Contains(UGameplayTagsLibrary::DataSource_Character))
 		{
-			GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Character] = Value;
+			GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character] = Value;
 		}
 		else
 		{
-			GameplayAttributeDataMap.Add(UGameplayTagsLibrary::DataSource_Character, Value);
+			GameplayAttributeDataMap.DataMap.Add(UGameplayTagsLibrary::DataSource_Character, Value);
 		}
 
-		GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Character] =
-			FMath::Clamp(GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Character], MinValue, MaxValue);
+		GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character] =
+			FMath::Clamp(
+			             GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character],
+			             MinValue,
+			             MaxValue
+			            );
 	}
 }
 
@@ -889,31 +901,84 @@ void UCharacterAbilitySystemComponent::UpdateMapTemporary(
 	FGameplayTagContainer AllAssetTags;
 	Spec.GetAllAssetTags(AllAssetTags);
 
-	if (!ValueMap.Contains(GameplayAttributeDataPtr))
+	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data))
 	{
-		ValueMap.Add(
-		             GameplayAttributeDataPtr,
-		             {
-			             {
-				             UGameplayTagsLibrary::DataSource_Character,
-				             GameplayAttributeDataPtr->GetCurrentValue()
-			             }
-		             }
-		            );
+		if (ValueMap.Contains(GameplayAttributeDataPtr))
+		{
+			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+			GameplayAttributeDataMap.DataMap.Add(Tag, Value);
+		}
+		else
+		{
+			FDataComposition DataComposition;
+
+			DataComposition.DataMap = {
+				{
+					Tag, Value
+				}
+			};
+
+			ValueMap.Add(
+						 GameplayAttributeDataPtr,
+						 DataComposition
+						);
+		}
+
+		return;
 	}
 
-	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary))
+	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data))
 	{
-		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-		GameplayAttributeDataMap.Add(Tag, Value);
-	}
-	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary))
-	{
-		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-		if (GameplayAttributeDataMap.Contains(Tag))
+		if (ValueMap.Contains(GameplayAttributeDataPtr))
 		{
-			GameplayAttributeDataMap.Remove(Tag);
+			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+			if (GameplayAttributeDataMap.DataMap.Contains(Tag))
+			{
+				GameplayAttributeDataMap.DataMap.Remove(Tag);
+			}
 		}
+
+		return;
+	}
+
+	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent))
+	{
+		if (ValueMap.Contains(GameplayAttributeDataPtr))
+		{
+			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+			GameplayAttributeDataMap.MagnitudeMap.Add(Tag, Value);
+		}
+		else
+		{
+			FDataComposition DataComposition;
+
+			DataComposition.MagnitudeMap = {
+				{
+					Tag, Value
+				}
+			};
+
+			ValueMap.Add(
+						 GameplayAttributeDataPtr,
+						 DataComposition
+						);
+		}
+
+		return;
+	}
+
+	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Percent))
+	{
+		if (ValueMap.Contains(GameplayAttributeDataPtr))
+		{
+			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+			if (GameplayAttributeDataMap.MagnitudeMap.Contains(Tag))
+			{
+				GameplayAttributeDataMap.MagnitudeMap.Remove(Tag);
+			}
+		}
+
+		return;
 	}
 }
 
@@ -928,7 +993,7 @@ void UCharacterAbilitySystemComponent::UpdateMapTemporary(
 		if (ModifyTypeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive))
 		{
 			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-			for (auto& Iter : GameplayAttributeDataMap)
+			for (auto& Iter : GameplayAttributeDataMap.DataMap)
 			{
 				if (Value > Iter.Value)
 				{
@@ -1304,8 +1369,10 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 	}
 	// 如果是此类 SetByCallerTagMagnitudes 仅为一条，且Key为数据的组成
 	else if (
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary) ||
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary)
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data) ||
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent) ||
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data) ||
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Percent)
 	)
 	{
 		auto Lambda = [&NeedModifySet, this, TargetSet, &Spec, &CustomMagnitudes](
@@ -1343,7 +1410,10 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 		}
 		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalHitRate))
 		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_CriticalHitRate, UAS_Character::GetCriticalHitRateAttribute());
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_CriticalHitRate,
+			       UAS_Character::GetCriticalHitRateAttribute()
+			      );
 		}
 		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_HitRate))
 		{

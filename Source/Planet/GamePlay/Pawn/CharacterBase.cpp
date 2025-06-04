@@ -21,7 +21,7 @@
 #include "GenerateTypes.h"
 #include "InputProcessor.h"
 #include "InputActions.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "CharacterAttributesComponent.h"
 #include "PlanetPlayerState.h"
 #include "PlanetGameplayAbility.h"

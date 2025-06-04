@@ -10,7 +10,7 @@
 #include "Components/ActorComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "InputProcessorSubSystem.generated.h"
+#include "InputProcessorSubSystemBase.generated.h"
 
 class UInputComponent;
 
@@ -19,13 +19,27 @@ class APlanetPlayerController;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FSYKeyEvent, EInputEvent);
 
+UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
+class UGetInputProcessorSubSystemInterface : public UInterface
+{
+	GENERATED_BODY()
+};
+
+class STATEPROCESSOR_API IGetInputProcessorSubSystemInterface
+{
+	GENERATED_BODY()
+
+public:
+	virtual UInputProcessorSubSystemBase* GetInputProcessorSubSystem()const = 0;
+};
+
 /**
  * 对于输入处理方式
  * 如正常模式下WASD和鼠标会控制玩家角色
  * 在浏览菜单时WASD则是其他的行为
  */
 UCLASS(BlueprintType, Blueprintable)
-class STATEPROCESSOR_API UInputProcessorSubSystem : public UGameInstanceSubsystem
+class STATEPROCESSOR_API UInputProcessorSubSystemBase : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 
@@ -39,8 +53,6 @@ public:
 
 	using FOnQuitFunc = std::function<void()>;
 
-	static UInputProcessorSubSystem* GetInstance();
-
 	virtual void Initialize(
 		FSubsystemCollectionBase& Collection
 		) override;
@@ -48,15 +60,6 @@ public:
 	virtual void Deinitialize() override;
 
 	TSharedPtr<FInputProcessor>& GetCurrentAction();
-
-	template <typename ProcessorType>
-	void SwitchToProcessor();
-
-	template <typename ProcessorType>
-	void SwitchToProcessor(
-		const FInitSwitchFunc<ProcessorType>& InitSwitchFunc,
-		const FOnQuitFunc& OnQuitFunc = nullptr
-		);
 
 	void ResetProcessor();
 
@@ -86,18 +89,27 @@ public:
 		);
 
 protected:
+	template <typename ProcessorType>
+	void SwitchToProcessorBase();
+
+	template <typename ProcessorType>
+	void SwitchToProcessorBase(
+		const FInitSwitchFunc<ProcessorType>& InitSwitchFunc,
+		const FOnQuitFunc& OnQuitFunc = nullptr
+		);
+
 	UFUNCTION()
 	bool Tick(
 		float DeltaTime
 		);
 
-private:
 	TSet<TSharedPtr<FInputProcessor>> ActionCacheSet;
 
 	TSharedPtr<FInputProcessor> CurrentProcessorSPtr;
 
 	TMap<FKey, FSYKeyEvent> OnKeyPressedMap;
 
+private:
 	const float Frequency = 1.f;
 
 	bool bIsRunning = true;
@@ -106,13 +118,13 @@ private:
 };
 
 template <typename ProcessorType>
-void UInputProcessorSubSystem::SwitchToProcessor()
+void UInputProcessorSubSystemBase::SwitchToProcessorBase()
 {
-	SwitchToProcessor<ProcessorType>(nullptr);
+	SwitchToProcessorBase<ProcessorType>(nullptr);
 }
 
 template <typename ProcessorType>
-void UInputProcessorSubSystem::SwitchToProcessor(
+void UInputProcessorSubSystemBase::SwitchToProcessorBase(
 	const FInitSwitchFunc<ProcessorType>& InitSwitchFunc,
 		const FOnQuitFunc& OnQuitFunc
 	)

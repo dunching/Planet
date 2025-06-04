@@ -17,9 +17,18 @@ float IGameplayEffectDataModifyInterface::GetBaseValueMaps(
 
 	auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
 
-	for (auto Iter : GameplayAttributeDataMap)
+	// 
+	for (const auto Iter : GameplayAttributeDataMap.DataMap)
 	{
 		Result += Iter.Value;
+	}
+
+	//
+	const auto OriginlResult = Result;
+	for (const auto Iter : GameplayAttributeDataMap.MagnitudeMap)
+	{
+		const auto Percent = Iter.Value / 100;
+		Result += (OriginlResult * Percent);
 	}
 
 	// 去掉小数部分
@@ -30,14 +39,21 @@ void IGameplayEffectDataModifyInterface::UpdateValueMap()
 {
 	for (auto Iter = ValueMap.CreateIterator(); Iter; ++Iter)
 	{
-		for (auto SecondIter = Iter->Value.CreateIterator(); SecondIter; ++SecondIter)
+		for (auto SecondIter = Iter->Value.DataMap.CreateIterator(); SecondIter; ++SecondIter)
 		{
 			if (SecondIter->Value <= 0)
 			{
 				SecondIter.RemoveCurrent();
 			}
 		}
-		if (Iter->Value.IsEmpty())
+		for (auto SecondIter = Iter->Value.MagnitudeMap.CreateIterator(); SecondIter; ++SecondIter)
+		{
+			if (SecondIter->Value <= 0)
+			{
+				SecondIter.RemoveCurrent();
+			}
+		}
+		if (Iter->Value.DataMap.IsEmpty() && Iter->Value.MagnitudeMap.IsEmpty())
 		{
 			Iter.RemoveCurrent();
 		}
@@ -85,6 +101,13 @@ void IGameplayEffectDataModifyInterface::ModifyInputData(
 	{
 		InputDataModifysMap.erase(Iter);
 	}
+}
+
+void FDataComposition::Empty()
+{
+	DataMap.Empty();
+	
+	MagnitudeMap.Empty();
 }
 
 void IGameplayEffectDataModifyInterface::ModifyOutputData(

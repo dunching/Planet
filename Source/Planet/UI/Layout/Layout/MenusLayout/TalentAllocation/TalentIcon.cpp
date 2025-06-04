@@ -4,13 +4,28 @@
 #include "Components/TextBlock.h"
 
 #include "CharacterBase.h"
+#include "DataTableCollection.h"
 #include "ItemProxy_Character.h"
 #include "TalentAllocationComponent.h"
+#include "Components/Border.h"
+#include "Kismet/KismetStringLibrary.h"
 
 struct FTalentIcon : public TStructVariable<FTalentIcon>
 {
 	const FName Level = TEXT("Level");
 };
+
+void UTalentIcon::SetIsEnabled(
+	bool bInIsEnabled
+	)
+{
+	if (DisEnable)
+	{
+		DisEnable->SetVisibility(bInIsEnabled ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
+	}
+
+	Super::SetIsEnabled(bInIsEnabled);
+}
 
 void UTalentIcon::Reset()
 {
@@ -20,6 +35,16 @@ void UTalentIcon::Reset()
 void UTalentIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	const auto TargetTalent = UDataTableCollection::GetInstance()->GetTableRow_TalenSocket(TalentSocket);
+	if (TargetTalent && DescriptionText)
+	{
+		const auto NewStr = DescriptionStr.Replace(
+		                                           TEXT("{Value}"),
+		                                           *UKismetStringLibrary::Conv_IntToString(TargetTalent->Value)
+		                                          );
+		DescriptionText->SetText(FText::FromString(NewStr));
+	}
 }
 
 FReply UTalentIcon::NativeOnMouseButtonDown(
@@ -56,22 +81,23 @@ void UTalentIcon::UpdateNum()
 		if (UIPtr)
 		{
 			int32 Num = 0;
-			if (CharacterTalentRef.AllocationMap.Contains(IconSocket))
+			if (CharacterTalentRef.AllocationMap.Contains(TalentSocket))
 			{
-				Num = CharacterTalentRef.AllocationMap[IconSocket];
+				Num = CharacterTalentRef.AllocationMap[TalentSocket];
 			}
 			else
 			{
 			}
+
 			UIPtr->SetText(
-						   FText::FromString(
-											 *FString::Printf(
-															  TEXT("%d/%d"),
-															  Num,
-															  MaxNum
-															 )
-											)
-						  );
+			               FText::FromString(
+			                                 *FString::Printf(
+			                                                  TEXT("%d/%d"),
+			                                                  Num,
+			                                                  MaxNum
+			                                                 )
+			                                )
+			              );
 		}
 	}
 }

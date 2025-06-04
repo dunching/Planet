@@ -14,7 +14,7 @@
 #include "HumanAIController.h"
 #include "HumanCharacter_AI.h"
 #include "HumanRegularProcessor.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "MainHUD.h"
 #include "PlanetPlayerController.h"
 
@@ -28,6 +28,7 @@
 #include "HumanInteractionWithNPC.h"
 #include "HumanInteractionWithChallengeEntry.h"
 #include "InputActions.h"
+#include "InputProcessorSubSystem_Imp.h"
 #include "PlanetGameViewportClient.h"
 #include "ResourceBoxBase.h"
 #include "STT_CommonData.h"
@@ -335,7 +336,7 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
 		// 在SetPawn之后调用
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>(
+		UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>(
 			 [this](
 			 auto NewProcessor
 			 )
@@ -546,7 +547,7 @@ bool AHumanCharacter_Player::InteractionSceneActor(
 		}
 
 		// 
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<
+		UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<
 			HumanProcessor::FHumanInteractionWithChallengeEntryProcessor>(
 			                                                              [SceneObjPtr](
 			                                                              auto NewProcessor
@@ -592,7 +593,7 @@ bool AHumanCharacter_Player::InteractionSceneCharacter(
 	}
 
 	// 
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanInteractionWithNPCProcessor>(
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanInteractionWithNPCProcessor>(
 		 [CharacterPtr](
 		 auto NewProcessor
 		 )

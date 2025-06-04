@@ -33,6 +33,28 @@ class UGameplayEffectDataModifyInterface : public UInterface
 	GENERATED_BODY()
 };
 
+USTRUCT()
+struct GAMEPLAYEFFECTDATAMODIFY_API FDataComposition
+{
+	GENERATED_USTRUCT_BODY()
+
+	void Empty();
+	
+	/**
+	 * 数据的基础组成
+	 * 来源
+	 * 值
+	 */
+	TMap<FGameplayTag, float> DataMap;
+	
+	/**
+	 * 数据的百分比组成
+	 * 来源
+	 * 修正值 Percent
+	 */
+	TMap<FGameplayTag, float> MagnitudeMap;
+};
+
 class GAMEPLAYEFFECTDATAMODIFY_API IGameplayEffectDataModifyInterface
 {
 	GENERATED_BODY()
@@ -110,5 +132,5 @@ protected:
 	 * 如HP仅有 DataSource_Character 基础组成
 	 * 而移速则会由 DataSource_Character 和减速时的减速buff 叠加负数
 	 */
-	TMap<const FGameplayAttributeData*, TMap<FGameplayTag, float>> ValueMap;
+	TMap<const FGameplayAttributeData*, FDataComposition> ValueMap;
 };

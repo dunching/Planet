@@ -28,6 +28,6 @@ class PLANET_API URegionPromt :
 
 public:
 	void SetRegionPromt(
-		FTableRow_Regions* TableRow_RegionsPtr
+		const FTableRow_Regions* TableRow_RegionsPtr
 		);
 };

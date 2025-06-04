@@ -12,11 +12,11 @@ struct FInputKeyEventArgs;
 
 class FViewport;
 class APawn;
-class UInputProcessorSubSystem;
+class UInputProcessorSubSystemBase;
 
 class STATEPROCESSOR_API FInputProcessor
 {
-	friend UInputProcessorSubSystem;
+	friend UInputProcessorSubSystemBase;
 	
 public:
 
@@ -77,6 +77,8 @@ public:
 
 	void UnRegisterTicker();
 
+	void SetOnQuitFunc(const FOnQuitFunc& InOnQuitFunc);
+	
 protected:
 
 	void IncreaseAsyncTaskNum();

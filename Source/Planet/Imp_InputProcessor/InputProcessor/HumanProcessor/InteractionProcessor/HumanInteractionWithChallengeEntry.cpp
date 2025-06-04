@@ -4,7 +4,7 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
 #include "CreateMenu.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HumanRegularProcessor.h"
 #include "HorseProcessor.h"
 #include "HumanCharacter_AI.h"

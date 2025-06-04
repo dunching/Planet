@@ -15,7 +15,7 @@
 #include "GroupManagger.h"
 #include "ItemProxy_Skills.h"
 #include "ItemProxy_Weapon.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 
 UScriptStruct* FGameplayAbilityTargetData_ActiveSkill_ActiveParam::GetScriptStruct() const
 {

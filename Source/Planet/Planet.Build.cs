@@ -136,6 +136,7 @@ public class Planet : ModuleRules
 		PublicIncludePaths.Add("Planet/Imp_ItemProxy/ItemProxys");
 		PublicIncludePaths.Add("Planet/Imp_ItemProxy/ItemProxy");
 
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor");
 		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputActions");
 		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/TransitionProcessor");
 		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/BirdProcessor");

@@ -1,27 +1,27 @@
-
 #include "InputProcessor.h"
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
-FInputProcessor::FInputProcessor(FOwnerPawnType* CharacterPtr) :
-                                                               OnwerPawnPtr(CharacterPtr)
+FInputProcessor::FInputProcessor(
+	FOwnerPawnType* CharacterPtr
+	) :
+	  OnwerPawnPtr(CharacterPtr)
 {
-
 }
 
 FInputProcessor::~FInputProcessor()
 {
-
 }
 
-void FInputProcessor::TickImp(float Delta)
+void FInputProcessor::TickImp(
+	float Delta
+	)
 {
-
 }
 
 void FInputProcessor::SwitchShowCursor(
 	bool bIsShowCursor
-)
+	)
 {
 	auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 	if (OnwerActorPtr)
@@ -44,7 +44,10 @@ void FInputProcessor::SwitchShowCursor(
 		}
 	}
 }
-bool FInputProcessor::Tick(float Delta)
+
+bool FInputProcessor::Tick(
+	float Delta
+	)
 {
 	IncreaseAsyncTaskNum();
 
@@ -63,12 +66,14 @@ void FInputProcessor::EnterAction()
 {
 	bIsRequestQuit = false;
 
-	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateRaw(this, &ThisClass::Tick), Frequency);
+	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(
+	                                                          FTickerDelegate::CreateRaw(this, &ThisClass::Tick),
+	                                                          Frequency
+	                                                         );
 }
 
 void FInputProcessor::ReEnterAction()
 {
-
 }
 
 void FInputProcessor::QuitAction()
@@ -77,18 +82,17 @@ void FInputProcessor::QuitAction()
 	{
 		OnQuitFunc();
 	}
-	
+
 	UnRegisterTicker();
 }
 
 void FInputProcessor::BeginDestroy()
 {
-
 }
 
 bool FInputProcessor::InputKey(
 	const FInputKeyEventArgs& EventArgs
-)
+	)
 {
 	return true;
 }
@@ -101,17 +105,19 @@ bool FInputProcessor::InputAxis(
 	float DeltaTime,
 	int32 NumSamples,
 	bool bGamepad
-)
+	)
 {
 	return true;
 }
 
 bool FInputProcessor::GetIsComplete() const
 {
-    return AsyncTaskNum == 0;
+	return AsyncTaskNum == 0;
 }
 
-void FInputProcessor::SetPawn(FOwnerPawnType* NewPawnPtr)
+void FInputProcessor::SetPawn(
+	FOwnerPawnType* NewPawnPtr
+	)
 {
 	OnwerPawnPtr = NewPawnPtr;
 }
@@ -121,6 +127,13 @@ void FInputProcessor::UnRegisterTicker()
 	bIsRequestQuit = true;
 
 	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
+}
+
+void FInputProcessor::SetOnQuitFunc(
+	const FOnQuitFunc& InOnQuitFunc
+	)
+{
+	OnQuitFunc = InOnQuitFunc;
 }
 
 void FInputProcessor::IncreaseAsyncTaskNum()

@@ -6,13 +6,14 @@
 
 #include "GetModifyItemProxyStrategiesInterface.h"
 #include "GuideSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "PAD_ItemProxyCollection.h"
 
 #include "PlanetWorldSettings.generated.h"
 
 class UAssetRefMap;
 class UStateTagExtendInfoMap;
-class USceneProxyExtendInfoMap;
+class UDataTableCollection;
 class UGameOptions;
 class AGuideActor;
 class AGuideThread_Main;
@@ -42,7 +43,7 @@ public:
 
 	UAssetRefMap* GetAssetRefMapInstance()const;
 
-	USceneProxyExtendInfoMap* GetSceneProxyExtendInfoMap()const;
+	UDataTableCollection* GetSceneProxyExtendInfoMap()const;
 
 	virtual UGuideSubSystem* GetGuideSubSystem()const override;
 	
@@ -71,6 +72,6 @@ protected:
 	TSoftObjectPtr<UPAD_ItemProxyCollection>PAD_ItemProxyCollectionRef;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSoftObjectPtr<USceneProxyExtendInfoMap>SceneProxyExtendInfoMapPtr;
+	TSoftObjectPtr<UDataTableCollection>SceneProxyExtendInfoMapPtr;
 	
 };

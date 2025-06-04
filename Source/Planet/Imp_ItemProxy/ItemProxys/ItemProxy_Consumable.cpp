@@ -2,7 +2,7 @@
 
 #include "HumanCharacter_AI.h"
 #include "CharacterAttributesComponent.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "AllocationSkills.h"
 #include "Skill_Base.h"
 #include "Skill_Consumable_Generic.h"

@@ -12,7 +12,7 @@
 #include "HumanCharacter_AI.h"
 #include "HumanRegularProcessor.h"
 #include "HumanTransactionProcessor.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "PlanetPlayerController.h"
 #include "STE_Interaction.h"
 

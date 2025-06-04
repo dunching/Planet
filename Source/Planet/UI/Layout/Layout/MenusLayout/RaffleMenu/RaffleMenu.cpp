@@ -19,7 +19,7 @@
 #include "UICommon.h"
 #include "RaffleSubSystem.h"
 #include "Raffle_Proxy.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "ItemProxy_Container.h"
 #include "InventoryComponent.h"
 
