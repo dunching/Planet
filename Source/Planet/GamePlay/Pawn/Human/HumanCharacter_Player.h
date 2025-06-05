@@ -81,7 +81,9 @@ private:
 
 	virtual void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count) override;
 
-	FDelegateHandle OnGameplayEffectTagCountChangedHandle;
+	void OnFocusTargetGETagCountChanged(const FGameplayTag Tag, int32 Count);
+
+	FDelegateHandle OnFocusTargetGETagCountChangedHandle;
 
 	TObjectPtr<ACharacterBase>PreviousFocusCharactersPtr = nullptr;
 };

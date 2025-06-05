@@ -75,12 +75,6 @@ public:
 		const FObjectInitializer& ObjectInitializer
 		);
 
-	void SwitchTeammateOption(
-		ETeammateOption InTeammateOption
-		);
-
-	ETeammateOption GetTeammateOption() const;
-
 #pragma region 锁定,感知到的目标
 	void AddKnowCharacter(
 		ACharacterBase* CharacterPtr
@@ -104,9 +98,13 @@ public:
 		const TSet<TWeakObjectPtr<ACharacterBase>>& KnowCharater
 		);
 
+	virtual void SwitchTeammateOption(
+		ETeammateOption InTeammateOption
+		) override;
+
 #pragma endregion
 
-	void SpwanTeammateCharacter();
+	virtual void SpwanTeammateCharacter() override;
 
 	void UpdateTeammateConfig(
 		const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr,
@@ -117,16 +115,16 @@ public:
 		const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr
 		) const;
 
-	bool IsMember(
+	virtual bool IsMember(
 		const FGuid& CharacterID
-		) const;
+		) const override;
 
-	bool TeleportTo(
+	virtual bool TeleportTo(
 		const FVector& DestLocation,
 		const FRotator& DestRotation,
 		bool bIsATest = false,
 		bool bNoCheck = false
-		);
+		) override;
 
 	TSharedPtr<FCharacterProxyType> GetOwnerCharacterProxy() const;
 
@@ -178,7 +176,6 @@ public:
 	UFUNCTION(Server, Reliable)
 	virtual void TeammateCharacter_ActiveWeapon_Server();
 
-private:
 	UFUNCTION(Server, Reliable)
 	void SwitchTeammateOption_Server(
 		ETeammateOption InTeammateOption
@@ -198,6 +195,8 @@ private:
 
 #pragma endregion
 
+private:
+	
 	UFUNCTION()
 	void OnRep_GroupSharedInfoChanged();
 

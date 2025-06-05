@@ -48,7 +48,7 @@ struct PLANET_API FSTID_GuideInteractionOption :
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable_Interaction* GloabVariable = nullptr;
+	UGloabVariable_InteractionBase* GloabVariable = nullptr;
 	
 	UPROPERTY(EditAnywhere, Category = Param)
 	TArray<FString> OptionAry;

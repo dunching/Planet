@@ -477,6 +477,20 @@ void UCharacterAbilitySystemComponent::BreakMoveToAttackDistance()
 	}
 }
 
+void UCharacterAbilitySystemComponent::OnEffectOhterCharacter_Implementation(
+	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
+	)
+{
+	MakedDamageDelegate(ReceivedEventModifyDataCallback);
+}
+
+void UCharacterAbilitySystemComponent::OnReceivedOhterCharacter_Implementation(
+	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
+	)
+{
+	ReceivedDamageDelegate(ReceivedEventModifyDataCallback);
+}
+
 void UCharacterAbilitySystemComponent::OnGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
 	)
@@ -1844,7 +1858,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 
 	if (Instigator != TargetCharacterPtr)
 	{
-		TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
+		TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnReceivedOhterCharacter(
 			 ReceivedEventModifyDataCallback
 			);
 
@@ -1869,11 +1883,4 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			}
 		}
 	}
-}
-
-void UCharacterAbilitySystemComponent::OnEffectOhterCharacter_Implementation(
-	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
-	)
-{
-	MakedDamageDelegate(ReceivedEventModifyDataCallback);
 }

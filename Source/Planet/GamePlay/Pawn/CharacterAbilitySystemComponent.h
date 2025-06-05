@@ -214,12 +214,21 @@ public:
 
 	// 对“其他”角色造成的影响（伤害、控制）
 	FMakedDamageDelegate MakedDamageDelegate;
+	
+	// 收到“其他”角色造成的影响（伤害、控制）
+	FMakedDamageDelegate ReceivedDamageDelegate;
 #pragma endregion
 
 public:
 	// 对“其他”角色造成的影响（伤害、控制）
 	UFUNCTION(NetMulticast, Reliable)
 	void OnEffectOhterCharacter(
+		const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
+		);
+	
+	// 收到“其他”角色造成的影响（伤害、控制）
+	UFUNCTION(NetMulticast, Reliable)
+	void OnReceivedOhterCharacter(
 		const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 		);
 

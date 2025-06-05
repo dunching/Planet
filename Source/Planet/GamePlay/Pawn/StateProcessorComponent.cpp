@@ -20,6 +20,7 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "CollisionDataStruct.h"
 #include "GroupManagger.h"
+#include "HumanCharacter_Player.h"
 #include "KismetGravityLibrary.h"
 #include "TeamMatesHelperComponentBase.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -89,7 +90,7 @@ void UStateProcessorComponent::EndPlay(
 	if (CharacterPtr)
 	{
 		auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		GASCompPtr->RegisterGenericGameplayTagEvent().Remove(OnGameplayEffectTagCountChangedHandle);
+		GASCompPtr->RegisterGenericGameplayTagEvent().Remove(OnGETagCountChangedHandle);
 	}
 
 	Super::EndPlay(EndPlayReason);
@@ -115,7 +116,7 @@ void UStateProcessorComponent::OnGroupManaggerReady(
 	if (CharacterPtr)
 	{
 		auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(
+		OnGETagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(
 			 this,
 			 &ThisClass::OnGameplayEffectTagCountChanged
 			);
@@ -247,6 +248,10 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
 				CharacterMovementPtr->bSkip_PlayerInput = Lambda();
+				if (CharacterMovementPtr->bSkip_PlayerInput && CharacterPtr->IsA(AHumanCharacter_Player::StaticClass()))
+				{
+					checkNoEntry();
+				}
 			}
 		}
 		else if (Tag.MatchesTagExact(UGameplayTagsLibrary::MovementStateAble_CantRootMotion))

@@ -189,8 +189,6 @@ protected:
 #pragma region GAs
 #pragma endregion GAs
 
-	FDelegateHandle OnGameplayEffectTagCountChangedHandle;
-
 private:
 	bool GetOrientDefautl(
 		FRotator& DesiredRotation,
@@ -210,4 +208,7 @@ private:
 	TMap<int32, FGetOrientFunc> GetOrientFuncMap;
 
 	const int32 GetOrientPrority = 100;
+	
+	FDelegateHandle OnGETagCountChangedHandle;
+
 };

@@ -46,19 +46,19 @@ public:
 		const FObjectInitializer& ObjectInitializer
 		);
 
-	void SwitchTeammateOption(
+	virtual void SwitchTeammateOption(
 		ETeammateOption InTeammateOption
 		);
 
 	ETeammateOption GetTeammateOption() const;
 
-	void SpwanTeammateCharacter();
+	virtual void SpwanTeammateCharacter();
 
-	bool IsMember(
+	virtual bool IsMember(
 		const FGuid& CharacterID
 		) const;
 
-	bool TeleportTo(
+	virtual bool TeleportTo(
 		const FVector& DestLocation,
 		const FRotator& DestRotation,
 		bool bIsATest = false,

@@ -77,7 +77,7 @@ void GameplayCommand::SwitchTeammateOptionToFollow()
 	auto OnwerActorPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (OnwerActorPtr)
 	{
-		OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->SwitchTeammateOption(
+		OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->SwitchTeammateOption_Server(
 			 ETeammateOption::kFollow
 			);
 	}
@@ -88,7 +88,7 @@ void GameplayCommand::SwitchTeammateOptionToAssistance()
 	auto OnwerActorPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (OnwerActorPtr)
 	{
-		OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->SwitchTeammateOption(
+		OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->SwitchTeammateOption_Server(
 			 ETeammateOption::kAssistance
 			);
 	}
@@ -99,7 +99,7 @@ void GameplayCommand::SwitchTeammateOptionToFireTarget()
 	auto OnwerActorPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (OnwerActorPtr)
 	{
-		OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->SwitchTeammateOption(
+		OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->SwitchTeammateOption_Server(
 			 ETeammateOption::kFireTarget
 			);
 	}

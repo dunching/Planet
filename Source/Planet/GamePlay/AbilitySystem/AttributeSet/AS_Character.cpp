@@ -67,6 +67,10 @@ void UAS_Character::GetLifetimeReplicatedProps(
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Mana, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Mana_Replay, COND_None, REPNOTIFY_Always);
 
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Level, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Experience, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, LevelExperience, COND_None, REPNOTIFY_Always);
+
 	DOREPLIFETIME_CONDITION(ThisClass, MetalValue, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, MetalLevel, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, MetalPenetration, COND_None);
@@ -78,6 +82,24 @@ void UAS_Character::GetLifetimeReplicatedProps(
 	DOREPLIFETIME_CONDITION(ThisClass, WoodPenetration, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, WoodPercentPenetration, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, WoodResistance, COND_None);
+
+	DOREPLIFETIME_CONDITION(ThisClass, WaterValue, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, WaterLevel, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, WaterPenetration, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, WaterPercentPenetration, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, WaterResistance, COND_None);
+
+	DOREPLIFETIME_CONDITION(ThisClass, FireValue, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, FireLevel, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, FirePenetration, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, FirePercentPenetration, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, FireResistance, COND_None);
+
+	DOREPLIFETIME_CONDITION(ThisClass, EarthValue, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, EarthLevel, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, EarthPenetration, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, EarthPercentPenetration, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, EarthResistance, COND_None);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MoveSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION(ThisClass, CriticalDamage, COND_None);

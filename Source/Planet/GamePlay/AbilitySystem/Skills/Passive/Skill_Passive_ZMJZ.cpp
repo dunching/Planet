@@ -39,7 +39,7 @@ void USkill_Passive_ZMJZ::OnAvatarSet(
 		CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 		if (CharacterPtr)
 		{
-			AbilityActivatedCallbacksHandle =
+			EffectOhterCharacterCallbackDelegate =
 				CharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate.AddCallback(
 					std::bind(&ThisClass::MakedDamageDelegate, this, std::placeholders::_1)
 				);
@@ -81,9 +81,9 @@ void USkill_Passive_ZMJZ::OnRemoveAbility(
 	const FGameplayAbilitySpec& Spec
 )
 {
-	if (AbilityActivatedCallbacksHandle)
+	if (EffectOhterCharacterCallbackDelegate)
 	{
-		AbilityActivatedCallbacksHandle.Reset();
+		EffectOhterCharacterCallbackDelegate.Reset();
 	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);

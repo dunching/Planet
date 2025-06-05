@@ -139,6 +139,10 @@ protected:
 		const FOnEffectedTargetCallback&
 		)>::FCallbackHandleSPtr EffectOhterCharacterCallbackDelegate;
 
+	TCallbackHandleContainer<void(
+		const FOnEffectedTargetCallback&
+		)>::FCallbackHandleSPtr ReceivedOhterCharacterCallbackDelegate;
+
 private:
 	
 	TOnValueChangedCallbackContainer<uint8>::FCallbackHandleSPtr LevelChangedDelegateHandle;

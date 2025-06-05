@@ -146,6 +146,16 @@ void URegularActionLayout::Enable()
 			                                                                       )
 		                                                                      );
 
+		ReceivedOhterCharacterCallbackDelegate = PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->
+		                                                           ReceivedDamageDelegate.
+		                                                           AddCallback(
+		                                                                       std::bind(
+			                                                                        &ThisClass::OnEffectOhterCharacter,
+			                                                                        this,
+			                                                                        std::placeholders::_1
+			                                                                       )
+		                                                                      );
+
 		auto CharacterProxySPtr = PlayerCharacterPtr->GetCharacterProxy();
 		if (!CharacterProxySPtr)
 		{
@@ -224,6 +234,11 @@ void URegularActionLayout::DisEnable()
 	if (EffectOhterCharacterCallbackDelegate)
 	{
 		EffectOhterCharacterCallbackDelegate.Reset();
+	}
+
+	if (ReceivedOhterCharacterCallbackDelegate)
+	{
+		ReceivedOhterCharacterCallbackDelegate.Reset();
 	}
 
 	if (FocusCharacterDelegateSPtr)

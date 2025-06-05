@@ -128,7 +128,13 @@ void UCharacterPlayerStateProcessorComponent::OnGameplayEffectTagCountChanged(
 	)
 {
 	Super::OnGameplayEffectTagCountChanged(Tag, Count);
+}
 
+void UCharacterPlayerStateProcessorComponent::OnFocusTargetGETagCountChanged(
+	const FGameplayTag Tag,
+	int32 Count
+	)
+{
 	auto Lambda = [&]
 	{
 		const auto Value = Count > 0;
@@ -153,10 +159,10 @@ void UCharacterPlayerStateProcessorComponent::SetFocusCharactersAry(
 		PreviousFocusCharactersPtr = TargetCharacterPtr;
 
 		TargetCharacterPtr->OnDestroyed.AddDynamic(this, &ThisClass::OnFocusCharacterDestroyed);
-		OnGameplayEffectTagCountChangedHandle = TargetCharacterPtr->GetCharacterAbilitySystemComponent()->
+		OnFocusTargetGETagCountChangedHandle = TargetCharacterPtr->GetCharacterAbilitySystemComponent()->
 		                                                            RegisterGenericGameplayTagEvent().AddUObject(
 			                                                             this,
-			                                                             &ThisClass::OnGameplayEffectTagCountChanged
+			                                                             &ThisClass::OnFocusTargetGETagCountChanged
 			                                                            );
 	}
 	else
@@ -184,7 +190,7 @@ void UCharacterPlayerStateProcessorComponent::ClearFocusCharactersAry()
 	{
 		PreviousFocusCharactersPtr->OnDestroyed.RemoveDynamic(this, &ThisClass::OnFocusCharacterDestroyed);
 		PreviousFocusCharactersPtr->GetCharacterAbilitySystemComponent()->
-		                            RegisterGenericGameplayTagEvent().Remove(OnGameplayEffectTagCountChangedHandle);
+		                            RegisterGenericGameplayTagEvent().Remove(OnFocusTargetGETagCountChangedHandle);
 		PreviousFocusCharactersPtr = nullptr;
 	}
 

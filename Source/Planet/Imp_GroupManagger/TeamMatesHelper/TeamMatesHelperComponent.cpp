@@ -255,18 +255,6 @@ void UTeamMatesHelperComponent::SwitchTeammateOption(
 	TeammateOption = InTeammateOption;
 
 	TeammateOptionChanged.ExcuteCallback(InTeammateOption, OwnerCharacterProxyPtr);
-
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		SwitchTeammateOption_Server(InTeammateOption);
-	}
-#endif
-}
-
-ETeammateOption UTeamMatesHelperComponent::GetTeammateOption() const
-{
-	return TeammateOption;
 }
 
 void UTeamMatesHelperComponent::AddKnowCharacter(

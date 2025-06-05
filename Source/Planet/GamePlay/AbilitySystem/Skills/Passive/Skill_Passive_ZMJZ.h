@@ -134,7 +134,7 @@ protected:
 
 	float SecondaryDecreamTime = 1.f;
 
-	FMakedDamageHandle AbilityActivatedCallbacksHandle;
+	FMakedDamageHandle EffectOhterCharacterCallbackDelegate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
 	TSubclassOf<UGameplayEffect> GE_ZMJZClass;

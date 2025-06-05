@@ -28,25 +28,7 @@ class AHumanCharacter_Player;
 class AHumanCharacter_AI;
 
 UCLASS(Blueprintable)
-class PLANET_API UGloabVariable_Interaction : public UGloabVariable_InteractionBase
-{
-	GENERATED_BODY()
-
-public:
-
-};
-
-UCLASS(Blueprintable)
-class PLANET_API USTE_Interaction : public USTE_InteractionBase
-{
-	GENERATED_BODY()
-
-public:
-
-};
-
-UCLASS(Blueprintable)
-class PLANET_API USTE_Interaction_HumanCharacter_AI : public USTE_Interaction
+class PLANET_API USTE_Interaction_HumanCharacter_AI : public USTE_InteractionBase
 {
 	GENERATED_BODY()
 
@@ -62,7 +44,7 @@ public:
 };
 
 UCLASS(Blueprintable)
-class PLANET_API USTE_Interaction_ChallengeEntry : public USTE_Interaction
+class PLANET_API USTE_Interaction_ChallengeEntry : public USTE_InteractionBase
 {
 	GENERATED_BODY()
 

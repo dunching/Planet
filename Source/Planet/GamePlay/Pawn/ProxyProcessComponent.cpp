@@ -216,6 +216,7 @@ bool UProxyProcessComponent::SwitchWeapon()
 void UProxyProcessComponent::RetractputWeapon()
 {
 	SwitchWeaponImpAndCheck(FCharacterSocket());
+	
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
