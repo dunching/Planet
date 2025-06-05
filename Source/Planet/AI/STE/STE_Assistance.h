@@ -60,6 +60,12 @@ private:
 
 	TWeakObjectPtr<ACharacterBase> UpdateTargetCharacter();
 
+	TWeakObjectPtr<ACharacterBase> GetTargetCharacter(
+			const FVector& Location,
+			const int32 &MaxDistance, 
+			TSet<TWeakObjectPtr<ACharacterBase>>&KnowCharatersSet
+			)const;
+	
 public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Param)

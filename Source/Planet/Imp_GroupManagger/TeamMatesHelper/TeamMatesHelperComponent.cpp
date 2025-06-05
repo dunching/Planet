@@ -434,14 +434,7 @@ bool UTeamMatesHelperComponent::CheckCharacterIsValid(
 {
 	if (CharacterPtr.IsValid())
 	{
-		if (CharacterPtr->GetCharacterAbilitySystemComponent()->IsInDeath())
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}
+		return true;
 	}
 
 	return false;

@@ -173,18 +173,27 @@ void USkill_Passive_ZMJZ::MakedDamageDelegate(
 	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 )
 {
-	if (CharacterPtr)
+	if (!CharacterPtr)
 	{
-		if (ReceivedEventModifyDataCallback.AllAssetTags.HasTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
-		{
-			ModifyGASpeed(
-				GetCurrentAbilitySpecHandle(),
-				GetCurrentActorInfo(),
-				GetCurrentActivationInfo(),
-				&CurrentEventData
-			);
-		}
+		return;
 	}
+	
+	if (!ReceivedEventModifyDataCallback.AllAssetTags.HasTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
+	{
+		return;
+	}
+	
+	if (ReceivedEventModifyDataCallback.bIsEvade)
+	{
+		return;
+	}
+	
+	ModifyGASpeed(
+		GetCurrentAbilitySpecHandle(),
+		GetCurrentActorInfo(),
+		GetCurrentActivationInfo(),
+		&CurrentEventData
+	);
 }
 
 void USkill_Passive_ZMJZ::DurationDelegate(

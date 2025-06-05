@@ -4,7 +4,7 @@
 
 inline void USTE_CharacterBase::TreeStart(
 	FStateTreeExecutionContext& Context
-)
+	)
 {
 	Super::TreeStart(Context);
 
@@ -18,7 +18,7 @@ UGloabVariable_Character* USTE_CharacterBase::CreateGloabVarianble()
 
 TWeakObjectPtr<ACharacterBase> USTE_CharacterBase::GetNewTargetCharacter(
 	const TSet<TWeakObjectPtr<ACharacterBase>>& ChractersSet
-)
+	) const
 {
 	const auto Location = HumanCharacterPtr->GetActorLocation();
 

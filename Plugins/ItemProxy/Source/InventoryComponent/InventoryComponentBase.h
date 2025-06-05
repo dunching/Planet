@@ -246,6 +246,26 @@ TSharedPtr<typename ModifyItemProxyStrategyType::FItemProxyType> UInventoryCompo
 	const FGameplayTag& ProxyType
 	)
 {
+	ModifyItemProxyStrategyType ModifyItemProxyStrategy;
+
+	if (ModifyItemProxyStrategiesMap.Contains(ModifyItemProxyStrategy.GetCanOperationType()))
+	{
+		auto ResultSPtr = ModifyItemProxyStrategiesMap[ModifyItemProxyStrategy.GetCanOperationType()];
+
+		auto AddResultAry = ResultSPtr->Add(this, ProxyType, 1);
+
+		if (AddResultAry.IsEmpty())
+		{
+			
+		}
+		else
+		{
+			return DynamicCastSharedPtr<typename ModifyItemProxyStrategyType::FItemProxyType>(
+			AddResultAry[0]
+				);
+		}
+	}
+
 	return nullptr;
 }
 

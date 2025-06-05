@@ -66,7 +66,7 @@ void UFocusTitle::NativeDestruct()
 		}
 	}
 
-	if (CharacterPtr)
+	if (CharacterPtr.IsValid())
 	{
 		{
 			auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
@@ -85,7 +85,7 @@ void UFocusTitle::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 void UFocusTitle::SetTargetCharacter(ACharacterBase* TargetCharacterPtr)
 {
 	CharacterPtr = TargetCharacterPtr;
-	if (CharacterPtr)
+	if (CharacterPtr.IsValid())
 	{
 		float Radius = 0.f;
 		CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);

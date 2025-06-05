@@ -48,18 +48,14 @@ public:
 	TCallbackHandleContainer<void(
 		const FTeammate&,
 		const TSharedPtr<FCharacterProxyType>&
-
-
-	
+		
 		)>;
 
 	using FTeammateOptionChangedDelegateContainer =
 	TCallbackHandleContainer<void(
 		ETeammateOption,
 		const TSharedPtr<FCharacterProxyType>&
-
-
-	
+		
 		)>;
 
 	using FKnowCharaterChanged =
@@ -71,9 +67,6 @@ public:
 	using FOnFocusCharacterDelegate =
 	TCallbackHandleContainer<void(
 		ACharacterBase*
-
-
-	
 		)>;
 
 	using FTeamHelperChangedDelegateContainer = TCallbackHandleContainer<void()>;
@@ -140,9 +133,9 @@ public:
 	void SetOwnerCharacterProxy(
 		const TSharedPtr<FCharacterProxyType>& CharacterProxySPtr
 		);
-	
-	TSet<TSharedPtr<FCharacterProxyType>>GetMembersSet() const;
-	
+
+	TSet<TSharedPtr<FCharacterProxyType>> GetMembersSet() const;
+
 	FTeammateOptionChangedDelegateContainer TeammateOptionChanged;
 
 	/**

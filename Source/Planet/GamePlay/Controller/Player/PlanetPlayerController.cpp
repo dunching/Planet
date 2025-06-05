@@ -1467,6 +1467,7 @@ void APlanetPlayerController::OnPossessCharacterMakedDamage(
 
 	if (!OnEffectedTargetCallback.bIsDeath)
 	{
+		return;
 	}
 
 	if (GetPlayerState<APlanetPlayerState>()->GetIsInChallenge())

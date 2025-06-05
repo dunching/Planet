@@ -14,6 +14,7 @@
 #include "BuildingArea.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameOptions.h"
+#include "GameplayTagsLibrary.h"
 #include "GeneratorColony_ByInvoke.h"
 #include "GeneratorColony_Patrol.h"
 #include "GroupManagger.h"
@@ -42,6 +43,9 @@ void USTE_Assistance::TreeStart(
 		else if (GroupManagger->IsA(AGroupManagger_NPC::StaticClass()))
 		{
 			GeneratorNPCs_PatrolPtr = HumanCharacterPtr->GetGroupManagger_NPC()->GeneratorNPCs_PatrolPtr;
+			
+			BuildingAreaPtr = HumanCharacterPtr->GetGroupManagger_NPC()->BuildingAreaPtr;
+			GloabVariable_Character->OriginalLocation = HumanCharacterPtr->GetActorLocation();
 		}
 
 		if (HumanAIControllerPtr)
@@ -156,42 +160,21 @@ TWeakObjectPtr<ACharacterBase> USTE_Assistance::UpdateTargetCharacter()
 		{
 			auto KnowCharatersSet = TeamMatesHelperComponent->GetSensingChractersSet();
 
-			auto AI_CharacterActorPtr = Cast<AHumanCharacter_AI>(CharacterActorPtr.Get());
-
 			if (GeneratorNPCs_PatrolPtr)
 			{
 				const auto Location = GeneratorNPCs_PatrolPtr->GetActorLocation();
 				const auto MaxDistance = GeneratorNPCs_PatrolPtr->MaxDistance;
 
-				TSet<ACharacterBase*> NeedRemoveAry;
-				for (const auto& Iter : KnowCharatersSet)
-				{
-					if (Iter.IsValid())
-					{
-						if (FVector::Distance(Iter->GetActorLocation(), Location) > MaxDistance)
-						{
-							NeedRemoveAry.Add(Iter.Get());
-						}
-						else if (Iter->IsA(AHumanCharacter_AI::StaticClass()))
-						{
-							NeedRemoveAry.Add(Iter.Get());
-						}
-					}
-					else
-					{
-						NeedRemoveAry.Add(Iter.Get());
-					}
-				}
-				for (const auto& Iter : NeedRemoveAry)
-				{
-					if (KnowCharatersSet.Contains(Iter))
-					{
-						KnowCharatersSet.Remove(Iter);
-					}
-				}
+				return GetTargetCharacter(Location, MaxDistance,KnowCharatersSet);
 			}
+			
+			if (BuildingAreaPtr)
+			{
+				const auto Location = BuildingAreaPtr->GetActorLocation();
+				const auto MaxDistance = BuildingAreaPtr->MaxDistance;
 
-			return GetNewTargetCharacter(KnowCharatersSet);
+				return GetTargetCharacter(Location, MaxDistance,KnowCharatersSet);
+			}
 		}
 		else if (CharacterActorPtr->IsA(AHumanCharacter_Player::StaticClass()))
 		{
@@ -215,32 +198,59 @@ TWeakObjectPtr<ACharacterBase> USTE_Assistance::UpdateTargetCharacter()
 
 			const auto Location = HumanCharacterPtr->GetActorLocation();
 			const auto MaxDistance = UGameOptions::GetInstance()->NPCTeammateMaxActtackDistance;
-
-			TSet<ACharacterBase*> NeedRemoveAry;
-			for (const auto& Iter : KnowCharatersSet)
-			{
-				if (Iter.IsValid())
-				{
-					if (FVector::Distance(Iter->GetActorLocation(), Location) > MaxDistance)
-					{
-						NeedRemoveAry.Add(Iter.Get());
-					}
-				}
-				else
-				{
-					NeedRemoveAry.Add(Iter.Get());
-				}
-			}
-			for (const auto& Iter : NeedRemoveAry)
-			{
-				if (KnowCharatersSet.Contains(Iter))
-				{
-					KnowCharatersSet.Remove(Iter);
-				}
-			}
-			return GetNewTargetCharacter(KnowCharatersSet);
+			
+			return GetTargetCharacter(Location, MaxDistance,KnowCharatersSet);
 		}
 	}
 
 	return nullptr;
+}
+
+TWeakObjectPtr<ACharacterBase> USTE_Assistance::GetTargetCharacter(
+	const FVector& Location,
+	const int32& MaxDistance,
+	TSet<TWeakObjectPtr<ACharacterBase>>& KnowCharatersSet
+	) const
+{
+	TSet<ACharacterBase*> NeedRemoveAry;
+	for (const auto& Iter : KnowCharatersSet)
+	{
+		if (Iter.IsValid())
+		{
+			// 超出距离
+			if (FVector::Distance(Iter->GetActorLocation(), Location) > MaxDistance)
+			{
+				NeedRemoveAry.Add(Iter.Get());
+				continue;
+			}
+
+			// 角色死亡了
+			if (Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
+			{
+				NeedRemoveAry.Add(Iter.Get());
+				continue;
+			}
+
+			// 角色是功能性的NPC
+			if (Iter->GetCharacterProxy()->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Character_NPC_Functional))
+			{
+				NeedRemoveAry.Add(Iter.Get());
+				continue;
+			}
+		}
+		else
+		{
+			// 无效了，比如被Destroy
+			NeedRemoveAry.Add(Iter.Get());
+		}
+	}
+	for (const auto& Iter : NeedRemoveAry)
+	{
+		if (KnowCharatersSet.Contains(Iter))
+		{
+			KnowCharatersSet.Remove(Iter);
+		}
+	}
+			
+	return GetNewTargetCharacter(KnowCharatersSet);
 }

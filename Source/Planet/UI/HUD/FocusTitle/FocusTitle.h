@@ -42,7 +42,7 @@ public:
 
 	void SwitchCantBeSelect(bool bIsCanBeSelect);
 
-	ACharacterBase* CharacterPtr = nullptr;
+	TWeakObjectPtr<ACharacterBase> CharacterPtr = nullptr;
 
 protected:
 
