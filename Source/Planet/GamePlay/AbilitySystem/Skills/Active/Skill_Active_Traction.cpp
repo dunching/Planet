@@ -1,11 +1,11 @@
-
 #include "Skill_Active_Traction.h"
 
 #include <Engine/OverlapResult.h>
+#include "Components/CapsuleComponent.h"
 
+#include "AbilityTask_ARM_RadialForce.h"
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
-#include "CS_RootMotion.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
@@ -13,11 +13,31 @@
 #include "CharacterAttibutes.h"
 #include "CharacterAttributesComponent.h"
 #include "KismetGravityLibrary.h"
-#include "KismetCollisionHelper.h"
-#include "CS_RootMotion_Traction.h"
+#include "SPlineActor.h"
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
 #include "AbilityTask_PlayMontage.h"
+#include "ItemProxy_Skills.h"
+#include "TractionActor.h"
+
+void UItemDecription_Skill_Active_Traction::SetUIStyle()
+{
+}
+
+void USkill_Active_Traction::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	if (SkillProxyPtr)
+	{
+		ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(
+			DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxyPtr)->GetTableRowProxy_ActiveSkillExtendInfo()
+		);
+	}
+}
 
 void USkill_Active_Traction::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
@@ -27,15 +47,65 @@ void USkill_Active_Traction::EndAbility(
 	bool bWasCancelled
 )
 {
-	if (TractionPointPtr.IsValid())
+#if UE_EDITOR || UE_SERVER
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
-		TractionPointPtr->Destroy();
-		TractionPointPtr = nullptr;
+		CommitAbility(Handle, ActorInfo, ActivationInfo);
+	}
+#endif
+
+	if (TractionPoint)
+	{
+		TractionPoint->Destroy();
 	}
 
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
+	TractionPoint = nullptr;
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+void USkill_Active_Traction::ApplyCooldown(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo
+) const
+{
+	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
+	if (CooldownGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_CD);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			UGameplayTagsLibrary::GEData_Duration,
+			ItemProxy_DescriptionPtr->CD.PerLevelValue[0]
+		);
+
+		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
+}
+
+void USkill_Active_Traction::ApplyCost(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo
+) const
+{
+	UGameplayEffect* CostGE = GetCostGameplayEffect();
+	if (CostGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(CostGE->GetClass(), GetAbilityLevel());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			UGameplayTagsLibrary::GEData_ModifyItem_Mana,
+			-ItemProxy_DescriptionPtr->Cost.PerLevelValue[0]
+		);
+
+		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
 }
 
 void USkill_Active_Traction::PerformAction(
@@ -48,83 +118,98 @@ void USkill_Active_Traction::PerformAction(
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
-	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
-		CommitAbility(Handle, ActorInfo, ActivationInfo);
-
-		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
-		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
-		CharacterStateInfoSPtr->DataChanged();
-
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
-
-		{
-			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-			TaskPtr->SetDuration(Duration, 0.1f);
-			TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::DurationDelegate);
-			TaskPtr->OnFinished.BindLambda([this](auto)
-				{
-					K2_CancelAbility();
-					return true;
-				});
-			TaskPtr->ReadyForActivation();
-		}
-
 		FActorSpawnParameters SpawnParameters;
+
+		SpawnParameters.CustomPreSpawnInitalization = [this](
+			auto ActorPtr
+		)
+			{
+				Cast<ATractionPoint>(ActorPtr)->ItemProxy_DescriptionPtr = ItemProxy_DescriptionPtr;
+			};
+
 		SpawnParameters.Owner = CharacterPtr;
 
-		TractionPointPtr = CharacterPtr->GetWorld()->SpawnActor<ATractionPoint>(
-			CharacterPtr->GetActorLocation(), FRotator::ZeroRotator, SpawnParameters
+		TractionPoint = GetWorld()->SpawnActor<ATractionPoint>(
+			CharacterPtr->GetActorLocation(),
+			FRotator::ZeroRotator,
+			SpawnParameters
 		);
-
-		TractionPointPtr->Strength = MoveSpeed;
-		TractionPointPtr->Radius = Radius;
 	}
 #endif
+
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+	)
+	{
+		auto DelayTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+		DelayTaskPtr->SetDuration(ItemProxy_DescriptionPtr->Duration.PerLevelValue[0]);
+		DelayTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
+
+		if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+		{
+			DelayTaskPtr->OnFinished.BindLambda(
+				[this](
+				auto
+			)
+				{
+					K2_CancelAbility();
+
+					return true;
+				}
+			);
+		}
+		DelayTaskPtr->ReadyForActivation();
+	}
 
 	PlayMontage();
 }
 
-void USkill_Active_Traction::IntervalDelegate(
-	UAbilityTask_TimerHelper*,
-	float CurrentIntervalTime, 
-	float IntervalTime,
-	bool bIsEnd
-)
+float USkill_Active_Traction::GetRemainTime() const
 {
-}
-
-void USkill_Active_Traction::DurationDelegate(UAbilityTask_TimerHelper*, float CurrentIntervalTime, float IntervalTime)
-{
-#if UE_EDITOR || UE_SERVER
-	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
-	{
-		if (CharacterStateInfoSPtr)
-		{
-			CharacterStateInfoSPtr->TotalTime = CurrentIntervalTime;
-			CharacterStateInfoSPtr->DataChanged();
-			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
-		}
-	}
-#endif
+	return RemainTime;
 }
 
 void USkill_Active_Traction::PlayMontage()
 {
-	const float InPlayRate = 1.f;
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+	)
+	{
+		const float InPlayRate = 1.f;
 
-	auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
-		this,
-		TEXT(""),
-		HumanMontagePtr,
-		InPlayRate,
-		StartSection
-	);
+		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
+			this,
+			TEXT(""),
+			HumanMontagePtr,
+			InPlayRate,
+			StartSection
+		);
 
-	TaskPtr->Ability = this;
-	TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
+		TaskPtr->Ability = this;
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
-	TaskPtr->ReadyForActivation();
+		TaskPtr->ReadyForActivation();
+	}
+}
+
+void USkill_Active_Traction::OnDuration(
+	UAbilityTask_TimerHelper*,
+	float CurrentTiem,
+	float TotalTime
+)
+{
+	if (FMath::IsNearlyZero(TotalTime))
+	{
+		return;
+	}
+	
+	RemainTime = (TotalTime - CurrentTiem) / TotalTime;
+	if (RemainTime < 0.f)
+	{
+		RemainTime = 0.f;
+	}
 }

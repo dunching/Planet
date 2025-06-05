@@ -26,16 +26,18 @@ class PLANET_API UAITask_MoveBySpline : public UAITask_MoveTo
 
 public:
 	
+	virtual void Activate() override;
+
 	virtual void PerformMove()override;
 
 	virtual void OnRequestFinished(FAIRequestID RequestID, const FPathFollowingResult& Result)override;
-// 
-// 	FMyMoveTaskCompletedSignature GetMoveTaskCompletedSignature();
-// 
-// 	FMyMoveTaskCompletedSignature MyMoveTaskCompletedSignature;
+	
+	/**
+	 * 是否已经到了SPline上？
+	 */
+	bool bIsReachedSPline = false;
 
-	TArray<FVector>Pts;
-
-	int32 Index = 0;
-
+	UPROPERTY(Transient)
+	USplineComponent* SPlinePtr = nullptr;
+	
 };

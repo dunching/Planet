@@ -4,15 +4,14 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
 #include "UObject/ObjectMacros.h"
 #include "UObject/Interface.h"
 
-#include "GenerateType.h"
 #include "ItemProxy_Minimal.h"
 
 #include "SceneActorInteractionInterface.generated.h"
 
+class ASceneActor;
 class ACharacterBase;
 class USceneActorInteractionComponent;
 
@@ -28,6 +27,10 @@ class PLANET_API ISceneActorInteractionInterface
 
 public:
 
+	/**
+	 * 开始交互
+	 * @param CharacterPtr 
+	 */
 	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr) = 0;
 
 	virtual void HasBeenStartedLookAt(ACharacterBase* CharacterPtr) = 0;
@@ -39,7 +42,7 @@ public:
 	virtual USceneActorInteractionComponent*GetSceneActorInteractionComponent()const = 0;
 	
 protected:
-
+	
 private:
 
 };

@@ -22,4 +22,6 @@ public:
 	
 	virtual bool SpawnPlayActor(const FString& URL,FString& OutError, UWorld* InWorld)override;
 	
+	virtual void PlayerAdded(class UGameViewportClient* InViewportClient, FPlatformUserId InUserId) override;
+	
 };

@@ -11,15 +11,16 @@
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "InventoryComponent.h"
-#include "GenerateType.h"
-#include "TeamMatesHelperComponent.h"
+#include "GenerateTypes.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "CharacterBase.h"
 #include "GroupMateInfo.h"
 #include "PlanetControllerInterface.h"
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
 #include "GameplayTagsLibrary.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
+#include "HumanCharacter_Player.h"
 #include "ItemProxy_Character.h"
 #include "TeamMatesList.h"
 
@@ -33,32 +34,25 @@ namespace GroupManaggerMenu
 void UGroupManaggerMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	ResetUIByData();
 }
 
-void UGroupManaggerMenu::ResetUIByData()
+void UGroupManaggerMenu::EnableMenu()
 {
 	ResetGroupmates();
 }
 
-void UGroupManaggerMenu::SyncData()
+void UGroupManaggerMenu::DisEnableMenu()
 {
-	auto PCPtr =
-		Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
-	if (!PCPtr)
-	{
-		return;
-	}
-
 	auto TeamMatesListPtr = Cast<UTeamMatesList>(GetWidgetFromName(GroupManaggerMenu::TeamMatesList));
 	if (TeamMatesListPtr)
 	{
-		TeamMatesListPtr->SyncData();
+		TeamMatesListPtr->DisEnableMenu();
 	}
+}
 
-	auto GMCPtr = PCPtr->GetGroupSharedInfo();
-	GMCPtr->GetTeamMatesHelperComponent()->SpwanTeammateCharacter();
+EMenuType UGroupManaggerMenu::GetMenuType() const
+{
+	return EMenuType::kGroupManagger;
 }
 
 void UGroupManaggerMenu::ResetGroupmates()
@@ -72,16 +66,16 @@ void UGroupManaggerMenu::ResetGroupmates()
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
 
-	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
-	if (!PCPtr)
+	auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!PlayerCharacterPtr)
 	{
 		return;
 	}
 
-	auto GMCPtr = PCPtr->GetGroupSharedInfo();
-	auto HICPtr = PCPtr->GetHoldingItemsComponent();
+	auto GroupManaggerPtr = PlayerCharacterPtr->GetGroupManagger();
+	auto InventoryComponentPtr = GroupManaggerPtr->GetInventoryComponent();
 
-	auto CharacterProxyAry = HICPtr->GetCharacterProxyAry();
+	auto CharacterProxyAry = InventoryComponentPtr->GetCharacterProxyAry();
 	for (auto Iter : CharacterProxyAry)
 	{
 		if (UGameplayTagsLibrary::Proxy_Character_Player == Iter->GetProxyType())

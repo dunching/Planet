@@ -10,12 +10,12 @@
 #include "AbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_Repeat.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
@@ -27,6 +27,7 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "TemplateHelper.h"
+#include "Tools.h"
 
 namespace Skill_WeaponHandProtection
 {
@@ -70,24 +71,6 @@ void USkill_WeaponActive_HandProtection::PreActivate(
 			WeaponPtr = Cast<AWeapon_HandProtection>(ActiveParamSPtr->WeaponPtr);
 		}
 	}
-}
-
-void USkill_WeaponActive_HandProtection::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData
-)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	if (WeaponPtr)
-	{
-		return;
-	}
-
-	checkNoEntry();
-	K2_EndAbility();
 }
 
 bool USkill_WeaponActive_HandProtection::CanActivateAbility(
@@ -208,12 +191,21 @@ void USkill_WeaponActive_HandProtection::OnNotifyBeginReceived(FName NotifyName)
 		}
 #endif
 
-		CheckInContinue(-1.f);
+		PerformIfContinue();
 	}
 }
 
 void USkill_WeaponActive_HandProtection::OnMontateComplete()
 {
+#if UE_EDITOR || UE_SERVER
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+	)
+	{
+		// 
+		K2_CancelAbility();
+	}
+#endif
 }
 
 void USkill_WeaponActive_HandProtection::MakeDamage()
@@ -237,55 +229,15 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		CapsuleParams
 	))
 	{
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-		for (auto Iter : OutHits)
-		{
-			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-			if (TargetCharacterPtr)
-			{
-				FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-				GAEventData.SetBaseDamage(Damage);
-
-				GAEventDataPtr->DataAry.Add(GAEventData);
-			}
-		}
-
-		auto SkillsAry = CharacterPtr->GetProxyProcessComponent()->GetAllSocket();
-		auto GASPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		for (const auto& Iter : SkillsAry)
-		{
-// 			if (Iter.Value->SkillProxyPtr)
-// 			{
-// 				if (Iter.Value->SkillProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active))
-// 				{
-// 					auto ActiveSkillProxyPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter.Value->SkillProxyPtr);
-// 					if (!ActiveSkillProxyPtr)
-// 					{
-// 						continue;
-// 					}
-// 
-// 					ActiveSkillProxyPtr->AddCooldownConsumeTime(1.f);
-// 				}
-// 			}
-		}
-
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 
 void USkill_WeaponActive_HandProtection::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
-	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
-
-	{
-		// 
-	}
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+	)
 	{
 		UAnimMontage* HumanMontage = nullptr;
 
@@ -307,6 +259,8 @@ void USkill_WeaponActive_HandProtection::PlayMontage()
 		}
 		break;
 		}
+
+		const float Rate = CharacterPtr->GetCharacterAttributesComponent()->GetRate();
 
 		auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 			this,

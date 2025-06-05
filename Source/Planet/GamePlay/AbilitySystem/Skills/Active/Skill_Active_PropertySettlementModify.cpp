@@ -17,20 +17,19 @@
 #include <GameFramework/SpringArmComponent.h>
 #include "Net/UnrealNetwork.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
 #include "AbilityTask_TimerHelper.h"
 #include "Helper_RootMotionSource.h"
-#include "AbilityTask_tornado.h"
-#include "CS_RootMotion.h"
+#include "GameplayTask_Tornado.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
@@ -50,20 +49,20 @@ void USkill_Active_PropertySettlementModify::ActivateAbility(
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
-		struct FMyPropertySettlementModify : public FPropertySettlementModify
-		{
-			FMyPropertySettlementModify():
-				FPropertySettlementModify(10)
-			{
-			
-			}
-
-			virtual int32 SettlementModify(const TMap<FGameplayTag, int32>& ValueMap)const override
-			{
-				const auto Result = FPropertySettlementModify::SettlementModify(ValueMap);
-				return 100 < Result ? 100 : Result;
-			}
-		};
+		// struct FMyPropertySettlementModify : public FPropertySettlementModify
+		// {
+		// 	FMyPropertySettlementModify():
+		// 		FPropertySettlementModify(10)
+		// 	{
+		// 	
+		// 	}
+		//
+		// 	virtual int32 SettlementModify(const TMap<FGameplayTag, int32>& ValueMap)const override
+		// 	{
+		// 		const auto Result = FPropertySettlementModify::SettlementModify(ValueMap);
+		// 		return 100 < Result ? 100 : Result;
+		// 	}
+		// };
 
 		// const auto MyPropertySettlementModify = MakeShared<FMyPropertySettlementModify>();
 		// CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.AddSettlementModify(MyPropertySettlementModify);

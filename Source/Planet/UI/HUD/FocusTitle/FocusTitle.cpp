@@ -16,7 +16,7 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/SizeBox.h"
 #include "CharacterAttributesComponent.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "CharacterBase.h"
 #include "GameplayTagsLibrary.h"
 #include "EffectsList.h"
@@ -51,22 +51,22 @@ void UFocusTitle::NativeDestruct()
 
 	if (MaxHPValueChanged)
 	{
-		MaxHPValueChanged->UnBindCallback();
+		MaxHPValueChanged.Reset();
 	}
 	if (CurrentHPValueChanged)
 	{
-		CurrentHPValueChanged->UnBindCallback();
+		CurrentHPValueChanged.Reset();
 	}
 
 	for (auto Iter : ValueChangedAry)
 	{
 		if (Iter)
 		{
-			Iter->UnBindCallback();
+			Iter.Reset();
 		}
 	}
 
-	if (CharacterPtr)
+	if (CharacterPtr.IsValid())
 	{
 		{
 			auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
@@ -85,7 +85,7 @@ void UFocusTitle::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 void UFocusTitle::SetTargetCharacter(ACharacterBase* TargetCharacterPtr)
 {
 	CharacterPtr = TargetCharacterPtr;
-	if (CharacterPtr)
+	if (CharacterPtr.IsValid())
 	{
 		float Radius = 0.f;
 		CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
@@ -109,12 +109,12 @@ void UFocusTitle::SetTargetCharacter(ACharacterBase* TargetCharacterPtr)
 		}
 		{
 			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
-				CharacterAttributesPtr->GetPPAttribute()
+				CharacterAttributesPtr->GetStaminaAttribute()
 			).AddUObject(this, &ThisClass::OnPPChanged);
 			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
-				CharacterAttributesPtr->GetMax_PPAttribute()
+				CharacterAttributesPtr->GetMax_StaminaAttribute()
 			).AddUObject(this, &ThisClass::OnPPChanged);
-			SetPP(CharacterAttributesPtr->GetPP(), CharacterAttributesPtr->GetMax_PP());
+			SetPP(CharacterAttributesPtr->GetStamina(), CharacterAttributesPtr->GetMax_Stamina());
 		}
 		{
 			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
@@ -200,7 +200,7 @@ void UFocusTitle::SetHPChanged(float Value, float MaxValue)
 void UFocusTitle::OnPPChanged(const FOnAttributeChangeData& CurrentValue)
 {
 	auto CharacterAttributesPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-	SetHPChanged(CharacterAttributesPtr->GetPP(), CharacterAttributesPtr->GetMax_PP());
+	SetHPChanged(CharacterAttributesPtr->GetStamina(), CharacterAttributesPtr->GetMax_Stamina());
 }
 
 void UFocusTitle::SetPP(float Value, float MaxValue)
@@ -233,7 +233,7 @@ void UFocusTitle::ApplyCharaterNameToTitle()
 		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FFocusTitle::Get().Title));
 		if (UIPtr)
 		{
-			UIPtr->SetText(FText::FromString(CharacterPtr->GetCharacterProxy()->Name));
+			UIPtr->SetText(FText::FromString(CharacterPtr->GetCharacterProxy()->GetDisplayTitle()));
 		}
 	}
 }

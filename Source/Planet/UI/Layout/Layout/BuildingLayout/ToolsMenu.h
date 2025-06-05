@@ -6,7 +6,7 @@
 
 #include "UIInterfaces.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include "ItemProxy_Minimal.h"
 #include "InventoryComponent.h"
 #include "ProxyProcessComponent.h"
@@ -20,7 +20,7 @@ class UToolIcon;
  *
  */
 UCLASS()
-class PLANET_API UToolsMenu : public UMyUserWidget
+class PLANET_API UToolsMenu : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

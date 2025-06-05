@@ -1,19 +1,22 @@
-// Copyright 2020 Dan Kestranek.
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "BasicFutures_Jump.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "CharacterBase.h"
 #include "Planet_Tools.h"
 #include "GameplayTagsLibrary.h"
 
 UBasicFutures_Jump::UBasicFutures_Jump() :
-	Super()
+                                         Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UBasicFutures_Jump::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+void UBasicFutures_Jump::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+	)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
@@ -29,11 +32,14 @@ void UBasicFutures_Jump::ActivateAbility(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
-)
+	)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	CharacterPtr->Jump();
+	if (CharacterPtr)
+	{
+		CharacterPtr->Jump();
+	}
 }
 
 bool UBasicFutures_Jump::CanActivateAbility(
@@ -42,7 +48,7 @@ bool UBasicFutures_Jump::CanActivateAbility(
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
 	const FGameplayTagContainer* TargetTags /*= nullptr*/,
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
-) const
+	) const
 {
 	if (Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
 	{
@@ -56,7 +62,7 @@ void UBasicFutures_Jump::CancelAbility(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	bool bReplicateCancelAbility
-)
+	)
 {
 	CharacterPtr->StopJumping();
 
@@ -64,8 +70,9 @@ void UBasicFutures_Jump::CancelAbility(
 }
 
 void UBasicFutures_Jump::OnRemoveAbility(
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
-)
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+	)
 {
 	if (CharacterPtr)
 	{
@@ -74,15 +81,17 @@ void UBasicFutures_Jump::OnRemoveAbility(
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
-void UBasicFutures_Jump::InitalDefaultTags()
-{
-	AbilityTags.AddTag(UGameplayTagsLibrary::Jump);
+// void UBasicFutures_Jump::InitalDefaultTags()
+// {
+// 	// // AbilityTags.AddTag(UGameplayTagsLibrary::Jump);
+//
+// 	// 在运动时不激活
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::RootMotion);
+// }
 
-	// 在运动时不激活
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::RootMotion);
-}
-
-void UBasicFutures_Jump::OnLanded(const FHitResult& Hit)
+void UBasicFutures_Jump::OnLanded(
+	const FHitResult& Hit
+	)
 {
 	K2_CancelAbility();
 }

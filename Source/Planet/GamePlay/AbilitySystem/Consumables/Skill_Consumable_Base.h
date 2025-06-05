@@ -6,6 +6,7 @@
 
 #include "Skill_Base.h"
 #include "ItemProxy_Minimal.h"
+#include "PlanetGameplayAbility.h"
 #include "Skill_Active_Base.h"
 
 #include "Skill_Consumable_Base.generated.h"
@@ -13,8 +14,10 @@
 class AConsumable_Base;
 class ACharacterBase;
 
+struct FConsumableProxy;
+
 USTRUCT()
-struct FGameplayAbilityTargetData_Consumable : 
+struct PLANET_API FGameplayAbilityTargetData_RegisterParam_Consumable : 
 	public FGameplayAbilityTargetData_RegisterParam
 {
 	GENERATED_USTRUCT_BODY()
@@ -28,8 +31,8 @@ struct FGameplayAbilityTargetData_Consumable :
 };
 
 template<>
-struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Consumable> :
-	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_Consumable>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_RegisterParam_Consumable> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_RegisterParam_Consumable>
 {
 	enum
 	{
@@ -45,7 +48,7 @@ class USkill_Consumable_Base :
 
 public:
 
-	using FRegisterParamType = FGameplayAbilityTargetData_Consumable;
+	using FRegisterParamType = FGameplayAbilityTargetData_RegisterParam_Consumable;
 
 	USkill_Consumable_Base();
 
@@ -60,7 +63,7 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
-	);
+	) override;
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -82,7 +85,7 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	);
+	) override;
 
 	virtual bool CanUse()const;
 
@@ -95,7 +98,7 @@ protected:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
-	);
+	) override;
 
 	ACharacterBase* CharacterPtr = nullptr;
 

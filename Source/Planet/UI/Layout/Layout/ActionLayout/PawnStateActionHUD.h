@@ -4,52 +4,58 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
 #include "CharacterAttributesComponent.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 #include "PawnStateActionHUD.generated.h"
 
 struct FSceneTool;
-struct FCharacterAttributes;
+
 struct FSocket_FASI;
 struct FWeaponProxy;
 
 class UState_Talent_NuQi;
 class UState_Talent_YinYang;
 class ACharacterBase;
+class UAS_Character;
+class UCharacterAbilitySystemComponent;
 
 UCLASS()
 class PLANET_API UPawnStateActionHUD :
-	public UMyUserWidget, 
-	public IHUDInterface
+	public UUserWidget_Override,
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
 public:
-
 	using FOnInitaliedGroupSharedInfo =
-		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+	TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
 	using FOnAllocationSkillChangedHandle =
-		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+	TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
 	using FOnCanAciveSkillChangedHandle =
-		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+	TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
-	virtual void NativeConstruct()override;
+	virtual void NativeConstruct() override;
 
-	virtual void NativeDestruct()override;
+	virtual void NativeDestruct() override;
 
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+	virtual void NativeTick(
+		const FGeometry& MyGeometry,
+		float InDeltaTime
+		) override;
 
-	virtual void ResetUIByData()override;
+	virtual void Enable() override;
 
-	ACharacterBase* CharacterPtr = nullptr;
+	virtual void DisEnable() override;
+
+	TObjectPtr<ACharacterBase> CharacterPtr = nullptr;
 
 protected:
-
 	void BindEvent();
 
 	void InitialTalentUI();
@@ -58,18 +64,36 @@ protected:
 
 	void InitialWeaponSkillIcon();
 
+	void InitialPassiveSkillIcon();
+
 	FOnInitaliedGroupSharedInfo OnInitaliedGroupSharedInfoHandle;
-	
+
 	TArray<FOnAllocationSkillChangedHandle> OnAllocationSkillChangedDelegateAry;
 
 	FOnCanAciveSkillChangedHandle OnCanAciveSkillChangedHandle;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UState_Talent_NuQi>State_Talent_NuQi_Class;
-	
+	TSubclassOf<UState_Talent_NuQi> State_Talent_NuQi_Class;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UState_Talent_YinYang>Talent_YinYang_Class;
+	TSubclassOf<UState_Talent_YinYang> Talent_YinYang_Class;
 
 private:
+	void BindExperienceProgressBar();
+	
+	void BindProgressData(
+		const UAS_Character* CharacterAttributeSetPtr,
+		UCharacterAbilitySystemComponent* AbilitySystemComponentPtr
+		);
+	
+	void BindElementalData(
+		const UAS_Character* CharacterAttributeSetPtr,
+		UCharacterAbilitySystemComponent* AbilitySystemComponentPtr
+		);
 
+	void OnExperienceChanged();
+
+	TOnValueChangedCallbackContainer<uint8>::FCallbackHandleSPtr ExperienceChangedDelegateHandle;
+	
+	TOnValueChangedCallbackContainer<uint8>::FCallbackHandleSPtr LevelExperienceChangedDelegateHandle;
 };

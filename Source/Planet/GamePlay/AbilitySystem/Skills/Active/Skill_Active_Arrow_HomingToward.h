@@ -19,7 +19,26 @@ class PLANET_API USkill_Active_Arrow_HomingToward : public USkill_Active_Base
 {
 	GENERATED_BODY()
 
-public:
+	using FItemProxy_DescriptionType = UItemProxy_Description_ActiveSkill;
+	
+protected:
+
+	virtual void OnAvatarSet(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	) override;
+
+	virtual void ApplyCooldown(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo
+	) const override;
+
+	virtual void ApplyCost(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo
+	) const override;
 
 	virtual void PerformAction(
 		const FGameplayAbilitySpecHandle Handle,
@@ -30,8 +49,10 @@ public:
 
 protected:
 
-	void DurationTick(UAbilityTask_TimerHelper*, float Interval, float InDuration);
+	virtual float GetRemainTime()const override;
 
+	void OnDuration(UAbilityTask_TimerHelper*, float CurrentTiem, float TotalTime);
+	
 	bool OnFinished(UAbilityTask_TimerHelper*);
 
 	void SwitchIsHomingToward(bool bIsHomingToward);
@@ -41,4 +62,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 Duration = 5;
 	
+	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
+
+	float RemainTime = 0.f;
 };

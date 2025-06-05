@@ -5,7 +5,7 @@
 
 #include "GameInstance/PlanetGameInstance.h"
 #include "StateTagExtendInfo.h"
-#include "Planet.h"
+#include "Tools.h"
 #include "PlanetWorldSettings.h"
 
 UAssetRefMap::UAssetRefMap():

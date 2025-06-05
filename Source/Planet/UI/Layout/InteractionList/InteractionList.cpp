@@ -30,10 +30,6 @@ void UInteractionList::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UInteractionList::ResetUIByData()
-{
-}
-
 void UInteractionList::UpdateDisplay(AHumanCharacter_AI* InTargetCharacterPtr)
 {
 	TargetCharacterPtr = InTargetCharacterPtr;
@@ -52,7 +48,7 @@ void UInteractionList::UpdateDisplay(AHumanCharacter_AI* InTargetCharacterPtr)
 
 	UIPtr->ClearChildren();
 
-	const auto TaskNodes = TargetCharacterPtr->GetSceneActorInteractionComponent()->GetTaskNodes();
+	const auto TaskNodes = TargetCharacterPtr->GetSceneActorInteractionComponent()->GetInteractionLists();
 	for (const auto& Iter : TaskNodes)
 	{
 	}

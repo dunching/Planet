@@ -9,7 +9,7 @@
 #include "Tasks/StateTreeAITask.h"
 #include <EnvironmentQuery/EnvQueryTypes.h>
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "STT_RunEQS.generated.h"
 
@@ -18,8 +18,8 @@ class UEnvQuery;
 class AHumanCharacter;
 class AHumanAIController;
 class UAITask_ReleaseSkill;
-class USTE_AICharacterController;
-class UGloabVariable;
+class USTE_Assistance;
+class UGloabVariable_Character;
 
 USTRUCT()
 struct PLANET_API FStateTreeRunEQSTaskInstanceData
@@ -33,10 +33,7 @@ struct PLANET_API FStateTreeRunEQSTaskInstanceData
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable* GloabVariable = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Output)
-	FVector Location = FVector::ZeroVector;
+	UGloabVariable_Character* GloabVariable = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Param)
 	TObjectPtr<UEnvQuery> QueryTemplate;
@@ -50,13 +47,13 @@ struct PLANET_API FStateTreeRunEQSTaskInstanceData
 	UPROPERTY(EditAnywhere, Category = Param)
 	int32 Donut_OuterRadius = 850;
 	
-	int32 RequestID = 0;
+	UPROPERTY(EditAnywhere, Category = Param)
+	bool bRunForever = true;
+	
+	int32 RequestID = INDEX_NONE;
 
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
-
-	UPROPERTY(Transient)
-	bool bIsFinished = false;
 
 	TSharedPtr<FEnvQueryResult> ResultSPtr;
 
@@ -84,16 +81,16 @@ struct PLANET_API FSTT_RunEQS : public FStateTreeAIActionTaskBase
 		const FStateTreeTransitionResult& Transition
 	) const override;
 
-	virtual void ExitState(
-		FStateTreeExecutionContext& Context,
-		const FStateTreeTransitionResult& Transition
-	) const override;
-
 	virtual EStateTreeRunStatus Tick(
 		FStateTreeExecutionContext& Context,
 		const float DeltaTime
 	) const override;
 
-	virtual EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context)const;
+	virtual void ExitState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context)const;
 
 };

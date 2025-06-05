@@ -41,8 +41,6 @@ void UToolFuture_PickAxe::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 		{
 			EquipmentAxePtr = GameplayAbilityTargetData_DashPtr->EquipmentAxePtr;
 		}
-
-		PerformAction();
 	}
 	else
 	{
@@ -67,7 +65,12 @@ void UToolFuture_PickAxe::CancelAbility(const FGameplayAbilitySpecHandle Handle,
 	bIsKeepAction = false;
 }
 
-void UToolFuture_PickAxe::PerformAction()
+void UToolFuture_PickAxe::PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+		)
 {
 	if (EquipmentAxePtr && CharacterPtr && bIsKeepAction)
 	{

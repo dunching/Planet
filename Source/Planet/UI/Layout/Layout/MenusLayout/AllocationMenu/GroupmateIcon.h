@@ -7,7 +7,7 @@
 #include "GameplayTagContainer.h"
 
 #include "UIInterfaces.h"
-#include "Common/GenerateType.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 #include "AllocationIconBase.h"
 
@@ -18,11 +18,11 @@ class UDragDropOperation;
 
 struct FSkillProxy;
 struct FCharacterProxy;
-struct FAllocationbleProxy;
+struct IProxy_Allocationble;
 
 UCLASS()
 class PLANET_API UGroupmateIcon :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IAllocationableProxyIconInterface
 {
 	GENERATED_BODY()
@@ -33,7 +33,7 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& BasicProxyPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 

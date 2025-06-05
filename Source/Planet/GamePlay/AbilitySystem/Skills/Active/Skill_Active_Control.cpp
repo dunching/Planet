@@ -15,22 +15,20 @@
 #include "KismetCollisionHelper.h"
 #include "KismetGravityLibrary.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "CS_RootMotion.h"
 #include "BasicFutures_MoveToAttaclArea.h"
-#include "PlanetPlayerController.h"
-#include "CS_RootMotion_MoveAlongSpline.h"
+#include "Tools.h"
 
 USkill_Active_Control::USkill_Active_Control() :
 	Super()
@@ -133,7 +131,6 @@ void USkill_Active_Control::PerformAction(
 		{
 			auto MoveToAttaclAreaPtr = new FGameplayAbilityTargetData_MoveToAttaclArea;
 
-			MoveToAttaclAreaPtr->TargetCharacterPtr = Cast<ACharacterBase>(CharacterPtr->GetController<APlanetPlayerController>()->GetFocusActor());
 			MoveToAttaclAreaPtr->AttackDistance = AttackDistance;
 
 			CharacterPtr->GetCharacterAbilitySystemComponent()->MoveToAttackDistance(
@@ -149,32 +146,6 @@ void USkill_Active_Control::ExcuteTasks()
 
 	const auto Duration = HumanMontage->CalculateSequenceLength();
 
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-
-	// 伤害
-	{
-		FGAEventData GAEventData(HasFocusActor(), CharacterPtr);
-
-		GAEventData.SetBaseDamage(Damage);
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-		ICPtr->SendEventImp(GAEventDataPtr);
-	}
-
-	// 控制效果
-	{
-		auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_RootMotion_MoveAlongSpline;
-
-		GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-		GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = HasFocusActor();
-		GameplayAbilityTargetData_RootMotionPtr->SPlineActorPtr = SPlineActorPtr;
-		GameplayAbilityTargetData_RootMotionPtr->Duration = Duration;
-
-		ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
-	}
 }
 
 void USkill_Active_Control::PlayMontage()

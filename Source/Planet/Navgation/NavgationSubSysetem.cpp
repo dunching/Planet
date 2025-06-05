@@ -5,9 +5,11 @@
 #include <NavMesh/NavMeshBoundsVolume.h>
 #include <Kismet/GameplayStatics.h>
 #include <GameFramework/Character.h>
+
 #include <AIController.h>
 #include <NavigationPath.h>
 #include "NavigationSystem.h"
+#include "Tools.h"
 
 namespace NavgationSubSysetm
 {

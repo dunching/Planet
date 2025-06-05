@@ -11,8 +11,8 @@
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "InventoryComponent.h"
-#include "GenerateType.h"
-#include "TeamMatesHelperComponent.h"
+#include "GenerateTypes.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "CharacterBase.h"
 #include "GroupMateInfo.h"
 #include "PlanetControllerInterface.h"
@@ -52,7 +52,7 @@ void UTeamMatesList::NativeConstruct()
 
 	HumanCharacterPtr = Cast<AHumanCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 
-	ResetUIByData();
+	EnableMenu();
 }
 
 void UTeamMatesList::NativeDestruct()
@@ -62,11 +62,11 @@ void UTeamMatesList::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UTeamMatesList::ResetUIByData()
+void UTeamMatesList::EnableMenu()
 {
 }
 
-void UTeamMatesList::SyncData()
+void UTeamMatesList::DisEnableMenu()
 {
 	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(TeanMatesList::Get().VerticalBox));
 	if (!PanelPtr)
@@ -82,6 +82,11 @@ void UTeamMatesList::SyncData()
 			WidgetPtr->SynMember2Config(Index);
 		}
 	}
+}
+
+EMenuType UTeamMatesList::GetMenuType() const
+{
+	return EMenuType::kGroupManagger;
 }
 
 void UTeamMatesList::OnWeaponProxyChanged(

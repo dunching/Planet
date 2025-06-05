@@ -1,41 +1,111 @@
 #include "SceneActorInteractionComponent.h"
 
-#include "GuideActor.h"
+#include "Kismet/GameplayStatics.h"
 
-#include "GuideInteractionActor.h"
+#include "HumanCharacter_AI.h"
+#include "GuideInteraction.h"
+#include "GuideSubSystem.h"
+#include "HumanCharacter_Player.h"
+#include "MainHUD.h"
+#include "MainHUDLayout.h"
+#include "PlanetPlayerController.h"
 
+class AMainHUD;
 FName USceneActorInteractionComponent::ComponentName = TEXT("SceneActorInteractionComponent");
 
-USceneActorInteractionComponent::USceneActorInteractionComponent(const FObjectInitializer& ObjectInitializer):
-	Super(ObjectInitializer)
+USceneActorInteractionComponent::USceneActorInteractionComponent(
+	const FObjectInitializer& ObjectInitializer
+	):
+	 Super(ObjectInitializer)
 {
 	// 因为有切换任务 所以这里我们不要他自动调用，
 	// bStartLogicAutomatically = false;
 }
 
-TArray<TSubclassOf<AGuideInteractionActor>>  USceneActorInteractionComponent::GetTaskNodes() const
+TArray<TSubclassOf<AGuideInteractionBase>> USceneActorInteractionComponent::GetInteractionLists() const
 {
-	TArray<TSubclassOf<AGuideInteractionActor>> Results;
-	
-	Results.Append(GuideInteractionAry);
-	Results.Append(TemporaryGuideInteractionAry);
-	
+	TArray<TSubclassOf<AGuideInteractionBase>> Results;
+
+	for (const auto& Iter : GuideInteractionAry)
+	{
+		if (Iter.bIsEnable)
+		{
+			Results.Add(Iter.GuideInteraction);
+		}
+	}
+
 	return Results;
 }
 
-void USceneActorInteractionComponent::AddGuideActor(const TSubclassOf<AGuideInteractionActor>& GuideActorClass)
+TObjectPtr<AGuideInteractionBase> USceneActorInteractionComponent::GetCurrentInteraction() const
 {
-	TemporaryGuideInteractionAry.Add(GuideActorClass);
+	return GuideInteractionActorPtr;
 }
 
- void USceneActorInteractionComponent::RemoveGuideActor(const TSubclassOf<AGuideInteractionActor>& GuideActorClass)
+TArray<FGuideInterationSetting> USceneActorInteractionComponent::GetGuideInteractionAry() const
 {
-	for (int32 Index = 0; Index < TemporaryGuideInteractionAry.Num(); Index++)
+	return GuideInteractionAry;
+}
+
+void USceneActorInteractionComponent::StartInteractionItem(
+	const TSubclassOf<AGuideInteractionBase>& Item
+	)
+{
+}
+
+void USceneActorInteractionComponent::StopInteractionItem()
+{
+	if (GuideInteractionActorPtr)
 	{
-		if (TemporaryGuideInteractionAry[Index] == GuideActorClass)
+		UGuideSubSystem::GetInstance()->AddGuidePostion(
+		                                                GuideInteractionActorPtr->GetGuideID(),
+		                                                GuideInteractionActorPtr->GetCurrentTaskID()
+		                                               );
+
+		GuideInteractionActorPtr->bWantToStop = true;
+		GuideInteractionActorPtr = nullptr;
+	}
+}
+
+void USceneActorInteractionComponent::ChangedInterationState(
+	const TSubclassOf<AGuideInteractionBase>& Item,
+	bool bIsEnable
+	)
+{
+	for (auto& Iter : GuideInteractionAry)
+	{
+		if (Iter.GuideInteraction == Item)
 		{
-			TemporaryGuideInteractionAry.RemoveAt(Index);
+			Iter.bIsEnable = bIsEnable;
 			break;
 		}
 	}
+}
+
+bool USceneActorInteractionComponent::GetIsEnableInteraction() const
+{
+	return bEnableInteraction && !GetInteractionLists().IsEmpty();
+}
+
+void USceneActorInteractionComponent::StartInteractionImp(
+	const TSubclassOf<AGuideInteractionBase>& Item,
+	const TObjectPtr<AGuideInteractionBase>& GuideInteraction_ActorPtr
+	)
+{
+	GuideInteractionActorPtr = GuideInteraction_ActorPtr;
+	
+	const auto NewGuideID = Item.GetDefaultObject()->GetGuideID();
+	if (!NewGuideID.IsValid())
+	{
+		checkNoEntry();
+	}
+	
+	FGuid CurrentTaskID;
+	if (UGuideSubSystem::GetInstance()->ConsumeGuidePostion(NewGuideID, CurrentTaskID))
+	{
+		//
+		GuideInteractionActorPtr->SetPreviousTaskID(CurrentTaskID);
+	}
+
+	GuideInteractionActorPtr->GetGuideSystemStateTreeComponent()->StartLogic();
 }

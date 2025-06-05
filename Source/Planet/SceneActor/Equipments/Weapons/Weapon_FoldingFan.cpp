@@ -22,6 +22,7 @@
 #include "HumanCharacter.h"
 #include "Animation/AnimInstanceBase.h"
 #include "AbilityTask_PlayMontage.h"
+#include "ItemProxy_Weapon.h"
 #include "ToolFuture_PickAxe.h"
 #include "Skill_WeaponActive_PickAxe.h"
 #include "KismetGravityLibrary.h"
@@ -48,7 +49,7 @@ AWeapon_FoldingFan::AWeapon_FoldingFan(const FObjectInitializer& ObjectInitializ
 	ProjectileMovementCompPtr->ProjectileGravityScale = 0.f;
 }
 
-void AWeapon_FoldingFan::AttachToCharacter(ACharacterBase* CharacterPtr)
+void AWeapon_FoldingFan::AttachToCharacter(ACharacter* CharacterPtr)
 {
 	Super::AttachToCharacter(CharacterPtr);
 

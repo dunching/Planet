@@ -64,6 +64,26 @@
     "Chinese": "失去",
     "English": "Lose"
   },
+  "EntryActionProcessor": {
+    "Default": "EntryActionProcessor",
+    "Chinese": "切换到动作模式",
+    "English": "EntryActionProcessor"
+  },
+  "ViewAllocationMenu": {
+    "Default": "ViewAllocationMenu",
+    "Chinese": "查看分配技能界面",
+    "English": "ViewAllocationMenu"
+  },
+  "MainThread": {
+    "Default": "MainThread",
+    "Chinese": "主线",
+    "English": "MainThread"
+  },
+  "BrandThread": {
+    "Default": "BrandThread",
+    "Chinese": "支线",
+    "English": "BrandThread"
+  },
   "Return": {
     "Default": "Return",
     "Chinese": "返回",

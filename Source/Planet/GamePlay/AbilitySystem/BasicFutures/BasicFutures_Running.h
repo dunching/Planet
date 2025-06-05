@@ -1,11 +1,11 @@
-// Copyright 2020 Dan Kestranek.
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 
 #include "BasicFuturesBase.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "BaseData.h"
 
 #include "BasicFutures_Running.generated.h"
@@ -47,7 +47,7 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateEndAbility,
 		bool bWasCancelled
-	);
+	) override;
 
 	virtual bool CanActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -57,23 +57,25 @@ public:
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	) const override;
 
+	virtual void ApplyCost(
+		const FGameplayAbilitySpecHandle Handle, 
+		const FGameplayAbilityActorInfo* ActorInfo, 
+		const FGameplayAbilityActivationInfo ActivationInfo
+		) const override;
+
 protected:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBaseProperty RunningSpeedOffset;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBaseProperty RunningConsume;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
-	TSubclassOf<UGE_Running>GE_RunningClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
-	TSubclassOf<UGE_CancelRunning>GE_CancelRunningClass;
-
 private:
 
-	virtual void InitalDefaultTags() override;
+	FActiveGameplayEffectHandle RunningCostGEHandle;
+	
+	// virtual void InitalDefaultTags() override;
 
 	void IntervalTick(UAbilityTask_TimerHelper*, float Interval, float InDuration);
 	

@@ -21,13 +21,13 @@ struct FGameplayAbilityTargetData_Affected :
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
-	EAffectedDirection AffectedDirection = EAffectedDirection::kForward;
+	EAffectedDirection AffectedDirection = EAffectedDirection::kNone;
 
 	int32 RepelDistance = -1;
 
 	FVector RepelDirection = FVector::ZeroVector;
 
-	ACharacterBase* TriggerCharacterPtr = nullptr;
+	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
 
 };
 
@@ -42,9 +42,9 @@ struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Affected> :
 };
 
 /**
- * 受击时的“僵直效果”
+ * 受击时的“动画效果”
+ * 不包含击退或僵直的额外效果
  */
-
 UCLASS()
 class PLANET_API UBasicFutures_Affected : public UBasicFuturesBase
 {
@@ -60,14 +60,6 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
 	) override;
-
-	virtual void PreActivate(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
-		const FGameplayEventData* TriggerEventData = nullptr
-	);
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -86,9 +78,17 @@ public:
 
 protected:
 
-	virtual void InitalDefaultTags()override;
+	virtual void PreActivate(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+		const FGameplayEventData* TriggerEventData = nullptr
+	) override;
 
-	void PerformAction();
+	// virtual void InitalDefaultTags()override;
+
+	void Perform();
 
 	void PlayMontage(UAnimMontage* CurMontagePtr, float Rate);
 

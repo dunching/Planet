@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "UIInterfaces.h"
+#include "ItemProxy_GenericType.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 #include "GetItemInfosList.generated.h"
 
@@ -16,14 +17,17 @@ class UHUD_TeamMateInfo;
 class UGetItemInfosItem;
 
 struct FBasicProxy;
-struct FCoinProxy;
+struct FWeaponProxy;
 struct FSkillProxy;
+struct FCoinProxy;
 struct FConsumableProxy;
+struct FCharacterProxy;
+
 
 UCLASS()
 class PLANET_API UGetItemInfosList :
-	public UMyUserWidget,
-	public IHUDInterface
+	public UUserWidget_Override,
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -34,19 +38,40 @@ public:
 	virtual void NativePreConstruct()override;
 #endif
 
-	virtual void ResetUIByData() override;
+	void SetPlayerCharacter(ACharacterBase*PlayeyCharacterPtr);
+	
+	void OnWeaponProxyChanged(
+		const TSharedPtr<FWeaponProxy>& ProxyPtr,
+		EProxyModifyType ProxyModifyType
+		);
 
-	void OnSkillProxyChanged(const TSharedPtr<FSkillProxy>& ProxyPtr, bool bIsAdd);
+	void OnSkillProxyChanged(
+		const TSharedPtr<FSkillProxy>& ProxyPtr,
+		EProxyModifyType ProxyModifyType
+		);
 
-	void OnCoinProxyChanged(const TSharedPtr<FCoinProxy>& ProxyPtr, bool bIsAdd, int32 Num);
+	void OnCoinProxyChanged(
+		const TSharedPtr<FCoinProxy>& ProxyPtr,
+		EProxyModifyType ProxyModifyType,
+		int32 Num
+		);
 
-	void OnConsumableProxyChanged(const TSharedPtr<FConsumableProxy>& ProxyPtr, EProxyModifyType ProxyModifyType);
+	void OnConsumableProxyChanged(
+		const TSharedPtr<FConsumableProxy>& ProxyPtr,
+		EProxyModifyType ProxyModifyType
+		);
 
-	void OnGourpmateProxyChanged(const TSharedPtr<FCharacterProxy>& ProxyPtr, bool bIsAdd);
+	void OnGourpmateProxyChanged(
+		const TSharedPtr<FCharacterProxy>& ProxyPtr,
+		EProxyModifyType ProxyModifyType
+		);
 
 protected:
 	void OnRemovedItem();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<USoundWave>GetCoinsSoundRef = nullptr;
+	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UGetItemInfosItem> GetItemInfosClass;
 
@@ -55,11 +80,13 @@ protected:
 
 	TArray<TSharedPtr<FBasicProxy>> OrderAry;
 
-	TArray<TPair<TWeakPtr<FSkillProxy>, bool>> SkillPendingAry;
+	TArray<TPair<TWeakPtr<FWeaponProxy>, EProxyModifyType>> WeaponPendingAry;
 
-	TArray<TTuple<TWeakPtr<FCoinProxy>, bool, int32>> CoinPendingAry;
+	TArray<TPair<TWeakPtr<FSkillProxy>, EProxyModifyType>> SkillPendingAry;
+
+	TArray<TTuple<TWeakPtr<FCoinProxy>, EProxyModifyType, int32>> CoinPendingAry;
 
 	TArray<TPair<TWeakPtr<FConsumableProxy>, EProxyModifyType>> ConsumablePendingAry;
 
-	TArray<TPair<TWeakPtr<FCharacterProxy>, bool>> CharacterPendingAry;
+	TArray<TPair<TWeakPtr<FCharacterProxy>, EProxyModifyType>> CharacterPendingAry;
 };

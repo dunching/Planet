@@ -3,32 +3,31 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "MenuInterface.h"
+#include "ScaleableWidget.h"
 
 #include "TalentAllocation.generated.h"
 
 class UTalentIcon;
+
+struct FCharacterProxy;
+
+UTalentIcon;
 
 /**
  *
  */
 UCLASS()
 class PLANET_API UTalentAllocation :
-	public UMyUserWidget,
+	public UScaleableWidget,
 	public IMenuInterface
 {
 	GENERATED_BODY()
 
 public:
-
-	// 可用的总点数变更
-	using FPointsDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
-
-	// 分配的点数变更
-	using FPointDelegateHandle = TCallbackHandleContainer<void(UTalentIcon*, bool)>::FCallbackHandleSPtr;
 
 	virtual void NativeConstruct()override;
 
@@ -36,16 +35,26 @@ public:
 
 protected:
 
-	virtual void ResetUIByData()override;
+	virtual void EnableMenu()override;
 
-	virtual void SyncData()override;
+	virtual void DisEnableMenu()override;
 
-	void OnUsedTalentNumChanged(int32 OldNum, int32 NewNum);
+	virtual EMenuType GetMenuType()const override final;
+
+	void UpdateTalenIconState();
 	
-	void OnAddPoint(UTalentIcon* TalentIconPtr, bool bIsAdd);
+	void OnUsedTalentNumChanged(int32 UsedNum, int32 TatolNum);
 
-	FPointsDelegateHandle OnValueChanged;
-	
-	TArray<FPointDelegateHandle> OnPointChangedHandleAry;
+	UFUNCTION()
+	bool OnAddPoint(UTalentIcon* TalentIconPtr, bool bIsAdd);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSet<UTalentIcon*> EnableSocletIconSet;
+
+private:
+	void OnSelectedCharacterProxy(
+		const TSharedPtr<FCharacterProxy>& ProxyPtr
+		);
+
+	TSharedPtr<FCharacterProxy> CurrentProxyPtr = nullptr;
 };

@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include "UObject/ObjectMacros.h"
 #include "UObject/Interface.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
+#include "MainMenuCommon.h"
 
 #include "MenuInterface.generated.h"
 
@@ -25,10 +26,12 @@ class PLANET_API IMenuInterface
 
 public:
 
-	virtual void ResetUIByData() = 0;
+	virtual void EnableMenu() = 0;
 	
-	virtual void SyncData() = 0;
+	virtual void DisEnableMenu() = 0;
 
+	virtual EMenuType GetMenuType()const = 0;
+	
 protected:
 
 private:

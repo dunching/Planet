@@ -12,13 +12,13 @@
 #include "Abilities/Tasks/AbilityTask_Repeat.h"
 #include "GameFramework/Controller.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
@@ -26,7 +26,7 @@
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
 #include "PlanetControllerInterface.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "HumanCharacter.h"
 #include "CharacterAbilitySystemComponent.h"
 
@@ -133,7 +133,7 @@ void USkill_WeaponActive_RangeTest::OnNotifyBeginReceived(FName NotifyName)
 	{
 		EmitProjectile();
 
-		CheckInContinue(-1.f);
+		PerformIfContinue();
 	}
 }
 
@@ -157,21 +157,6 @@ void USkill_WeaponActive_RangeTest::EmitProjectile()
 
 void USkill_WeaponActive_RangeTest::MakeDamage(ACharacterBase* TargetCharacterPtr)
 {
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-	if (TargetCharacterPtr)
-	{
-		FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-		GAEventData.SetBaseDamage(Damage);
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-	}
-
-	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-	ICPtr->SendEventImp(GAEventDataPtr);
 }
 
 void USkill_WeaponActive_RangeTest::PlayMontage()

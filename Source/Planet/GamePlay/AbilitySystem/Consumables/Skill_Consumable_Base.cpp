@@ -7,13 +7,14 @@
 #include "PlanetAbilitySystemComponent.h"
 #include "CharacterBase.h"
 #include "InventoryComponent.h"
+#include "ItemProxy_Consumable.h"
 
-UScriptStruct* FGameplayAbilityTargetData_Consumable::GetScriptStruct() const
+UScriptStruct* FGameplayAbilityTargetData_RegisterParam_Consumable::GetScriptStruct() const
 {
-	return FGameplayAbilityTargetData_Consumable::StaticStruct();
+	return FGameplayAbilityTargetData_RegisterParam_Consumable::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_Consumable::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FGameplayAbilityTargetData_RegisterParam_Consumable::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
@@ -88,8 +89,6 @@ void USkill_Consumable_Base::ActivateAbility(
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool USkill_Consumable_Base::CanActivateAbility(
@@ -100,7 +99,7 @@ bool USkill_Consumable_Base::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (ProxyPtr && ProxyPtr->CheckCooldown())
+	if (ProxyPtr && ProxyPtr->CheckNotInCooldown())
 	{
 		return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 	}

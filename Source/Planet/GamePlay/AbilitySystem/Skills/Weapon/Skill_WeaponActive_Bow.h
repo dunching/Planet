@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AS_Character.h"
 
 #include "ProjectileBase.h"
 #include "Skill_WeaponActive_Base.h"
@@ -12,14 +13,15 @@ class UPrimitiveComponent;
 class UNiagaraComponent;
 class UAnimMontage;
 
+class UItemProxy_Description_WeaponSkill;
 class AWeapon_Bow;
 class ACharacterBase;
 class UAbilityTask_PlayMontage;
 class ASkill_WeaponActive_Bow_Projectile;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_Bow_RegisterParam :
-	public FGameplayAbilityTargetData_SkillBase_RegisterParam
+struct PLANET_API FGameplayAbilityTargetData_Bow_RegisterParam :
+	public FGameplayAbilityTargetData_RegisterParam_SkillBase
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -56,6 +58,8 @@ public:
 
 	using FWeaponActorType = AWeapon_Bow;
 
+	using FItemProxy_DescriptionType = UItemProxy_Description_WeaponSkill;
+	
 	USkill_WeaponActive_Bow();
 
 	virtual void OnAvatarSet(
@@ -69,13 +73,6 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
-	);
-
-	virtual void ActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData
 	);
 
 	virtual void OnRemoveAbility(
@@ -95,8 +92,6 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	)override;
 
-	virtual void CheckInContinue(float InWaitInputTime)override;
-
 	void PlayMontage();
 
 	UFUNCTION()
@@ -105,7 +100,11 @@ protected:
 	UFUNCTION()
 	void OnMontateComplete();
 
-	void EmitProjectile()const;
+	UFUNCTION()
+	void OnMontageOnInterrupted();
+
+	// 默认的旋转角度（绕Z轴）
+	void EmitProjectile(float OffsetAroundZ)const;
 
 	void MakeDamage(ACharacterBase * TargetCharacterPtr);
 
@@ -128,14 +127,15 @@ protected:
 	UAnimMontage* BowMontage = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	int32 Damage = 10;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 SweepWidth = 500;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<ASkill_WeaponActive_Bow_Projectile>Skill_WeaponActive_RangeTest_ProjectileClass;
 
-	FWeaponActorType* WeaponPtr = nullptr;
+	FWeaponActorType* WeaponActorPtr = nullptr;
+
+private:
+	
+	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
 
 };

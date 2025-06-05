@@ -8,8 +8,9 @@
 #include "ArticleBase.h"
 #include "ArticleSharedData.h"
 #include "AssetRefMap.h"
-#include "Planet.h"
-#include "InputProcessorSubSystem.h"
+#include "PlanetModule.h"
+#include "InputProcessorSubSystemBase.h"
+#include "InputProcessorSubSystem_Imp.h"
 
 void UPlanetGameInstance::Init()
 {
@@ -20,23 +21,25 @@ void UPlanetGameInstance::OnStart()
 {
 	Super::OnStart();
 
-	GetWorldImp()->SetGameInstance(this);
+	// 之前的代码，为什么加这句记不起来了
+	// GetWorldImp()->SetGameInstance(this);
 
-	bIsExiting = false;
+	GIsExiting = false;
 }
 
 void UPlanetGameInstance::Shutdown()
 {
-	bIsExiting = true;
+	GIsExiting = true;
 
-	GUObjectArray.ShutdownUObjectArray();
+	// 注意：这里提前释放的会，之后编辑器模式下保存资源会出错
+	// GUObjectArray.ShutdownUObjectArray();
 
 #if WITH_EDITOR
 	auto TestMap1 = TestGCProxyMap;
 //	check(TestMap1.IsEmpty());
 #endif
 
-	UInputProcessorSubSystem::GetInstance()->ResetProcessor();
+	UInputProcessorSubSystem_Imp::GetInstance()->ResetProcessor();
 
 	Super::Shutdown();
 	PRINTFUNC();

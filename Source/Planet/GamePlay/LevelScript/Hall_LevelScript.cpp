@@ -1,8 +1,9 @@
-
 #include "Hall_LevelScript.h"
 
 #include <type_traits>
 
+#include "Dynamic_Weather.h"
+#include "WeatherSystem.h"
 #include "Engine/TargetPoint.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -16,17 +17,35 @@ void AMain_LevelScriptActor::BeginPlay()
 	Super::BeginPlay();
 
 	ClearWorldProcessCache();
+	
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather(WeatherSettings::Clear_Skies);
+	}
+#endif
+	
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+	}
+#endif
 }
 
 void AMain_LevelScriptActor::ClearWorldProcessCache()
 {
-	TArray<AActor*> OutActors;
-	UGameplayStatics::GetAllActorsOfClass(this, ATargetPoint::StaticClass(),OutActors);
-	for (auto Iter : OutActors)
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
 	{
-		if (Iter)
+		TArray<AActor*> OutActors;
+		UGameplayStatics::GetAllActorsOfClass(this, ATargetPoint::StaticClass(), OutActors);
+		for (auto Iter : OutActors)
 		{
-			Iter->Destroy();
+			if (Iter)
+			{
+				Iter->Destroy();
+			}
 		}
 	}
+#endif
 }

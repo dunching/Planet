@@ -6,6 +6,7 @@
 
 #include "Weapon_Base.h"
 #include "PlanetGameplayAbility.h"
+#include "PlanetWeapon_Base.h"
 #include "Skill_Base.h"
 
 #include "Weapon_RangeTest.generated.h"
@@ -17,7 +18,7 @@ class AHumanCharacter;
 class ATool_PickAxe;
 
 UCLASS()
-class PLANET_API AWeapon_RangeTest : public AWeapon_Base
+class PLANET_API AWeapon_RangeTest : public APlanetWeapon_Base
 {
 	GENERATED_BODY()
 
@@ -25,7 +26,7 @@ public:
 
 	AWeapon_RangeTest(const FObjectInitializer& ObjectInitializer);
 
-	virtual void AttachToCharacter(ACharacterBase* CharacterPtr)override;
+	virtual void AttachToCharacter(ACharacter* CharacterPtr)override;
 
 	USkeletalMeshComponent* GetMesh();
 

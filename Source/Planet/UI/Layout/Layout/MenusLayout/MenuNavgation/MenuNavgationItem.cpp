@@ -6,8 +6,13 @@
 
 #include "TemplateHelper.h"
 #include "MenuNavgationItem.h"
+
+#include "HumanViewTalentAllocation.h"
+#include "InputProcessorSubSystemBase.h"
 #include "MainMenuLayout.h"
 #include "UIManagerSubSystem.h"
+#include "HumanCharacter_Player.h"
+#include "InputProcessorSubSystem_Imp.h"
 
 struct FMenuNavgationItem : public TStructVariable<FMenuNavgationItem>
 {
@@ -27,28 +32,28 @@ void UMenuNavgationItem::NativeConstruct()
 
 void UMenuNavgationItem::OnClicked()
 {
-	switch (MenuType)
-	{
+	switch (MenuType) {
+	case EMenuType::kEmpty:
+		break;
 	case EMenuType::kAllocationSkill:
-	{
-		UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kAllocationSkill);
-	}
-	break;
+		break;
 	case EMenuType::kAllocationTalent:
-	{
-		UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kAllocationTalent);
-	}
-	break;
+		{
+			UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanViewTalentAllocation>();
+			return;
+		}
+		break;
 	case EMenuType::kGroupManagger:
-	{
-		UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kGroupManagger);
-	}
-	break;
+		break;
 	case EMenuType::kRaffle:
-	{
-		UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kRaffle);
+		break;
+	case EMenuType::kViewTask:
+		break;
+	case EMenuType::kViewMap:
+		break;
+	case EMenuType::kViewSetting:
+		break;
 	}
-	break;
-	}
+	UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(MenuType);
 }
 

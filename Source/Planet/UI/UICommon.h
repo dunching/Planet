@@ -14,12 +14,24 @@ enum EUIOrder : int8
 	kInteractionList,
 
 	kFightingTips,
+	
 	kFocus,
 
 	kHUD,
-	kPlayer_Character_State_HUD,
-	kOtherPlayer_Character_State_HUD,
+
+	/**
+	 * 玩家的角色的Title
+	 */
+	kPlayer_Character_State_Title,
+	
+	/**
+	 * NPC的角色的Title
+	 */
+	kOtherPlayer_Character_State_Title,
 
 	kMainUI,
+	
 	kTableMenu,
+
+	kHoverDecription,
 };

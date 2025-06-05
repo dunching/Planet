@@ -3,7 +3,7 @@
 
 #include "Net/UnrealNetwork.h"
 
-#include "AbilityTask_FlyAway.h"
+#include "AbilityTask_ApplyRootMotion_FlyAway.h"
 
 #include "GameFramework/RootMotionSource.h"
 
@@ -15,6 +15,7 @@
 #include "ProxyProcessComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Minimal.h"
+#include "ItemProxy_Skills.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 
 void USkill_Active_FoldingFan_AddNum::PerformAction(

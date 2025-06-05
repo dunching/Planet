@@ -11,8 +11,6 @@
 void USkill_Active_Switch_Test::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME_CONDITION(ThisClass, bIsUsingActives, COND_AutonomousOnly);
 }
 
 void USkill_Active_Switch_Test::PerformAction(

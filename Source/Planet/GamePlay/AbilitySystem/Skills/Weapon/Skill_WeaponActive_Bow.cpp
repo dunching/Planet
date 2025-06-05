@@ -13,25 +13,31 @@
 #include "GameFramework/Controller.h"
 #include "Kismet/KismetMathLibrary.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
 #include "AbilityTask_PlayAnimAndWaitOverride.h"
 #include "ToolFuture_PickAxe.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
+#include "AssetRefMap.h"
 #include "AS_Character.h"
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
 #include "PlanetControllerInterface.h"
-#include "TeamMatesHelperComponent.h"
+#include "GE_Common.h"
 #include "Weapon_Bow.h"
 #include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "ItemProxy_Skills.h"
+#include "ItemProxy_Weapon.h"
 #include "KismetGravityLibrary.h"
+#include "LogWriter.h"
+#include "SceneProxyTable.h"
 
 namespace Skill_WeaponActive_Bow
 {
@@ -77,6 +83,18 @@ void USkill_WeaponActive_Bow::OnAvatarSet(
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
+
+	if (CharacterPtr)
+	{
+		if (SkillProxyPtr)
+		{
+			ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(
+																		DynamicCastSharedPtr<FWeaponSkillProxy>(
+																			 SkillProxyPtr
+																			)->GetTableRowProxy_WeaponSkillExtendInfo()
+																	   );
+		}
+	}
 }
 
 void USkill_WeaponActive_Bow::PreActivate(
@@ -92,27 +110,9 @@ void USkill_WeaponActive_Bow::PreActivate(
 	{
 		if (ActiveParamSPtr)
 		{
-			WeaponPtr = Cast<FWeaponActorType>(ActiveParamSPtr->WeaponPtr);
+			WeaponActorPtr = Cast<FWeaponActorType>(ActiveParamSPtr->WeaponPtr);
 		}
 	}
-}
-
-void USkill_WeaponActive_Bow::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData
-)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	if (WeaponPtr)
-	{
-		return;
-	}
-
-	checkNoEntry();
-	K2_EndAbility();
 }
 
 void USkill_WeaponActive_Bow::OnRemoveAbility(
@@ -142,30 +142,20 @@ void USkill_WeaponActive_Bow::PerformAction(
 {
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	StartTasksLink();
-}
-
-void USkill_WeaponActive_Bow::CheckInContinue(float InWaitInputTime)
-{
-	if (bIsContinue)
+	if (WeaponActorPtr)
 	{
-		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
+		StartTasksLink();
 	}
 	else
 	{
-		if (
-			(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
-			(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
-			)
-		{
-			K2_CancelAbility();
-		}
+		PRINTINVOKEWITHSTR(FString(TEXT("No Weapon")));
+		K2_EndAbility();
 	}
 }
 
 void USkill_WeaponActive_Bow::StartTasksLink()
 {
-	if (WeaponPtr && CharacterPtr)
+	if (WeaponActorPtr && CharacterPtr)
 	{
 		PlayMontage();
 	}
@@ -173,7 +163,7 @@ void USkill_WeaponActive_Bow::StartTasksLink()
 
 void USkill_WeaponActive_Bow::OnProjectileBounce(
 	UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor,
+	AActor* OtherActor, 
 	UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex,
 	bool bFromSweep,
@@ -184,6 +174,10 @@ void USkill_WeaponActive_Bow::OnProjectileBounce(
 	{
 		auto OtherCharacterPtr = Cast<ACharacterBase>(OtherActor);
 		if (CharacterPtr->IsGroupmate(OtherCharacterPtr))
+		{
+			return;
+		}
+		if (OtherCharacterPtr->GetCharacterAbilitySystemComponent()->IsCantBeDamage())
 		{
 			return;
 		}
@@ -205,82 +199,122 @@ void USkill_WeaponActive_Bow::OnMontateComplete()
 {
 	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	{
-		EmitProjectile();
+		if (RegisterParamSPtr && RegisterParamSPtr->bIsMultiple)
+		{
+			EmitProjectile(-30.f);
+			EmitProjectile(0.f);
+			EmitProjectile(30.f);
+		}
+		else
+		{
+			EmitProjectile(0.f);
+		}
 	}
 
+#if UE_EDITOR || UE_SERVER
 	if (
-		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
-		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 		)
 	{
-		CheckInContinue(-1.f);
+		if (PerformIfContinue())
+		{
+		}
+		else
+		{
+			K2_CancelAbility();
+		}
 	}
+#endif
 }
 
-void USkill_WeaponActive_Bow::EmitProjectile()const
+void USkill_WeaponActive_Bow::OnMontageOnInterrupted()
 {
-	auto EmitTransform = WeaponPtr->GetEmitTransform();
+#if UE_EDITOR || UE_SERVER
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+	)
+	{
+		K2_CancelAbility();
+	}
+#endif
+}
 
-	const auto AttackDistance = WeaponPtr->GetWeaponProxy()->GetMaxAttackDistance();
+void USkill_WeaponActive_Bow::EmitProjectile(float OffsetAroundZ)const
+{
+	auto EmitTransform = WeaponActorPtr->GetEmitTransform();
+	const FRotator OffsetRot(0.f,OffsetAroundZ,0.f);
+	
+	const auto AttackDistance = WeaponActorPtr->GetWeaponProxy()->GetMaxAttackDistance();
 
 	ACharacterBase* HomingTarget = nullptr;
 	if (RegisterParamSPtr && RegisterParamSPtr->bIsHomingTowards)
 	{
-		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
-
-		FCollisionShape CollisionShape = FCollisionShape::MakeSphere(SweepWidth);
-
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(CharacterPtr);
-
-		TArray<struct FHitResult> OutHits;
-		if (CharacterPtr->GetWorld()->SweepMultiByObjectType(
-			OutHits,
-			EmitTransform.GetLocation(),
-			EmitTransform.GetLocation() + (CharacterPtr->GetActorForwardVector() * AttackDistance),
-			FQuat::Identity,
-			ObjectQueryParams,
-			CollisionShape,
-			Params
-		))
+		auto FocusActorPtr = HasFocusActor();
+		if (FocusActorPtr)
 		{
-			for (const auto& Iter : OutHits)
+			HomingTarget = FocusActorPtr;
+			auto OrgineRot = (FocusActorPtr->GetActorLocation() - EmitTransform.GetLocation()).Rotation();
+			EmitTransform.SetRotation((OrgineRot + OffsetRot).Quaternion());
+		}
+		else
+		{
+			FCollisionObjectQueryParams ObjectQueryParams;
+			ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+			FCollisionShape CollisionShape = FCollisionShape::MakeSphere(SweepWidth);
+
+			FCollisionQueryParams Params;
+			Params.AddIgnoredActor(CharacterPtr);
+
+			TArray<struct FHitResult> OutHits;
+			if (CharacterPtr->GetWorld()->SweepMultiByObjectType(
+				OutHits,
+				EmitTransform.GetLocation(),
+				EmitTransform.GetLocation() + (CharacterPtr->GetActorForwardVector() * AttackDistance),
+				FQuat::Identity,
+				ObjectQueryParams,
+				CollisionShape,
+				Params
+			))
 			{
-				auto OtherCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-				if (CharacterPtr->IsGroupmate(OtherCharacterPtr))
-				{
-					continue;
-				}
-				else if (FVector::Distance(OtherCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < SweepWidth)
-				{
-					continue;
-				}
-				EmitTransform.SetRotation(UKismetMathLibrary::MakeRotFromZX(
+				// 初始角度
+				const auto OriginRot = UKismetMathLibrary::MakeRotFromZX(
 					-UKismetGravityLibrary::GetGravity(),
 					CharacterPtr->GetActorForwardVector()
-				).Quaternion());
+				);
+				const auto Dir = (OriginRot + OffsetRot).Vector();
+				const auto CharacterLocation = CharacterPtr->GetActorLocation();
+				
+				float Dot = 0.f;
 
-				HomingTarget = OtherCharacterPtr;
+				for (const auto& Iter : OutHits)
+				{
+					auto OtherCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
+					if (CharacterPtr->IsGroupmate(OtherCharacterPtr))
+					{
+						continue;
+					}
 
-				break;
+					const auto TargetDir = (OtherCharacterPtr->GetActorLocation() - CharacterLocation).GetSafeNormal();
+					const auto NewDot = FVector::DotProduct(TargetDir, Dir);
+					if (NewDot  > Dot)
+					{
+						Dot = NewDot;
+						HomingTarget = OtherCharacterPtr;
+					}
+				}
+				
+				EmitTransform.SetRotation((OriginRot + OffsetRot).Quaternion());
 			}
 		}
 	}
 	else
 	{
-		auto FocusActorPtr = HasFocusActor();
-		if (FocusActorPtr)
-		{
-			EmitTransform.SetRotation((FocusActorPtr->GetActorLocation() - EmitTransform.GetLocation()).ToOrientationQuat());
-		}
-		else
-		{
-			EmitTransform.SetRotation(UKismetMathLibrary::MakeRotFromZX(
-				-UKismetGravityLibrary::GetGravity(),
-				CharacterPtr->GetActorForwardVector()
-			).Quaternion());
-		}
+		auto OrgineRot = UKismetMathLibrary::MakeRotFromZX(
+			-UKismetGravityLibrary::GetGravity(),
+			CharacterPtr->GetActorForwardVector()
+		);
+		EmitTransform.SetRotation((OrgineRot +OffsetRot).Quaternion());
 	}
 
 	FActorSpawnParameters SpawnParameters;
@@ -307,33 +341,39 @@ void USkill_WeaponActive_Bow::EmitProjectile()const
 
 void USkill_WeaponActive_Bow::MakeDamage(ACharacterBase* TargetCharacterPtr)
 {
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+	FGameplayEffectSpecHandle SpecHandle = MakeDamageToTargetSpecHandle(
+																  ItemProxy_DescriptionPtr->ElementalType,
+																  ItemProxy_DescriptionPtr->Elemental_Damage,
+																  ItemProxy_DescriptionPtr->Elemental_Damage_Magnification
+																 );
 
-	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+	TArray<TWeakObjectPtr<AActor> >Ary;
+	Ary.Add(TargetCharacterPtr);
+	FGameplayAbilityTargetDataHandle TargetData;
 
-	if (TargetCharacterPtr)
-	{
-		FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
+	auto GameplayAbilityTargetData_ActorArrayPtr = new FGameplayAbilityTargetData_ActorArray;
+	GameplayAbilityTargetData_ActorArrayPtr->SetActors(Ary);
 
-		GAEventData.SetBaseDamage(Damage);
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-	}
-
-	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-	ICPtr->SendEventImp(GAEventDataPtr);
+	TargetData.Add(GameplayAbilityTargetData_ActorArrayPtr);
+	const auto GEHandleAry = MyApplyGameplayEffectSpecToTarget(
+		GetCurrentAbilitySpecHandle(),
+		GetCurrentActorInfo(),
+		GetCurrentActivationInfo(),
+		SpecHandle,
+		TargetData
+	);
 }
 
 void USkill_WeaponActive_Bow::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
-	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
-
 	if (
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{ 
+		const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
+		const float Rate = static_cast<float>(GAPerformSpeed) / 100;
+
 		{
 			auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 				this,
@@ -347,6 +387,8 @@ void USkill_WeaponActive_Bow::PlayMontage()
 			AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
 			AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 
+			AbilityTask_PlayMontage_HumanPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
+
 			AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
 		}
 		{
@@ -354,7 +396,7 @@ void USkill_WeaponActive_Bow::PlayMontage()
 				this,
 				TEXT(""),
 				BowMontage,
-				WeaponPtr->GetMesh()->GetAnimInstance(),
+				WeaponActorPtr->GetMesh()->GetAnimInstance(),
 				Rate
 			);
 

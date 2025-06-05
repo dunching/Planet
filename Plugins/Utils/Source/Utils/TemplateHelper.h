@@ -171,13 +171,13 @@ public:
 
 	~TCallbackHandle();
 
-	void UnBindCallback();
-
 	bool bIsAutoUnregister = true;
 
 protected:
 
 private:
+
+	void UnBindCallback();
 
 	FCallbackIDType CallbackID = 0;
 

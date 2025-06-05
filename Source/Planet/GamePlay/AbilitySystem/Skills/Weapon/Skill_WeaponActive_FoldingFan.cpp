@@ -14,25 +14,26 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
 #include "PlanetControllerInterface.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "Weapon_FoldingFan.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "KismetGravityLibrary.h"
-#include "AbilityTask_FlyAway.h"
+#include "AbilityTask_ApplyRootMotion_FlyAway.h"
 #include "AS_Character.h"
+#include "ItemProxy_Weapon.h"
 #include "LogWriter.h"
 
 namespace Skill_WeaponActive_FoldingFan
@@ -159,13 +160,6 @@ void USkill_WeaponActive_FoldingFan::OnRemoveAbility(
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
-void USkill_WeaponActive_FoldingFan::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME_CONDITION(ThisClass, CurrentFanNum, COND_AutonomousOnly);
-}
-
 void USkill_WeaponActive_FoldingFan::UpdateRegisterParam(const FGameplayEventData& GameplayEventData)
 {
 	Super::UpdateRegisterParam(GameplayEventData);
@@ -186,21 +180,6 @@ void USkill_WeaponActive_FoldingFan::UpdateRegisterParam(const FGameplayEventDat
 		CurrentFanNum += RegisterParamSPtr->IncreaseNum;
 	}
 #endif
-}
-
-void USkill_WeaponActive_FoldingFan::CheckInContinue(float InWaitInputTime)
-{
-	if (
-		bIsContinue && 
-		!RootMotionPtr &&
-		CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()) 
-		)
-	{
-		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
-	}
-	else
-	{
-	}
 }
 
 bool USkill_WeaponActive_FoldingFan::GetNum(int32& Num) const
@@ -318,9 +297,9 @@ void USkill_WeaponActive_FoldingFan::OnMotionComplete()
 {
 	RootMotionPtr = nullptr;
 
-	if (bIsContinue)
+	if (GetIsContinue())
 	{
-		CheckInContinue(-1.f);
+		PerformIfContinue();
 	}
 	else
 	{
@@ -366,22 +345,6 @@ void USkill_WeaponActive_FoldingFan::MakeDamage(ACharacterBase* TargetCharacterP
 {
 	if (TargetCharacterPtr && WeaponProjectilePtr)
 	{
-		auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-		FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-		GAEventData.SetBaseDamage(Damage);
-
-		GAEventData.AttackEffectType = EAttackEffectType::kAttackEffectAndRepel;
-		GAEventData.RepelDirection = WeaponProjectilePtr->GetVelocity().GetSafeNormal();
-
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 
@@ -417,7 +380,7 @@ void USkill_WeaponActive_FoldingFan::RootMotion()
 	{
 		const auto Lenth = HumanMontage->CalculateSequenceLength();
 
-		RootMotionPtr = UAbilityTask_FlyAway::NewTask(
+		RootMotionPtr = UAbilityTask_ApplyRootMotion_FlyAway::NewTask(
 			this,
 			TEXT(""),
 			ERootMotionAccumulateMode::Additive,

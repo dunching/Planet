@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "RaffleCommon.h"
 #include "UIInterfaces.h"
 
@@ -19,7 +19,7 @@ struct FTableRowProxy;
  */
 UCLASS()
 class PLANET_API URaffle_Proxy :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IItemProxyIconInterface
 {
 	GENERATED_BODY()

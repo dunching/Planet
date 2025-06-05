@@ -30,6 +30,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StaticMeshComponent)
 	UStaticMeshComponent* MeshPtr = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = Parameter)
+	int32 MaxDistance = 800;
+
 protected:
 
 };

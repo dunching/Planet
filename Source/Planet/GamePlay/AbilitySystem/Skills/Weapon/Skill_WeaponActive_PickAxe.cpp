@@ -2,63 +2,106 @@
 
 #include "Abilities/GameplayAbilityTypes.h"
 #include "AbilitySystemBlueprintLibrary.h"
-#include "NiagaraComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "UObject/Class.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "AbilitySystemComponent.h"
-#include "Abilities/Tasks/AbilityTask_Repeat.h"
 #include "GameFramework/Controller.h"
 
-#include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
 #include "AbilityTask_PlayAnimAndWaitOverride.h"
 #include "ToolFuture_PickAxe.h"
-#include "Planet.h"
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
-#include "AbilityTask_TimerHelper.h"
-#include "AssetRefMap.h"
-#include "AS_Character.h"
 #include "Weapon_PickAxe.h"
-#include "GE_Common.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "HumanCharacter.h"
 #include "CharacterAbilitySystemComponent.h"
-#include "GameplayTagsLibrary.h"
-#include "GroupSharedInfo.h"
+#include "SceneProxyTable.h"
+#include "GroupManagger.h"
 #include "ItemProxy_Character.h"
+#include "ItemProxy_Skills.h"
+#include "LogWriter.h"
+#include "PlanetGameplayAbilityTargetTypes.h"
+#include "TeamMatesHelperComponent.h"
+#include "Tools.h"
 
-namespace Skill_WeaponActive_PickAxe
+struct FSkill_WeaponActive_PickAxe : public TStructVariable<FSkill_WeaponActive_PickAxe>
 {
 	const FName Hit = TEXT("Hit");
 
 	const FName AttackEnd = TEXT("AttackEnd");
+};
+
+UScriptStruct* FGameplayAbilityTargetData_Axe_RegisterParam::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_Axe_RegisterParam::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_Axe_RegisterParam::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+	)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	return true;
+}
+
+FGameplayAbilityTargetData_Axe_RegisterParam* FGameplayAbilityTargetData_Axe_RegisterParam::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_Axe_RegisterParam;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
 }
 
 USkill_WeaponActive_PickAxe::USkill_WeaponActive_PickAxe() :
-	Super()
+                                                           Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
 void USkill_WeaponActive_PickAxe::OnAvatarSet(
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
-)
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+	)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
 	if (CharacterPtr)
 	{
+		if (SkillProxyPtr)
+		{
+			ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(
+			                                                            DynamicCastSharedPtr<FWeaponSkillProxy>(
+				                                                             SkillProxyPtr
+				                                                            )->GetTableRowProxy_WeaponSkillExtendInfo()
+			                                                           );
+		}
 	}
 }
 
+bool USkill_WeaponActive_PickAxe::CanActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags /*= nullptr*/,
+	const FGameplayTagContainer* TargetTags /*= nullptr*/,
+	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
+	) const
+{
+	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
+}
+
 void USkill_WeaponActive_PickAxe::OnRemoveAbility(
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
-)
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+	)
 {
 	// Ins Or Spec
 
@@ -70,7 +113,8 @@ void USkill_WeaponActive_PickAxe::PreActivate(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
-	const FGameplayEventData* TriggerEventData /*= nullptr */)
+	const FGameplayEventData* TriggerEventData /*= nullptr */
+	)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
@@ -78,27 +122,9 @@ void USkill_WeaponActive_PickAxe::PreActivate(
 	{
 		if (ActiveParamSPtr)
 		{
-			EquipmentAxePtr = Cast<AWeapon_PickAxe>(ActiveParamSPtr->WeaponPtr);
+			WeaponActorPtr = Cast<AWeapon_PickAxe>(ActiveParamSPtr->WeaponPtr);
 		}
 	}
-}
-
-void USkill_WeaponActive_PickAxe::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData
-)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	if (EquipmentAxePtr)
-	{
-		return;
-	}
-
-	checkNoEntry();
-	K2_EndAbility();
 }
 
 void USkill_WeaponActive_PickAxe::PerformAction(
@@ -106,42 +132,51 @@ void USkill_WeaponActive_PickAxe::PerformAction(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
-)
+	)
 {
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	MontageNum = 0;
-
-	StartTasksLink();
+	if (WeaponActorPtr)
+	{
+		StartTasksLink();
+	}
+	else
+	{
+		PRINTINVOKEWITHSTR(FString(TEXT("No Weapon")));
+		K2_EndAbility();
+	}
 }
 
 void USkill_WeaponActive_PickAxe::StartTasksLink()
 {
-	if (EquipmentAxePtr && CharacterPtr)
+	if (WeaponActorPtr && CharacterPtr)
 	{
 		PlayMontage();
 	}
 }
 
-void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
+void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(
+	FName NotifyName
+	)
 {
-#if UE_EDITOR || UE_CLIENT
+#if UE_EDITOR || UE_SERVER
 	if (
-		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	)
 	{
+		if (NotifyName == FSkill_WeaponActive_PickAxe::Get().AttackEnd)
+		{
+			EnableMovement(true);
+			PerformIfContinue();
+		}
 	}
 #endif
-	
-	if (NotifyName == Skill_WeaponActive_PickAxe::AttackEnd)
-	{
-		CheckInContinue(-1.f);
-	}
-	
+
 #if UE_EDITOR || UE_SERVER
-	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
-		if (NotifyName == Skill_WeaponActive_PickAxe::Hit)
+		if (NotifyName == FSkill_WeaponActive_PickAxe::Get().Hit)
 		{
 			MakeDamage();
 		}
@@ -169,10 +204,7 @@ void USkill_WeaponActive_PickAxe::OnMontageOnInterrupted()
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	)
 	{
-		// 确认是不在输入，而不是再次输入
-		if (!bIsContinue)
-		{
-		}
+		K2_CancelAbility();
 	}
 #endif
 }
@@ -185,13 +217,13 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 	FCollisionQueryParams CapsuleParams;
 	CapsuleParams.AddIgnoredActor(CharacterPtr);
 
-	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupSharedInfo();
+	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupManagger();
 	if (GroupMnaggerComponent)
 	{
 		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamMatesHelperComponent();
 		if (TeamsHelperSPtr)
 		{
-			for (auto Iter : TeamsHelperSPtr->MembersSet)
+			for (auto Iter : TeamsHelperSPtr->GetMembersSet())
 			{
 				CapsuleParams.AddIgnoredActor(Iter->GetCharacterActor().Get());
 			}
@@ -202,74 +234,59 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 
 	TArray<struct FHitResult> OutHits;
 	if (GetWorldImp()->SweepMultiByObjectType(
-		OutHits,
-		CharacterPtr->GetActorLocation(),
-		CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorForwardVector() * Distance),
-		FQuat::Identity,
-		ObjectQueryParams,
-		CollisionShape,
-		CapsuleParams
-	))
+	                                          OutHits,
+	                                          CharacterPtr->GetActorLocation(),
+	                                          CharacterPtr->GetActorLocation() + (
+		                                          CharacterPtr->GetActorForwardVector() * Distance),
+	                                          FQuat::Identity,
+	                                          ObjectQueryParams,
+	                                          CollisionShape,
+	                                          CapsuleParams
+	                                         ))
 	{
-		const auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		const int32 BaseDamage = Damage + (CharacterAttributes->GetAD() * AD_Damage_Magnification);
-
-		// FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
-		// 	CharacterPtr);
-		//
-		// GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
 		TSet<ACharacterBase*> TargetCharacterSet;
 		for (auto Iter : OutHits)
 		{
 			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
 			if (TargetCharacterPtr)
 			{
+				if (CharacterPtr->IsGroupmate(TargetCharacterPtr))
+				{
+					continue;
+				}
+				if (TargetCharacterPtr->GetCharacterAbilitySystemComponent()->IsCantBeDamage())
+				{
+					continue;
+				}
 				TargetCharacterSet.Add(TargetCharacterPtr);
 			}
 		}
 
-		FGameplayEffectSpecHandle SpecHandle =
-			MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->DamageClass, GetAbilityLevel());
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
-		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+		FGameplayEffectSpecHandle SpecHandle = MakeDamageToTargetSpecHandle(
+		                                                          ItemProxy_DescriptionPtr->ElementalType,
+		                                                          ItemProxy_DescriptionPtr->Elemental_Damage,
+		                                                          ItemProxy_DescriptionPtr->Elemental_Damage_Magnification
+		                                                         );
 
-		SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
-													   BaseDamage);
-
-		TArray<TWeakObjectPtr<AActor> >Ary;
-		for (auto Iter:TargetCharacterSet)
+		TArray<TWeakObjectPtr<AActor>> Ary;
+		for (auto Iter : TargetCharacterSet)
 		{
 			Ary.Add(Iter);
 		}
 		FGameplayAbilityTargetDataHandle TargetData;
 
-		auto GameplayAbilityTargetData_ActorArrayPtr = new FGameplayAbilityTargetData_ActorArray;
+		auto GameplayAbilityTargetData_ActorArrayPtr = new FGameplayAbilityTargetData_MyActorArray;
 		GameplayAbilityTargetData_ActorArrayPtr->SetActors(Ary);
+		GameplayAbilityTargetData_ActorArrayPtr->HitResult.ImpactNormal = CharacterPtr->GetActorForwardVector();
 
 		TargetData.Add(GameplayAbilityTargetData_ActorArrayPtr);
 		const auto GEHandleAry = MyApplyGameplayEffectSpecToTarget(
-			GetCurrentAbilitySpecHandle(),
-			GetCurrentActorInfo(),
-			GetCurrentActivationInfo(),
-			SpecHandle,
-			TargetData
-		);
-		for (auto Iter : TargetCharacterSet)
-		{
-			// FGAEventData GAEventData(Iter, CharacterPtr);
-			//
-			// GAEventData.bIsWeaponAttack = true;
-			// GAEventData.AttackEffectType = EAttackEffectType::kNormalAttackEffect;
-			// GAEventData.SetBaseDamage(BaseDamage);
-			//
-			// GAEventDataPtr->DataAry.Add(GAEventData);
-
-		}
-
-		// auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		// ICPtr->SendEventImp(GAEventDataPtr);
+		                                                           GetCurrentAbilitySpecHandle(),
+		                                                           GetCurrentActorInfo(),
+		                                                           GetCurrentActivationInfo(),
+		                                                           SpecHandle,
+		                                                           TargetData
+		                                                          );
 	}
 }
 
@@ -284,14 +301,17 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 
 		{
 			auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
-				this,
-				TEXT(""),
-				HumanMontage,
-				Rate
-			);
+				 this,
+				 TEXT(""),
+				 HumanMontage,
+				 Rate
+				);
 
 			AbilityTask_PlayMontage_HumanPtr->Ability = this;
-			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
+			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(
+																		CharacterPtr->
+																		GetCharacterAbilitySystemComponent()
+																	   );
 			AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
 			AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontageOnInterrupted);
 
@@ -301,15 +321,18 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 		}
 		{
 			auto AbilityTask_PlayMontage_PickAxePtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
-				this,
-				TEXT(""),
-				PickAxeMontage,
-				EquipmentAxePtr->GetMesh()->GetAnimInstance(),
-				Rate
-			);
+				 this,
+				 TEXT(""),
+				 PickAxeMontage,
+				 WeaponActorPtr->GetMesh()->GetAnimInstance(),
+				 Rate
+				);
 
 			AbilityTask_PlayMontage_PickAxePtr->Ability = this;
-			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
+			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(
+																		  CharacterPtr->
+																		  GetCharacterAbilitySystemComponent()
+																		 );
 			// AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
 			// AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 

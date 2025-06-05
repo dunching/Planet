@@ -5,7 +5,7 @@
 
 #include "PlanetGameplayAbility.h"
 #include "Skill_Passive_Base.h"
-#include "GAEvent_Helper.h"
+
 
 #include "Skill_Passive_XS.generated.h"
 
@@ -18,6 +18,9 @@ class ACharacterBase;
 
 struct FGAEventData;
 
+/**
+ * 血手 低血量时触发护盾
+ */
 UCLASS()
 class PLANET_API USkill_Passive_XS : public USkill_Passive_Base
 {
@@ -76,7 +79,7 @@ protected:
 	
 	void RemoveShield();
 
-	void OnSendAttack(const FGAEventData& GAEventData);
+	void MakedDamageDelegate(const FGAEventData& GAEventData);
 
 	void CD_DurationDelegate(UAbilityTask_TimerHelper*, float CurrentTime, float Duration);
 	

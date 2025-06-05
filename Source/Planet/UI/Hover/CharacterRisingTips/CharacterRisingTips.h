@@ -4,13 +4,16 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include <AIController.h>
 
-#include "GenerateType.h"
-#include "GAEvent_Helper.h"
+#include "GenerateTypes.h"
+#include "HoverWidgetBase.h"
+
 
 #include "CharacterRisingTips.generated.h"
+
+struct FOnEffectedTargetCallback;
 
 class ACharacterBase;
 class UFightingTipsItem;
@@ -21,21 +24,24 @@ class UToolIcon;
  * 浮动跳字
  */
 UCLASS()
-class PLANET_API UCharacterRisingTips : public UMyUserWidget
+class PLANET_API UCharacterRisingTips : public UHoverWidgetBase
 {
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
 
-	virtual void NativeConstruct()override;
-
-	virtual void NativeDestruct()override;
-
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
-
-	bool ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
+	/**
+	 * 
+	 * @param ReceivedEventModifyDataCallback 
+	 * @return 是否要显示，如果数据需要过滤或者数据无效 则不显示
+	 */
+	bool SetData(
+		const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
+		);
 
 protected:
+	virtual FVector GetHoverPosition() override;
 
 	enum class EType
 	{
@@ -55,16 +61,34 @@ protected:
 		kIcon_BaseDamage,
 	};
 
-	void ProcessGAEVentImp(EType Type, const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
-
+	/**
+	 */
 	UFUNCTION(BlueprintImplementableEvent)
-	void PlayMyAnimation(
-		bool bIsCritical_In
-	);
+	void PlayDamageAnimation(
+		bool bIsCritical_In,
+		bool bIsEvade_In,
+		EElementalType ElementalType
+		);
+
+	/**
+	 */
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayTreatmentAnimation(
+		);
+
+	/**
+	 */
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayStaminaAnimation();
+
+	/**
+	 */
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayManaAnimation();
 
 	UFUNCTION(BlueprintCallable)
 	void PlayAnimationFinished();
-	
+
 	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = SizeOption)
 	FLinearColor TreatmentColor = FLinearColor(0.000000, 1.000000, 0.191129, 1.000000);
 
@@ -72,21 +96,7 @@ protected:
 	FLinearColor BaseDamageColor = FLinearColor(0.000000, 1.000000, 0.191129, 1.000000);
 
 private:
-
-	bool ResetPosition(float InDeltaTime);
+	void EndRising();
 
 	ACharacterBase* TargetCharacterPtr = nullptr;
-
-	FTSTicker::FDelegateHandle TickDelegateHandle;
-
-	bool bIsCritical = false;
-};
-
-UCLASS()
-class PLANET_API UCharacterRisingTips1 : public UCharacterRisingTips
-{
-	GENERATED_BODY()
-
-public:
-
 };

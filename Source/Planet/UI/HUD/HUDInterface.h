@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include "UObject/ObjectMacros.h"
 #include "UObject/Interface.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 
 #include "HUDInterface.generated.h"

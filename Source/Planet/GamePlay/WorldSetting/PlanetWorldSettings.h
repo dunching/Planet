@@ -4,46 +4,74 @@
 
 #include "CoreMinimal.h"
 
+#include "GetModifyItemProxyStrategiesInterface.h"
+#include "GuideSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
+#include "PAD_ItemProxyCollection.h"
+
 #include "PlanetWorldSettings.generated.h"
 
 class UAssetRefMap;
 class UStateTagExtendInfoMap;
-class USceneProxyExtendInfoMap;
+class UDataTableCollection;
 class UGameOptions;
 class AGuideActor;
-class AGuideMainThread;
+class AGuideThread_Main;
+class AGuideThread_MainBase;
+class UPAD_RewardsItems;
+class UPAD_ItemProxyCollection;
 
 /**
  *
  */
 UCLASS()
-class PLANET_API APlanetWorldSettings : public AWorldSettings
+class PLANET_API APlanetWorldSettings :
+	public AWorldSettings,
+	public IGetItemProxyCollectionInterface,
+	public IGetModifyItemProxyStrategies,
+	public IGetGuideSubSystemInterface
 {
 	GENERATED_BODY()
 
 public:
 
-	UAssetRefMap* GetAssetRefMapInstance();
+	virtual void PostInitializeComponents() override;
 
-	USceneProxyExtendInfoMap* GetSceneProxyExtendInfoMap();
+	virtual void BeginPlay() override;
+
+	UPAD_RewardsItems* GetTableRow_RewardsTD()const;
+
+	UAssetRefMap* GetAssetRefMapInstance()const;
+
+	UDataTableCollection* GetSceneProxyExtendInfoMap()const;
+
+	virtual UGuideSubSystem* GetGuideSubSystem()const override;
 	
-	UGameOptions* GetGameOptions();
+	virtual const UPAD_ItemProxyCollection*GetItemProxyCollection()const override;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideThread")
+	TArray<TSubclassOf<AGuideThread_MainBase>> MainGuideThreadChaptersAry;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<AGuideMainThread>MainLineGuideClass;
+	/**
+	 * 提示[未完待续]的任务引导
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideThread")
+	TSubclassOf<AGuideThread_MainBase> ToBeContinueGuideThread;
 
 protected:
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSoftObjectPtr<UAssetRefMap>AssetRefMapClass;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSoftObjectPtr<USceneProxyExtendInfoMap>SceneProxyExtendInfoMapPtrClass;
-	
-	UPROPERTY(Transient)
-	UGameOptions* GameOptionsPtr = nullptr;
+	virtual void InitialModifyItemProxyStrategies() override;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSubclassOf<UGameOptions>GameOptionsClass;
-
+	TSoftObjectPtr<UPAD_RewardsItems>TableRow_RewardsTDRef;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSoftObjectPtr<UAssetRefMap>AssetRefMapRef;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSoftObjectPtr<UPAD_ItemProxyCollection>PAD_ItemProxyCollectionRef;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSoftObjectPtr<UDataTableCollection>SceneProxyExtendInfoMapPtr;
+	
 };

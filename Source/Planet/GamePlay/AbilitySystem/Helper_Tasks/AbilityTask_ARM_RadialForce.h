@@ -12,33 +12,48 @@ DECLARE_DELEGATE(FOnTaskFinished);
 class ATractionPoint;
 
 /**
- *	Applies force to character's movement
+ *	是否应在做成脱手的形式？
  */
 UCLASS()
 class PLANET_API UAbilityTask_ARM_RadialForce :
-	public UAbilityTask_ApplyRootMotionRadialForce
+	public UAbilityTask_ApplyRootMotion_Base
 {
-	GENERATED_UCLASS_BODY()	
+	GENERATED_BODY()
 
-	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
-
-	static UAbilityTask_ARM_RadialForce* MyApplyRootMotionRadialForce(
-		UGameplayAbility* OwningAbility, 
-		FName TaskInstanceName, 
-		TWeakObjectPtr<ATractionPoint>TractionPointPtr
+public:
+	UAbilityTask_ARM_RadialForce(
+		const FObjectInitializer& ObjectInitializer
 	);
+
+	static UAbilityTask_ARM_RadialForce* ApplyRootMotionRadialForce(
+		UGameplayAbility* OwningAbility,
+		FName TaskInstanceName,
+		TWeakObjectPtr<ATractionPoint> TractionPoinAcotrPtr
+	);
+
+	void UpdateLocation(
+		TWeakObjectPtr<ATractionPoint> TractionPointPtr
+	);
+
+	FOnTaskFinished OnFinished;
+
+protected:
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+	) const override;
 
 	virtual void SharedInitAndApply() override;
 
+	virtual void Activate() override;
+
 	virtual void TickTask(float DeltaTime) override;
 
+	virtual void PreDestroyFromReplication() override;
+	
 	virtual void OnDestroy(bool AbilityIsEnding) override;
-
-	void UpdateLocation(TWeakObjectPtr<ATractionPoint>TractionPointPtr);
-
-	FOnTaskFinished OnFinish;
 	
 	UPROPERTY(Replicated)
-	TWeakObjectPtr<ATractionPoint>TractionPointPtr = nullptr;
+	TWeakObjectPtr<ATractionPoint> TractionPoinAcotrPtr = nullptr;
 
+private:
 };

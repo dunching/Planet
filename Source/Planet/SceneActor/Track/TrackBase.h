@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Common/GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "BuildingBase.h"
 #include "TrackBase.generated.h"

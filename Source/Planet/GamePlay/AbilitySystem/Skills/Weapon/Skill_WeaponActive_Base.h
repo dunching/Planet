@@ -11,28 +11,28 @@
 
 struct FBasicProxy;
 class UAbilityTask_TimerHelper;
-class AWeapon_Base;
+class APlanetWeapon_Base;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_WeaponActive_ActiveParam :
+struct PLANET_API FGameplayAbilityTargetData_ActiveParam_WeaponActive :
 	public FGameplayAbilityTargetData_ActiveParam
 {
 	GENERATED_USTRUCT_BODY()
 
 	virtual UScriptStruct* GetScriptStruct() const override;
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess) override;
 
-	virtual FGameplayAbilityTargetData_WeaponActive_ActiveParam* Clone()const override;
+	virtual FGameplayAbilityTargetData_ActiveParam_WeaponActive* Clone()const override;
 
 	bool bIsAutoContinue = false;
 
-	AWeapon_Base* WeaponPtr = nullptr;
+	TObjectPtr<APlanetWeapon_Base> WeaponPtr = nullptr;
 };
 
 template<>
-struct TStructOpsTypeTraits<FGameplayAbilityTargetData_WeaponActive_ActiveParam> :
-	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_WeaponActive_ActiveParam>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_ActiveParam_WeaponActive> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_ActiveParam_WeaponActive>
 {
 	enum
 	{
@@ -41,13 +41,13 @@ struct TStructOpsTypeTraits<FGameplayAbilityTargetData_WeaponActive_ActiveParam>
 };
 
 UCLASS()
-class USkill_WeaponActive_Base : public USkill_Base
+class PLANET_API USkill_WeaponActive_Base : public USkill_Base
 {
 	GENERATED_BODY()
 
 public:
 
-	using FActiveParamType = FGameplayAbilityTargetData_WeaponActive_ActiveParam;
+	using FActiveParamType = FGameplayAbilityTargetData_ActiveParam_WeaponActive;
 
 	USkill_WeaponActive_Base();
 
@@ -56,21 +56,6 @@ public:
 		const FGameplayAbilitySpec& Spec
 	) override;
 
-	virtual void PreActivate(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
-		const FGameplayEventData* TriggerEventData = nullptr
-	);
-
-	virtual void ActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData
-	);
-
 	virtual bool CanActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -78,6 +63,14 @@ public:
 		const FGameplayTagContainer* TargetTags = nullptr,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	) const override;
+
+	virtual void PreActivate(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+		const FGameplayEventData* TriggerEventData = nullptr
+	) override;
 
 	virtual void CancelAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -94,41 +87,37 @@ public:
 		bool bWasCancelled
 	)override;
 
-	virtual	void InitalDefaultTags()override;
+	// virtual	void InitalDefaultTags()override;
 
 	virtual bool GetNum(int32 & Num)const;
 
 protected:
 	
-	virtual void SetContinuePerform(bool bIsContinue)override;
-
 	virtual void PerformAction(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
-	);
+	) override;
 
-	void ContinueActive();
+	virtual bool CanOncemorePerformAction() const override;
 
-	void StopContinueActive();
+	/**
+	 *	进入等待输入，如果按下了攻击键，则继续执行
+	 */
+	bool PerformIfContinue();
 
-	// < 0 则为不限时间，在显式结束前就可以再次输入
-	virtual void CheckInContinue(float InWaitInputTime);
-
-	UFUNCTION()
-	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);
-
-	UAbilityTask_TimerHelper* WaitInputTaskPtr = nullptr;
-
-	bool bIsContinue = true;
-
+	void EnableMovement(bool bEnableMovement);
+	
 	FGuid PropertuModify_GUID = FGuid::NewGuid();
 
 	TSharedPtr<FActiveParamType> ActiveParamSPtr = nullptr;
 
 private:
 
-	float WaitInputPercent = 1.f;
+	/**
+	 * 攻击前摇结束，等待输入？
+	 */
+	bool WaitInput = true;
 
 };

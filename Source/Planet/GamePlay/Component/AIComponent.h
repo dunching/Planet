@@ -4,8 +4,12 @@
 
 #include "CoreMinimal.h"
 
-#include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
+#include "GameplayTagContainer.h"
+
+#include "GenerateTypes.h"
+#include "GroupManaggerInterface.h"
+#include "TeamMates_GenericType.h"
 
 #include "AIComponent.generated.h"
 
@@ -13,14 +17,20 @@ class USceneComponent;
 class ACharacterBase;
 class UPAD_TaskNode;
 class UPAD_TaskNode_Preset;
+class UDA_NPCAllocation;
 class UTaskNode_Temporary;
 class AHumanCharacter_AI;
+class AGeneratorNPCs_Patrol;
+class ABuildingArea;
+class UTaskPromt;
 
 /**
  *
  */
-UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
-class PLANET_API UAIComponent : public UActorComponent
+UCLASS(BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent))
+class PLANET_API UAIComponent :
+	public UActorComponent,
+	public IGroupManaggerInterface
 {
 	GENERATED_BODY()
 
@@ -32,6 +42,8 @@ public:
 	UAIComponent(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
+	
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)override;
 
 	void AddTemporaryTaskNode(UTaskNode_Temporary*TaskNodePtr);
 
@@ -39,22 +51,55 @@ public:
 
 	void InitialAllocationsByProxy();
 
-	// 预置的任务，如自动播放的对话
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<TSoftObjectPtr<UPAD_TaskNode_Preset>> PresetTaskNodesAry;
-
-	// 临时的任务，需要立即执行，比如多人对话时 A结束 B马上开始下一句，下一句则为临时任务被添加到此
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TArray<UTaskNode_Temporary*> TemporaryTaskNodesAry;
+	void DisplayTaskPromy(TSubclassOf<UTaskPromt> TaskPromtClass);
 	
-protected:
+	void StopDisplayTaskPromy();
+
+	TMap<FGameplayTag, FProductsForSale> GetSaleItemsInfo()const;
+	
+#pragma region RPC
+#pragma endregion
+	
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn")
+	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
+#endif
+
+	/**
+	 * 跟随前进的点
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<USceneComponent> PathFollowComponentPtr = nullptr;
+
+	/**
+	 * 是否是单个的NPC，如地图上的商家
+	 */
+	bool bIsSingle = true;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
-	FGameplayTag AI_Allocation_RowName = FGameplayTag::EmptyTag;
+	/**
+	 * 是否是玩家的队友
+	 */
+	bool bIsTeammate = false;
+	
+protected:
+	
+#pragma region Allocation
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Allocation")
+	FGameplayTag FirstWeaponSocketInfo;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Allocation")
+	FGameplayTag SecondWeaponSocketInfo;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
-	FGameplayTag AI_CharacterType = FGameplayTag::EmptyTag;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Allocation")
+	FGameplayTag ActiveSkillSet_1;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Allocation")
+	FGameplayTag ActiveSkillSet_2;
+#pragma endregion
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<FGameplayTag, FProductsForSale> ProxyMap;
+	
+	UPROPERTY(Transient)
+	UTaskPromt* TaskPromtPtr = nullptr;
 };

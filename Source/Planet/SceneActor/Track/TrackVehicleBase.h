@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 
-#include "Common/GenerateType.h"
+#include "GenerateTypes.h"
 #include "Component/SceneActorInteractionComponent.h"
 #include "CharacterBase.h"
 #include "SceneActor.h"

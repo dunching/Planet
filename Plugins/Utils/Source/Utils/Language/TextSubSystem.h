@@ -15,7 +15,7 @@ enum class ELanguageType :uint8
 };
 
 UCLASS()
-class UTILS_API UTextSubSystem : public UGameInstanceSubsystem
+class UTILS_API UTextSubSystem : public UEngineSubsystem
 {
 	GENERATED_BODY()
 

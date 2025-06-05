@@ -3,7 +3,7 @@
 
 #include "CoreMinimal.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "Skill_Talent_Base.h"
 
 #include "Skill_Talent_NuQi.generated.h"

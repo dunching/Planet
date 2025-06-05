@@ -1,4 +1,4 @@
-// Copyright 2020 Dan Kestranek.
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -8,7 +8,8 @@
 #include <Navigation/PathFollowingComponent.h>
 
 #include "BasicFuturesBase.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
+#include "TemplateHelper.h"
 
 #include "BasicFutures_MoveToAttaclArea.generated.h"
 
@@ -69,7 +70,7 @@ public:
 
 protected:
 
-	virtual void InitalDefaultTags() override;
+	// virtual void InitalDefaultTags() override;
 
 	void OnQueryFinished(TSharedPtr<FEnvQueryResult> Result);
 

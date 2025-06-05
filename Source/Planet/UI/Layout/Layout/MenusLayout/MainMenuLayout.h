@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "LayoutInterfacetion.h"
 #include "UICommon.h"
 #include "MenuInterface.h"
@@ -23,13 +23,15 @@ class UAllocationSkillsMenu;
  */
 UCLASS()
 class PLANET_API UMainMenuLayout :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public ILayoutInterfacetion
 {
 	GENERATED_BODY()
 
 public:
 
+	using FOnMenuLayoutChanged = TCallbackHandleContainer<void(EMenuType)>;
+	
 	virtual void NativeConstruct()override;
 
 	virtual void NativeDestruct()override;
@@ -38,6 +40,8 @@ public:
 	
 	virtual void DisEnable()override;
 
+	virtual ELayoutCommon GetLayoutType() const  override ;
+	
 	void SwitchViewer(EMenuType MenuType);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
@@ -52,6 +56,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UAllocationSkillsMenu>AllocationSkillsMenuClass;
 
+	FOnMenuLayoutChanged OnMenuLayoutChanged;
+	
 protected:
 
+	void SyncData();
+	
 };

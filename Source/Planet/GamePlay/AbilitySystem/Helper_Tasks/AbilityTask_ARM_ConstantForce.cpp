@@ -150,6 +150,7 @@ void UAbilityTask_ARM_ConstantForce::GetLifetimeReplicatedProps(TArray< FLifetim
 void UAbilityTask_ARM_ConstantForce::PreDestroyFromReplication()
 {
 	bIsFinished = true;
+	
 	EndTask();
 }
 

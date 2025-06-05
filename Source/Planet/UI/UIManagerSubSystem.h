@@ -7,18 +7,21 @@
 #include "CoreMinimal.h"
 #include "Engine/World.h"
 
-#include "GenerateType.h"
-#include <GameInstance/PlanetGameInstance.h>
-#include "Planet.h"
+#include "GenerateTypes.h"
+#include "PlanetModule.h"
 #include "ItemProxy_Minimal.h"
 #include "LayoutCommon.h"
+#include "LayoutInterfacetion.h"
 #include "MainMenuCommon.h"
 
 #include "UIManagerSubSystem.generated.h"
 
 struct FPawnDataStruct;
 struct FSceneTool;
-struct FCharacterAttributes;
+
+
+class UMainHUDLayout;
+class UMainMenuLayout;
 
 /*
 	HUD、UI
@@ -29,9 +32,10 @@ class PLANET_API UUIManagerSubSystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
-
-	template<typename FWidgetType>
-	using FBeforeDisplayFunc = std::function<void(FWidgetType*)>;
+	template <typename FWidgetType>
+	using FBeforeDisplayFunc = std::function<void(
+		FWidgetType*
+		)>;
 
 	static UUIManagerSubSystem* GetInstance();
 
@@ -39,18 +43,36 @@ public:
 
 	virtual ~UUIManagerSubSystem();
 
-	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	virtual void Initialize(
+		FSubsystemCollectionBase& Collection
+		) override;
 
-#pragma region  Layout
-	void SwitchLayout(ELayoutCommon MainHUDType);
-#pragma endregion  
+#pragma region Layout
+	UMainHUDLayout* GetMainHUDLayout() const;
+	
+	void SwitchLayout(
+		ELayoutCommon MainHUDType,
+		const ILayoutInterfacetion::FOnQuit& OnQuit = nullptr
+		);
+	
+	FString GetLayoutName(
+		ELayoutCommon MainHUDType
+		)const;
+#pragma endregion
 
-#pragma region Menu
-	void SwitchMenuLayout(EMenuType MenuType);
-#pragma endregion Menu
+#pragma region MenuLayout
+	UMainMenuLayout* GetMainMenuLayout() const;
+	
+	void SwitchMenuLayout(
+		EMenuType MenuType
+		);
+	
+	FString GetMenuLayoutName(
+		EMenuType MenuType
+		)const;
+#pragma endregion 
 
 protected:
 
 private:
-
 };

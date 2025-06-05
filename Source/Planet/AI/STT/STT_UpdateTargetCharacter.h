@@ -8,7 +8,8 @@
 #include "StateTreeExecutionContext.h"
 #include "Tasks/StateTreeAITask.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
+#include "STT_CharacterBase.h"
 
 #include "STT_UpdateTargetCharacter.generated.h"
 
@@ -17,23 +18,24 @@ class IGameplayTaskOwnerInterface;
 class UAITask_SwitchWalkState;
 
 class AHumanCharacter;
+class AHumanCharacter_AI;
 class AHumanAIController;
-class UGloabVariable;
-class USTE_AICharacterController;
+class UGloabVariable_Character;
+class USTE_Assistance;
 
 USTRUCT()
-struct PLANET_API FStateTreeUpdateTargetCharacterTaskInstanceData
+struct PLANET_API FSTID_UpdateTargetCharacter : public FSTID_CharacterBase
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter> CharacterPtr = nullptr;
+	UGloabVariable_Character* GloabVariable_Character = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
+	UPROPERTY(EditAnywhere, Category = Param)
+	bool bRunForever = false;
 
-	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable* GloabVariable = nullptr;
+	UPROPERTY(EditAnywhere, Category = Param)
+	bool bCheckHave = true;
 
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
@@ -44,7 +46,7 @@ struct PLANET_API FSTT_UpdateTargetCharacter : public FStateTreeAIActionTaskBase
 {
 	GENERATED_BODY()
 
-	using FInstanceDataType = FStateTreeUpdateTargetCharacterTaskInstanceData;
+	using FInstanceDataType = FSTID_UpdateTargetCharacter;
 
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 
@@ -58,6 +60,11 @@ struct PLANET_API FSTT_UpdateTargetCharacter : public FStateTreeAIActionTaskBase
 		const float DeltaTime
 	) const override;
 
-	virtual EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
+	virtual EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context) const;
 
+	/**
+	 * OnlyServer
+	 */
+	void UpdateTargetCharacter(FStateTreeExecutionContext& Context)const;
+	
 };

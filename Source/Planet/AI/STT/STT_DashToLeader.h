@@ -8,7 +8,7 @@
 #include "StateTreeExecutionContext.h"
 #include "Tasks/StateTreeAITask.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "STT_DashToLeader.generated.h"
 
@@ -43,6 +43,9 @@ struct PLANET_API FStateTreeDashToLeaderTaskInstanceData
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
 };
 
+/*
+ *	距离玩家过远时，或自动寻路跟随玩家失败时 强制冲刺至玩家身边
+ */
 USTRUCT()
 struct PLANET_API FSTT_DashToLeader : public FStateTreeAIActionTaskBase
 {
@@ -69,6 +72,6 @@ struct PLANET_API FSTT_DashToLeader : public FStateTreeAIActionTaskBase
 		const float DeltaTime
 	) const override;
 
-	virtual FAITaskType* PerformMoveTask(FStateTreeExecutionContext& Context) const;
+	virtual FAITaskType* PerformGameplayTask(FStateTreeExecutionContext& Context) const;
 
 };

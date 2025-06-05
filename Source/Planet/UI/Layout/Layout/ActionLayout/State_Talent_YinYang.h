@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "Skill_Talent_YinYang.h"
 
 #include "State_Talent_YinYang.generated.h"
 
 UCLASS()
-class PLANET_API UState_Talent_YinYang : public UMyUserWidget
+class PLANET_API UState_Talent_YinYang : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

@@ -26,14 +26,14 @@ AWeapon_PickAxe::AWeapon_PickAxe(const FObjectInitializer& ObjectInitializer) :
 	SkeletalComponentPtr->SetupAttachment(RootComponent);
 }
 
-void AWeapon_PickAxe::AttachToCharacter(ACharacterBase* CharacterPtr)
+void AWeapon_PickAxe::AttachToCharacterBase(ACharacterBase* CharacterPtr)
 {
-	Super::AttachToCharacter(CharacterPtr);
+	Super::AttachToCharacterBase(CharacterPtr);
 
-	AttachToComponent(CharacterPtr->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, Socket);
+	AttachToComponent(CharacterPtr->GetCopyPoseMesh(), FAttachmentTransformRules::KeepRelativeTransform, Socket);
 }
 
-USkeletalMeshComponent* AWeapon_PickAxe::GetMesh()
+USkeletalMeshComponent* AWeapon_PickAxe::GetMesh() const
 {
 	return SkeletalComponentPtr;
 }

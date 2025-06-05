@@ -9,9 +9,13 @@
 #include "AbilityTask_TimerHelper.h"
 #include "PlanetWorldSettings.h"
 #include "PlanetPlayerController.h"
-#include "GameOptions.h"
+#include "Tools.h"
 #include "SceneProxyTable.h"
 #include "GameplayTagsLibrary.h"
+#include "GroupManagger.h"
+#include "ItemProxy_Skills.h"
+#include "ItemProxy_Weapon.h"
+#include "DataTableCollection.h"
 
 UScriptStruct* FGameplayAbilityTargetData_ActiveSkill_ActiveParam::GetScriptStruct() const
 {
@@ -54,6 +58,13 @@ void USkill_Active_Base::OnAvatarSet(
 	{
 		DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxyPtr)->OffsetCooldownTime();
 	}
+
+	if (SkillProxyPtr)
+	{
+		ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(
+			DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxyPtr)->GetTableRowProxy_ActiveSkillExtendInfo()
+		);
+	}
 }
 
 void USkill_Active_Base::PreActivate(
@@ -84,8 +95,6 @@ void USkill_Active_Base::ActivateAbility(
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool USkill_Active_Base::CommitAbility(
@@ -113,7 +122,7 @@ bool USkill_Active_Base::CanActivateAbility(
 	{
 		return false;
 	}
-	if (!ActiveSkillProxyPtr->CheckCooldown())
+	if (!ActiveSkillProxyPtr->CheckNotInCooldown())
 	{
 		return false;
 	}
@@ -144,11 +153,6 @@ bool USkill_Active_Base::CanActivateAbility(
 		return false;
 	}
 
-	if (IsActive())
-	{
-		return true;
-	}
-
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
@@ -175,20 +179,15 @@ void USkill_Active_Base::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Active_Base::SetContinuePerform(bool bIsContinue)
-{
-	ContinueActive();
-}
-
-void USkill_Active_Base::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
-
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
-}
+// void USkill_Active_Base::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
+//
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
+// }
 
 void USkill_Active_Base::GetInputRemainPercent(bool& bIsAcceptInput, float& Percent) const
 {
@@ -266,6 +265,43 @@ void USkill_Active_Base::Tick(float DeltaTime)
 void USkill_Active_Base::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
+void USkill_Active_Base::ApplyCooldown(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo
+	) const
+{
+	Super::ApplyCooldown(Handle, ActorInfo, ActivationInfo);
+	
+	// 公共冷却
+	{
+		UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
+		
+		auto AbilitySystemComponentPtr = CharacterPtr->GetGroupManagger()->GetAbilitySystemComponent();
+		const auto SkillCommonCooldownInfoMap = ItemProxy_DescriptionPtr->SkillCommonCooldownInfoMap;
+		for (const auto Iter : SkillCommonCooldownInfoMap)
+		{
+			auto CommonCooldownInfoPtr = GetTableRowProxy_CommonCooldownInfo(Iter);
+			if (CommonCooldownInfoPtr)
+			{
+				FGameplayEffectSpecHandle SpecHandle =
+					AbilitySystemComponentPtr->MakeOutgoingSpec(CooldownGE->GetClass(), GetAbilityLevel(),
+																AbilitySystemComponentPtr->MakeEffectContext());
+
+				const auto CD = CommonCooldownInfoPtr->CoolDownTime;
+				SpecHandle.Data.Get()->SetDuration(CD, true);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(Iter);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_CD);
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration, CD);
+				AbilitySystemComponentPtr->ApplyGameplayEffectSpecToSelf(
+					*SpecHandle.Data.Get(),
+					AbilitySystemComponentPtr->GetPredictionKeyForNewAction()
+				);
+			}
+		}
+	}
 }
 
 void USkill_Active_Base::PerformAction(

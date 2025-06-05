@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActiveGameplayEffectHandle.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
 #include "CharacterAttributesComponent.h"
 #include "UIInterfaces.h"
@@ -13,12 +14,15 @@
 
 struct FStreamableHandle;
 struct FCharacterStateInfo;
+struct FActiveGameplayEffect;
+
 class UCS_Base;
 class UGameplayEffect;
+class UAbilitySystemComponent;
 
 UCLASS()
 class PLANET_API UEffectItem : 
-	public UMyUserWidget
+	public UUserWidget_Override
 
 {
 	GENERATED_BODY()
@@ -27,11 +31,12 @@ public:
 
 	using FDataChangedHandle = TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
-	void SetData(const TSharedPtr<FCharacterStateInfo> &InCharacterStateInfoSPtr);
+	void SetData(
+		const TObjectPtr<UAbilitySystemComponent>& AbilitySystemComponentPtr,
+		FActiveGameplayEffectHandle NewActiveGameplayEffectHandle
+		);
 
-	void SetData(const FActiveGameplayEffect*ActiveGameplayEffect);
-
-protected:
+private:
 
 	virtual void NativeConstruct()override;
 
@@ -50,12 +55,12 @@ protected:
 
 	void SetPercentIsDisplay(bool bIsDisplay);
 
-	void SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr);
+	void SetTexutre();
 
 	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
 	
-	const FActiveGameplayEffect* ActiveGameplayEffectPtr = nullptr;
-
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponentPtr = nullptr;
+	
 	FActiveGameplayEffectHandle Handle;
 	
 	FDataChangedHandle DataChangedHandle;

@@ -2,9 +2,8 @@
 
 #include "Blueprint\WidgetTree.h"
 
-#include "MyWrapBox.h"
+#include "WrapBox_Override.h"
 #include "EffectItem.h"
-#include "CS_Base.h"
 #include "CharacterBase.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
@@ -24,7 +23,7 @@ void UEffectsList::SynchronizeProperties()
 
 	WidgetTree->ForEachWidget([&](UWidget* Widget)
 	{
-		if (auto UserWidget = Cast<UMyWrapBox>(Widget))
+		if (auto UserWidget = Cast<UWrapBox_Override>(Widget))
 		{
 			UserWidget->bIsPositiveSequence = bIsPositiveSequence;
 			UserWidget->SynchronizeProperties();
@@ -37,40 +36,30 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 void UEffectsList::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	ResetUIByData();
 }
 
 void UEffectsList::NativeDestruct()
 {
-	if (CallbackHandle)
-	{
-		CallbackHandle->UnBindCallback();
-	}
-
-	// if (CharacterStateMapHandle)
-	// {
-	// 	CharacterStateMapHandle->UnBindCallback();
-	// }
-
-#if UE_EDITOR || UE_SERVER
-	if (TargetCharacterPtr && TargetCharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
-	{
-		auto GASCompPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
-		GASCompPtr->OnActiveGameplayEffectAddedDelegateToSelf.Remove(ActiveGameplayEffectHandle);
-		GASCompPtr->OnActiveGameplayEffectAddedDelegateToSelf.Remove(AppliedGameplayEffectHandle);
-	}
-#endif
-	
 	Super::NativeDestruct();
 }
 
-UEffectItem* UEffectsList::AddEffectItem()
+UEffectItem* UEffectsList::AddEffectItem(
+		const TObjectPtr<UAbilitySystemComponent>& AbilitySystemComponentPtr,
+		FActiveGameplayEffectHandle NewActiveGameplayEffectHandle
+		)
 {
-	auto UIPtr = Cast<UMyWrapBox>(GetWidgetFromName(FEffectsList::Get().WrapBox));
+	auto ActiveGameplayEffectPtr = AbilitySystemComponentPtr->GetActiveGameplayEffect(NewActiveGameplayEffectHandle);
+	if (!ActiveGameplayEffectPtr)
+	{
+		return nullptr;
+	}
+
+	auto UIPtr = Cast<UWrapBox_Override>(GetWidgetFromName(FEffectsList::Get().WrapBox));
 	if (UIPtr)
 	{
 		auto ChildPtr = CreateWidget<UEffectItem>(this, EffectItemClass);
+		ChildPtr->SetData(AbilitySystemComponentPtr, NewActiveGameplayEffectHandle);
+		
 		auto SlotPtr = UIPtr->AddChildToWrapBox(ChildPtr);
 
 		return ChildPtr;
@@ -82,6 +71,23 @@ UEffectItem* UEffectsList::AddEffectItem()
 void UEffectsList::BindCharacterState(ACharacterBase* InTargetCharacterPtr)
 {
 	TargetCharacterPtr = InTargetCharacterPtr;
+}
+
+void UEffectsList::Enable()
+{
+	ILayoutItemInterfacetion::Enable();
+	
+	auto UIPtr = Cast<UWrapBox_Override>(GetWidgetFromName(FEffectsList::Get().WrapBox));
+	if (UIPtr)
+	{
+		UIPtr->ClearChildren();
+	}
+
+	if (!TargetCharacterPtr)
+	{
+		return;
+	}
+	
 	CallbackHandle = TargetCharacterPtr->GetStateProcessorComponent()->BindCharacterStateChanged(
 		std::bind(&ThisClass::OnCharacterStateChanged, this, std::placeholders::_1, std::placeholders::_2)
 	);
@@ -90,14 +96,36 @@ void UEffectsList::BindCharacterState(ACharacterBase* InTargetCharacterPtr)
 	// 	std::bind(&ThisClass::OnCharacterStateMapChanged, this, std::placeholders::_1, std::placeholders::_2)
 	// );
 
-#if UE_EDITOR || UE_SERVER
 	if (TargetCharacterPtr && TargetCharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
 	{
 		auto GASCompPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
 		ActiveGameplayEffectHandle = GASCompPtr->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &ThisClass::OnActiveGameplayEffect);
-		AppliedGameplayEffectHandle = GASCompPtr->OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ThisClass::OnActiveGameplayEffect);
+		// AppliedGameplayEffectHandle = GASCompPtr->OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ThisClass::OnActiveGameplayEffect);
+	}
+}
+
+void UEffectsList::DisEnable()
+{
+	if (CallbackHandle)
+	{
+		CallbackHandle.Reset();
+	}
+
+	// if (CharacterStateMapHandle)
+	// {
+	// 	CharacterStateMapHandle.Reset();
+	// }
+
+#if UE_EDITOR || UE_SERVER
+	if (TargetCharacterPtr && TargetCharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		auto GASCompPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
+		GASCompPtr->OnActiveGameplayEffectAddedDelegateToSelf.Remove(ActiveGameplayEffectHandle);
+		GASCompPtr->OnActiveGameplayEffectAddedDelegateToSelf.Remove(AppliedGameplayEffectHandle);
 	}
 #endif
+	
+	ILayoutItemInterfacetion::DisEnable();
 }
 
 void UEffectsList::OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base* CharacterStatePtr)
@@ -140,16 +168,6 @@ void UEffectsList::OnActiveGameplayEffect(
 
 	if (OutContainer.HasTag(UGameplayTagsLibrary::GEData_Info))
 	{
-		auto ItemPtr = AddEffectItem();
-		ItemPtr->SetData(ActiveGameplayEffectPtr);
-	}
-}
-
-void UEffectsList::ResetUIByData()
-{
-	auto UIPtr = Cast<UMyWrapBox>(GetWidgetFromName(FEffectsList::Get().WrapBox));
-	if (UIPtr)
-	{
-		UIPtr->ClearChildren();
+		auto ItemPtr = AddEffectItem(AbilitySystemComponentPtr, InActiveGameplayEffectHandle);
 	}
 }

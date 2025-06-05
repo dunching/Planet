@@ -21,6 +21,8 @@ class WEATHER_API ADynamic_Sky : public AActor
 
 public:
 
+	ADynamic_Sky(const FObjectInitializer& ObjectInitializer);
+
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintImplementableEvent)
@@ -38,6 +40,10 @@ public:
 
 	void RemoveOnHourly(int32 ID);
 
+	/**
+	 * 调整UDS模拟的时间流逝速度
+	 * @param Speed 
+	 */
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetTimeSpeed(float Speed);
 

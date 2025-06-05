@@ -33,7 +33,6 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	);
 	
-	UPROPERTY(Replicated)
 	bool bIsUsingActives = true;
 
 };

@@ -3,7 +3,7 @@
 
 #include "Net/UnrealNetwork.h"
 
-#include "AbilityTask_FlyAway.h"
+#include "AbilityTask_ApplyRootMotion_FlyAway.h"
 
 #include "GameFramework/RootMotionSource.h"
 
@@ -16,6 +16,66 @@
 #include "GameplayTagsLibrary.h"
 #include "Skill_WeaponActive_Bow.h"
 #include "ItemProxy_Minimal.h"
+#include "ItemProxy_Skills.h"
+#include "SceneProxyTable.h"
+
+void USkill_Active_Arrow_HomingToward::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+	)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	if (SkillProxyPtr)
+	{
+		ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(
+			DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxyPtr)->GetTableRowProxy_ActiveSkillExtendInfo()
+		);
+	}
+}
+
+void USkill_Active_Arrow_HomingToward::ApplyCooldown(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo
+	) const
+{
+	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
+	if (CooldownGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_CD);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			UGameplayTagsLibrary::GEData_Duration,
+			ItemProxy_DescriptionPtr->CD.PerLevelValue[0]
+		);
+
+		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
+}
+
+void USkill_Active_Arrow_HomingToward::ApplyCost(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo
+	) const
+{
+	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
+	if (CooldownGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			UGameplayTagsLibrary::GEData_ModifyItem_Mana,
+			ItemProxy_DescriptionPtr->Cost.PerLevelValue[0]
+		);
+
+		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
+}
 
 void USkill_Active_Arrow_HomingToward::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
@@ -29,51 +89,56 @@ void USkill_Active_Arrow_HomingToward::PerformAction(
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
-		// 状态信息
-		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
-		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
-		CharacterStateInfoSPtr->DataChanged();
-
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
-
-		//
-		{
-			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-			TaskPtr->SetDuration(Duration, 0.1f);
-			TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::DurationTick);
-			TaskPtr->OnFinished.BindUObject(this, &ThisClass::OnFinished);
-			TaskPtr->ReadyForActivation();
-		}
-
 		SwitchIsHomingToward(true);
 
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 	}
 #endif
-}
-
-void USkill_Active_Arrow_HomingToward::DurationTick(UAbilityTask_TimerHelper*, float Interval, float InDuration)
-{
-#if UE_EDITOR || UE_SERVER
-	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
+	
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+	)
 	{
-		if (CharacterStateInfoSPtr)
+		// 状态信息
+
+
+		//
 		{
-			CharacterStateInfoSPtr->TotalTime = Interval;
-			CharacterStateInfoSPtr->DataChanged();
-			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
+			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+			TaskPtr->SetDuration(Duration, 0.1f);
+			TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
+			if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+			{
+				TaskPtr->OnFinished.BindUObject(this, &ThisClass::OnFinished);
+			}
+			TaskPtr->ReadyForActivation();
 		}
 	}
-#endif
+}
+
+float USkill_Active_Arrow_HomingToward::GetRemainTime() const
+{
+	return RemainTime;
+}
+
+void USkill_Active_Arrow_HomingToward::OnDuration(UAbilityTask_TimerHelper*, float CurrentTiem, float TotalTime)
+{
+	if (FMath::IsNearlyZero(TotalTime))
+	{
+		return;
+	}
+	
+	RemainTime = (TotalTime - CurrentTiem) / TotalTime;
+	if (RemainTime < 0.f)
+	{
+		RemainTime = 0.f;
+	}
 }
 
 bool USkill_Active_Arrow_HomingToward::OnFinished(UAbilityTask_TimerHelper*)
 {
 	SwitchIsHomingToward(false);
-
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
 	K2_CancelAbility();
 

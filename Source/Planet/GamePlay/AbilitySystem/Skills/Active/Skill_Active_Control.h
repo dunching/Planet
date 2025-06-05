@@ -16,7 +16,7 @@ class ASPlineActor;
 struct FGameplayAbilityTargetData_PickAxe;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_Control : public FGameplayAbilityTargetData_ActiveSkill_ActiveParam
+struct PLANET_API FGameplayAbilityTargetData_Control : public FGameplayAbilityTargetData_ActiveSkill_ActiveParam
 {
 	GENERATED_USTRUCT_BODY()
 

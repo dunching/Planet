@@ -7,6 +7,7 @@
 #include "SPlineActor.generated.h"
 
 class USplineComponent;
+class UItemProxy_Description_ActiveSkill_Traction;
 
 /**
  *
@@ -25,4 +26,6 @@ public:
 
 protected:
 
+	virtual void GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const override;
+	
 };

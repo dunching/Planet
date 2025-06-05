@@ -12,10 +12,12 @@ AConsumable_Generic::AConsumable_Generic(const FObjectInitializer& ObjectInitial
 	StaticComponentPtr->SetupAttachment(RootComponent);
 }
 
-void AConsumable_Generic::HasbeenInteracted(ACharacterBase* CharacterPtr)
+void AConsumable_Generic::HasbeenInteracted(
+	ACharacterBase* CharacterPtr
+	)
 {
 	Super::HasbeenInteracted(CharacterPtr);
-
+	
 	AttachToComponent(CharacterPtr->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, Socket);
 }
 

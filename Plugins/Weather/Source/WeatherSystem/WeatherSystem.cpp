@@ -1,4 +1,3 @@
-
 #include "WeatherSystem.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -17,22 +16,29 @@ UWorld* GetWorldImp()
 	{
 		auto Ptr = GWorld;
 		return GEngine->GetCurrentPlayWorld() ? GEngine->GetCurrentPlayWorld() : GEditor->PlayWorld.Get();
-}
+	}
 	else
 	{
 		return GEditor->PlayWorld;
 	}
-#else 
+#else
 	return GEngine->GetCurrentPlayWorld();
 #endif
 }
 
 UWeatherSystem* UWeatherSystem::GetInstance()
 {
-	return Cast<UWeatherSystem>(USubsystemBlueprintLibrary::GetWorldSubsystem(GetWorldImp(), UWeatherSystem::StaticClass()));
+	return Cast<UWeatherSystem>(
+	                            USubsystemBlueprintLibrary::GetWorldSubsystem(
+	                                                                          GetWorldImp(),
+	                                                                          UWeatherSystem::StaticClass()
+	                                                                         )
+	                           );
 }
 
-void UWeatherSystem::Initialize(FSubsystemCollectionBase& Collection)
+void UWeatherSystem::Initialize(
+	FSubsystemCollectionBase& Collection
+	)
 {
 	Super::Initialize(Collection);
 }
@@ -44,14 +50,26 @@ void UWeatherSystem::Deinitialize()
 
 void UWeatherSystem::ResetTime()
 {
-// 	if (GetDynamicSky())
-// 	{
-// 		GetDynamicSky()->SetUseRealWorldTime(true);
-// 	}
+	// 	if (GetDynamicSky())
+	// 	{
+	// 		GetDynamicSky()->SetUseRealWorldTime(true);
+	// 	}
 
 	const auto Now = FDateTime::Now();
 
 	AdjustTime(FDateTime(Now.GetYear(), Now.GetMonth(), 10));
+}
+
+void UWeatherSystem::AdjustTime(
+	const FDateTime& Time
+	)
+{
+	CustomTime = Time;
+
+	if (CustomTime.GetHour() != CurrentTime.GetHour())
+	{
+		GetDynamicSky()->SetTimeSpeed(AdjustTimeSpeed);
+	}
 }
 
 void UWeatherSystem::RegisterCallback()
@@ -62,7 +80,9 @@ void UWeatherSystem::RegisterCallback()
 	}
 }
 
-void UWeatherSystem::OnHoury(int32 Hour)
+void UWeatherSystem::OnHoury(
+	int32 Hour
+	)
 {
 	auto Now = FDateTime::Now();
 
@@ -73,36 +93,18 @@ void UWeatherSystem::OnHoury(int32 Hour)
 		GetDynamicSky()->SetTimeSpeed(OriginalSpeed);
 	}
 
-// 	auto Global_MPC = UAssetsRef::GetInstance()->Global_MPC.LoadSynchronous();
-// 
-// 	UMaterialParameterCollectionInstance* LandscapeCollectionInstance = GetWorld()->GetParameterCollectionInstance(Global_MPC);
-// 	if (LandscapeCollectionInstance)
-// 	{
-// //		LandscapeCollectionInstance->SetScalarParameterValue(*Global_MPC::Hour, Hour);
-// 	}
+	// 	auto Global_MPC = UAssetsRef::GetInstance()->Global_MPC.LoadSynchronous();
+	// 
+	// 	UMaterialParameterCollectionInstance* LandscapeCollectionInstance = GetWorld()->GetParameterCollectionInstance(Global_MPC);
+	// 	if (LandscapeCollectionInstance)
+	// 	{
+	// //		LandscapeCollectionInstance->SetScalarParameterValue(*Global_MPC::Hour, Hour);
+	// 	}
 }
 
-void UWeatherSystem::AdjustTime(const FDateTime& Time)
-{
-// 	if (!UGameOptions::GetInstance()->bIsAllowAdjustTime)
-// 	{
-// 		return;
-// 	}
-// 
-// 	if (GetDynamicSky())
-// 	{
-// 		GetDynamicSky()->SetUseRealWorldTime(false);
-// 	}
-
-	CustomTime = Time;
-
-	if (CustomTime.GetHour() != CurrentTime.GetHour())
-	{
-		GetDynamicSky()->SetTimeSpeed(AdjustTimeSpeed);
-	}
-}
-
-int32 UWeatherSystem::AddOnHourly(const FOnHourly& OnHourly)
+int32 UWeatherSystem::AddOnHourly(
+	const FOnHourly& OnHourly
+	)
 {
 	if (GetDynamicSky())
 	{

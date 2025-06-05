@@ -6,7 +6,7 @@
 
 #include "UIInterfaces.h"
 
-#include "Common/GenerateType.h"
+#include "GenerateTypes.h"
 #include "InventoryComponent.h"
 #include "ItemProxy_Minimal.h"
 #include "MenuInterface.h"
@@ -16,7 +16,8 @@
 class UGroupmateIcon;
 class UAllocationIconBase;
 struct FWeaponProxy;
-struct FAllocationbleProxy;
+struct IProxy_Allocationble;
+struct FCharacterProxy;
 struct FCharacterProxy;
 
 /**
@@ -24,94 +25,122 @@ struct FCharacterProxy;
  */
 UCLASS()
 class PLANET_API UAllocationSkillsMenu :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IMenuInterface
 {
 	GENERATED_BODY()
 
 public:
-
-	using FOnWeaponChangedDelegate = 
-		TCallbackHandleContainer<void(const TSharedPtr<FWeaponProxy>&)>::FCallbackHandleSPtr;
+	using FOnWeaponChangedDelegate =
+	TCallbackHandleContainer<void(
+		const TSharedPtr<FWeaponProxy>&
+		)>::FCallbackHandleSPtr;
 
 	using FOnResetDataDelegate =
-		TCallbackHandleContainer<void(UAllocationIconBase*)>::FCallbackHandleSPtr;
+	TCallbackHandleContainer<void(
+		UAllocationIconBase*
+		)>::FCallbackHandleSPtr;
 
-	UAllocationSkillsMenu(const FObjectInitializer& ObjectInitializer);
+	UAllocationSkillsMenu(
+		const FObjectInitializer& ObjectInitializer
+		);
 
 	virtual void PostCDOContruct() override;
 
-	virtual void NativeConstruct()override;
+	virtual void NativeConstruct() override;
 
-	virtual void NativeDestruct()override;
+	virtual void NativeDestruct() override;
 
 protected:
+	virtual void EnableMenu() override;
 
-	virtual void ResetUIByData()override;
+	virtual void DisEnableMenu() override;
 
-	virtual void SyncData()override;
+	virtual EMenuType GetMenuType() const override final;
 
 	void BindEvent();
 
 	void ResetUI(
-		const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr, 
 		const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
-	);
+		);
 
 	void InitialGroupmateList();
 
 	void ResetBackpack(
-		const TSharedPtr<FCharacterProxy>& AICharacterProxyPtr,
-		const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
-	);
-
-	void ResetUIByData_WeaponSkills(
-		const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr,
 		const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
 		);
 
-	void ResetUIByData_Skills(const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr);
+	void ResetUIByData_WeaponSkills(
+		const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr
+		);
 
-	void ResetUIByData_Consumable(const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr);
+	void ResetUIByData_Skills(
+		const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr
+		);
 
-	void OnItemProxyDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& ProxyPtr);
+	void ResetUIByData_Consumable(
+		const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr
+		);
 
-	void OnAllocationbableDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr);
+	void OnItemProxyDragIcon(
+		bool bIsDragging,
+		const TSharedPtr<FBasicProxy>& ProxyPtr
+		);
 
-	void OnSelectedCharacterProxy(const TSharedPtr<FCharacterProxy>& ProxyPtr);
+	void OnAllocationbableDragIcon(
+		bool bIsDragging,
+		const TSharedPtr<IProxy_Allocationble>& ProxyPtr
+		);
 
-	void OnMainWeaponChanged(const TSharedPtr<FWeaponProxy>& ToolSPtr);
+	/**
+	 * 选择了要分配的人物
+	 * @param ProxyPtr 
+	 */
+	void OnSelectedCharacterProxy(
+		const TSharedPtr<FCharacterProxy>& ProxyPtr
+		);
 
-	void OnSecondaryWeaponChanged(const TSharedPtr<FWeaponProxy>& ToolSPtr);
+	void OnMainWeaponChanged(
+		const TSharedPtr<FWeaponProxy>& ToolSPtr
+		);
+
+	void OnSecondaryWeaponChanged(
+		const TSharedPtr<FWeaponProxy>& ToolSPtr
+		);
 
 	void OnResetData(
 		UAllocationIconBase* UAllocationIconPtr
-	);
+		);
 
 	void OnWeaponProxyChanged(
-		const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr,
-		const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
-		const FGameplayTag&SocketTag
-	);
+		const TSharedPtr<IProxy_Allocationble>& PreviousProxyPtr,
+		const TSharedPtr<IProxy_Allocationble>& NewProxyPtr,
+		const FGameplayTag& SocketTag
+		);
 
 	void OnSkillProxyChanged(
-		const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr,
-		const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
-		const FGameplayTag&SocketTag
-	);
+		const TSharedPtr<IProxy_Allocationble>& PreviousProxyPtr,
+		const TSharedPtr<IProxy_Allocationble>& NewProxyPtr,
+		const FGameplayTag& SocketTag
+		);
 
 	void OnConsumableProxyChanged(
-		const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr, 
-		const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
-		const FGameplayTag&SocketTag
-	);
+		const TSharedPtr<IProxy_Allocationble>& PreviousProxyPtr,
+		const TSharedPtr<IProxy_Allocationble>& NewProxyPtr,
+		const FGameplayTag& SocketTag
+		);
+
+	void UpdateAllocation(
+		const TSharedPtr<IProxy_Allocationble>& PreviousProxyPtr,
+		const TSharedPtr<IProxy_Allocationble>& NewProxyPtr,
+		const FGameplayTag& SocketTag
+		);
 
 	void SetAllocation(
-		const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr, 
-		const TSharedPtr<FAllocationbleProxy>& NewProxyPtr, 
-		const FGameplayTag&SocketTag,
-		bool bIsReplaced
-	);
+		const TSharedPtr<IProxy_Allocationble>& NewProxyPtr,
+		const TSharedPtr<FCharacterProxy>& AllocationCharacterProxyPtr,
+		const FGameplayTag& SocketTag
+		);
 
 	FOnWeaponChangedDelegate MainDelegateHandleSPtr;
 
@@ -145,10 +174,8 @@ protected:
 	FKey Consumable_4_Key;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UGroupmateIcon>GroupmateIconClass;
+	TSubclassOf<UGroupmateIcon> GroupmateIconClass;
 
 private:
-
 	TSharedPtr<FCharacterProxy> CurrentProxyPtr = nullptr;
-
 };

@@ -1,4 +1,3 @@
-
 #include "CharacterRisingTips.h"
 
 #include <Kismet/GameplayStatics.h>
@@ -10,27 +9,25 @@
 #include "Components/WidgetSwitcher.h"
 
 #include "CharacterBase.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "GameOptions.h"
+#include "GameplayTagsLibrary.h"
+#include "OnEffectedTargetCallback.h"
+#include "PlanetGameViewportClient.h"
 #include "TemplateHelper.h"
 #include "TextSubSystem.h"
 #include "TextCollect.h"
+#include "WidgetScreenLayer.h"
+#include "Components/Button.h"
+#include "Kismet/KismetStringLibrary.h"
 
 struct FCharacterRisingTips : public TStructVariable<FCharacterRisingTips>
 {
 	const FName VerticalBox = TEXT("VerticalBox");
 
-	const FName Icon = TEXT("Icon");
-
-	const FName Icon_Disable = TEXT("Icon_Disable");
-
 	const FName Icon_Treatment = TEXT("Icon_Treatment");
 
 	const FName Text = TEXT("Text");
-
-	const FName SizeBox = TEXT("SizeBox");
-
-	const FName WidgetSwitcher = TEXT("WidgetSwitcher");
 };
 
 void UCharacterRisingTips::NativeConstruct()
@@ -39,330 +36,141 @@ void UCharacterRisingTips::NativeConstruct()
 
 	SetAnchorsInViewport(FAnchors(.5f));
 	SetAlignmentInViewport(FVector2D(.5f, .5f));
-
-	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(
-		FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition)
-	);
-
-	PlayMyAnimation(bIsCritical);
-
-	ResetPosition(0.f);
 }
 
-void UCharacterRisingTips::NativeDestruct()
+bool UCharacterRisingTips::SetData(
+	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
+	)
 {
-	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
-
-	Super::NativeDestruct();
-}
-
-void UCharacterRisingTips::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	Super::NativeTick(MyGeometry, InDeltaTime);
-}
-
-bool UCharacterRisingTips::ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
-{
-	const auto& Ref = GAEvent.Data;
-	if (Ref.TargetCharacterPtr.IsValid())
+	if (!ReceivedEventModifyDataCallback.TargetCharacterPtr)
 	{
-		TargetCharacterPtr = Ref.TargetCharacterPtr.Get();
+		return false;
+	}
 
-		if (Ref.ElementSet.Num() > 0)
+	if (ReceivedEventModifyDataCallback.AllAssetTags.HasTag(UGameplayTagsLibrary::DataSource_Reply))
+	{
+		return false;
+	}
+
+	TargetCharacterPtr = ReceivedEventModifyDataCallback.TargetCharacterPtr;
+
+	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterRisingTips::Get().Text));
+	if (UIPtr)
+	{
+		if (ReceivedEventModifyDataCallback.
+			bIsEvade)
 		{
-			for (const auto& Iter : Ref.ElementSet)
+			const auto Text = FText::FromString(TEXT("闪避"));
+
+			UIPtr->SetText(Text);
+
+			PlayDamageAnimation(
+			                    ReceivedEventModifyDataCallback.
+			                    bIsCritical,
+			                    ReceivedEventModifyDataCallback.
+			                    bIsEvade,
+			                    ReceivedEventModifyDataCallback.
+			                    ElementalType
+			                   );
+
+			return true;
+		}
+		else if (ReceivedEventModifyDataCallback.
+		         Damage > 0)
+		{
+			const auto Text = FText::FromString(FString::Printf(TEXT("%d"), ReceivedEventModifyDataCallback.Damage));
+
+			UIPtr->SetText(Text);
+
+			PlayDamageAnimation(
+			                    ReceivedEventModifyDataCallback.
+			                    bIsCritical,
+			                    ReceivedEventModifyDataCallback.
+			                    bIsEvade,
+			                    ReceivedEventModifyDataCallback.
+			                    ElementalType
+			                   );
+
+			return true;
+		}
+		else if (ReceivedEventModifyDataCallback.
+		         TherapeuticalDose > 0)
+		{
+			const auto Text = FText::FromString(FString::Printf(TEXT("+%d"), ReceivedEventModifyDataCallback.Damage));
+
+			UIPtr->SetText(Text);
+
+			PlayTreatmentAnimation();
+
+			return true;
+		}
+		else
+		{
+			for (const auto& Iter : ReceivedEventModifyDataCallback.SetByCallerTagMagnitudes)
 			{
-				switch (Iter.Get<0>())
+				if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina))
 				{
-				case EWuXingType::kGold:
-				{
-					ProcessGAEVentImp(EType::kGold, GAEvent);
+					if (Iter.Value > 0)
+					{
+						const auto Text = FText::FromString(FString::Printf(TEXT("+%.0lf"), Iter.Value));
+
+						UIPtr->SetText(Text);
+					}
+					else
+					{
+						const auto Text = FText::FromString(FString::Printf(TEXT("%.0lf"), Iter.Value));
+
+						UIPtr->SetText(Text);
+					}
+
+					PlayStaminaAnimation();
+
+					return true;
 				}
-				break;
-				case EWuXingType::kWood:
+				else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
 				{
-					ProcessGAEVentImp(EType::kWood, GAEvent);
-				}
-				break;
-				case EWuXingType::kWater:
-				{
-					ProcessGAEVentImp(EType::kWater, GAEvent);
-				}
-				break;
-				case EWuXingType::kFire:
-				{
-					ProcessGAEVentImp(EType::kFire, GAEvent);
-				}
-				break;
-				case EWuXingType::kSoil:
-				{
-					ProcessGAEVentImp(EType::kSoil, GAEvent);
-				}
-				break;
+					if (Iter.Value > 0)
+					{
+						const auto Text = FText::FromString(FString::Printf(TEXT("+%.0lf"), Iter.Value));
+
+						UIPtr->SetText(Text);
+					}
+					else
+					{
+						const auto Text = FText::FromString(FString::Printf(TEXT("%.0lf"), Iter.Value));
+
+						UIPtr->SetText(Text);
+					}
+
+					PlayManaAnimation();
+
+					return true;
 				}
 			}
 		}
-		else if (Ref.BaseDamage > 0)
-		{
-			ProcessGAEVentImp(EType::kBaseDamage, GAEvent);
-		}
-
-#if UE_EDITOR || UE_CLIENT
-		if (TargetCharacterPtr->GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
-		{
-			if (
-				Ref.DataModify.Contains(ECharacterPropertyType::HP) &&
-				(Ref.DataModify[ECharacterPropertyType::HP].GetCurrentValue() > 0)
-				)
-			{
-				ProcessGAEVentImp(EType::kTreatment, GAEvent);
-			}
-		}
-		else if (TargetCharacterPtr->GetLocalRole() == ENetRole::ROLE_SimulatedProxy)
-		{
-			const auto NPC_HP_Display_MoveToAttaclAreaOffset = UGameOptions::GetInstance()->NPC_HP_Display_MoveToAttaclAreaOffset;
-			if (Ref.DataModify.Contains(ECharacterPropertyType::HP))
-			{
-				if (Ref.DataModify[ECharacterPropertyType::HP].GetCurrentValue() > NPC_HP_Display_MoveToAttaclAreaOffset)
-				{
-					ProcessGAEVentImp(EType::kTreatment, GAEvent);
-				}
-				else
-				{
-					return false;
-				}
-			}
-		}
-#endif
-
-		return true;
 	}
 
 	return false;
 }
 
+FVector UCharacterRisingTips::GetHoverPosition()
+{
+	return TargetCharacterPtr->GetActorLocation();
+}
+
 void UCharacterRisingTips::PlayAnimationFinished()
 {
-	RemoveFromParent();
+	EndRising();
 }
 
-bool UCharacterRisingTips::ResetPosition(float InDeltaTime)
+void UCharacterRisingTips::EndRising()
 {
-	FVector2D ScreenPosition = FVector2D::ZeroVector;
-	UGameplayStatics::ProjectWorldToScreen(
-		UGameplayStatics::GetPlayerController(this, 0),
-		TargetCharacterPtr->GetActorLocation(),
-		ScreenPosition
-	);
-
-	SetPositionInViewport(ScreenPosition);
-
-	return true;
-}
-
-void UCharacterRisingTips::ProcessGAEVentImp(EType Type, const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
-{
-	const auto& Ref = GAEvent.Data;
-	if (Ref.TargetCharacterPtr.IsValid())
+	auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
+		 GetWorld(),
+		 TargetPointSharedLayerName
+		);
+	if (ScreenLayer)
 	{
-		auto Lambda = [&](int32 Value, const FLinearColor & Color)
-			{
-				if 
-					(
-						(Ref.GetIsCriticalHited()) &&
-						(Ref.GetIsHited())
-					)
-				{
-					bIsCritical = true;
-					{
-						auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterRisingTips::Get().Text));
-						if (!UIPtr)
-						{
-							return;
-						}
-						const auto Text = FText::FromString(
-							FString::Printf(TEXT("%s:%d"), *UTextSubSystem::GetInstance()->GetText(TextCollect::Critical), Value)
-						);
-						UIPtr->SetText(Text);
-						UIPtr->SetColorAndOpacity(FSlateColor(Color));
-					}
-				}
-				else if (
-					(Ref.GetIsHited())
-					)
-				{
-					{
-						auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterRisingTips::Get().Text));
-						if (!UIPtr)
-						{
-							return;
-						}
-						UIPtr->SetText(FText::FromString(FString::Printf(TEXT("-%d"), Value)));
-						UIPtr->SetColorAndOpacity(FSlateColor(Color));
-					}
-				}
-				// 
-				else if (!Ref.GetIsHited())
-				{
-					{
-						auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterRisingTips::Get().Text));
-						if (!UIPtr)
-						{
-							return;
-						}
-						const auto Text = FText::FromString(
-							FString::Printf(TEXT("%s:%d"), *UTextSubSystem::GetInstance()->GetText(TextCollect::Evade), Value)
-						);
-						UIPtr->SetText(Text);
-						UIPtr->SetColorAndOpacity(FSlateColor(Color));
-					}
-				}
-			};
-
-		switch (Type)
-		{
-		case EType::kBaseDamage:
-		{
-			{
-				auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FCharacterRisingTips::Get().WidgetSwitcher));
-				if (!UIPtr)
-				{
-					return;
-				}
-				UIPtr->SetActiveWidgetIndex(kIcon_BaseDamage);
-			}
-			Lambda(Ref.BaseDamage, BaseDamageColor);
-		}
-		break;
-		case EType::kTrueDamage:
-		{
-			Lambda(Ref.TrueDamage, BaseDamageColor);
-		}
-		break;
-		case EType::kGold:
-		{
-			for (const auto& Iter : Ref.ElementSet)
-			{
-				bool bIsBreak = false;
-				switch (Iter.Get<0>())
-				{
-				case EWuXingType::kGold:
-				{
-					Lambda(Iter.Get<2>(), BaseDamageColor);
-					bIsBreak = true;
-				}
-				break;
-				}
-				if (bIsBreak)
-				{
-					break;
-				}
-			}
-		}
-		break;
-		case EType::kWood:
-		{
-			for (const auto& Iter : Ref.ElementSet)
-			{
-				bool bIsBreak = false;
-				switch (Iter.Get<0>())
-				{
-				case EWuXingType::kWood:
-				{
-					Lambda(Iter.Get<2>(), BaseDamageColor);
-					bIsBreak = true;
-				}
-				break;
-				}
-				if (bIsBreak)
-				{
-					break;
-				}
-			}
-		}
-		break;
-		case EType::kWater:
-		{
-			for (const auto& Iter : Ref.ElementSet)
-			{
-				bool bIsBreak = false;
-				switch (Iter.Get<0>())
-				{
-				case EWuXingType::kWater:
-				{
-					Lambda(Iter.Get<2>(), BaseDamageColor);
-					bIsBreak = true;
-				}
-				break;
-				}
-				if (bIsBreak)
-				{
-					break;
-				}
-			}
-		}
-		break;
-		case EType::kFire:
-		{
-			for (const auto& Iter : Ref.ElementSet)
-			{
-				bool bIsBreak = false;
-				switch (Iter.Get<0>())
-				{
-				case EWuXingType::kFire:
-				{
-					Lambda(Iter.Get<2>(), BaseDamageColor);
-					bIsBreak = true;
-				}
-				break;
-				}
-				if (bIsBreak)
-				{
-					break;
-				}
-			}
-		}
-		break;
-		case EType::kSoil:
-		{
-			for (const auto& Iter : Ref.ElementSet)
-			{
-				bool bIsBreak = false;
-				switch (Iter.Get<0>())
-				{
-				case EWuXingType::kSoil:
-				{
-					Lambda(Iter.Get<2>(), BaseDamageColor);
-					bIsBreak = true;
-				}
-				break;
-				}
-				if (bIsBreak)
-				{
-					break;
-				}
-			}
-		}
-		break;
-		case EType::kTreatment:
-		{
-			{
-				auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FCharacterRisingTips::Get().WidgetSwitcher));
-				if (!UIPtr)
-				{
-					return;
-				}
-				UIPtr->SetActiveWidgetIndex(kIcon_Treatment);
-			}
-			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterRisingTips::Get().Text));
-			if (!UIPtr)
-			{
-				return;
-			}
-			UIPtr->SetText(FText::FromString(FString::Printf(TEXT("+%d"), Ref.DataModify[ECharacterPropertyType::HP].GetCurrentValue())));
-			UIPtr->SetColorAndOpacity(FSlateColor(TreatmentColor));
-		}
-		break;
-		}
+		ScreenLayer->RemoveHoverWidget(this);
 	}
 }

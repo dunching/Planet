@@ -4,8 +4,9 @@
 #include <Subsystems/SubsystemBlueprintLibrary.h>
 #include <Kismet/GameplayStatics.h>
 
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "AssetRefMap.h"
+#include "Tools.h"
 
 USceneActorSubSystem* USceneActorSubSystem::GetInstance()
 {

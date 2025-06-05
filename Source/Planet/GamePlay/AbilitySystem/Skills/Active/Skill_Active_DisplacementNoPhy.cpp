@@ -13,7 +13,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/CapsuleComponent.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "Tool_PickAxe.h"
@@ -67,7 +67,7 @@ bool USkill_Active_DisplacementNoPhy::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (PP > CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPP())
+	if (PP > CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetStamina())
 	{
 		return false;
 	}
@@ -95,21 +95,6 @@ bool USkill_Active_DisplacementNoPhy::CommitAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
 {
-	// 数值修改
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-	{
-		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-		GAEventData.DataModify.Add(ECharacterPropertyType::PP, -PP);
-		GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-	}
-	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-	ICPtr->SendEventImp(GAEventDataPtr);
-
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
 
@@ -162,12 +147,12 @@ void USkill_Active_DisplacementNoPhy::Move()
 	}
 }
 
-void USkill_Active_DisplacementNoPhy::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_NoPhy);
-}
+// void USkill_Active_DisplacementNoPhy::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_NoPhy);
+// }
 
 void USkill_Active_DisplacementNoPhy::PlayMontage()
 {
@@ -217,19 +202,4 @@ void USkill_Active_DisplacementNoPhy::OnComponentBeginOverlap(
 
 void USkill_Active_DisplacementNoPhy::MakeDamage(ACharacterBase* TargetCharacterPtr)
 {
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-	if (TargetCharacterPtr)
-	{
-		FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-		GAEventData.SetBaseDamage(Damage);
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-	}
-
-	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-	ICPtr->SendEventImp(GAEventDataPtr);
 }

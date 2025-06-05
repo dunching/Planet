@@ -1,4 +1,3 @@
-
 #include "ActionConsumablesIcon.h"
 
 #include "Components/TextBlock.h"
@@ -16,7 +15,6 @@
 #include "Components/SizeBox.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Engine/Texture2D.h"
-#include "ToolsLibrary.h"
 #include "BackpackIcon.h"
 
 #include "StateTagExtendInfo.h"
@@ -27,6 +25,7 @@
 #include "ProxyProcessComponent.h"
 #include "Skill_Base.h"
 #include "GameplayTagsLibrary.h"
+#include "ItemProxy_Consumable.h"
 #include "Skill_Active_Base.h"
 
 #include "Skill_Consumable_Generic.h"
@@ -52,13 +51,16 @@ struct FActionConsumablesIcon : public TStructVariable<FActionConsumablesIcon>
 	const FName WaitInputPercent = TEXT("WaitInputPercent");
 };
 
-UActionConsumablesIcon::UActionConsumablesIcon(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+UActionConsumablesIcon::UActionConsumablesIcon(
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
-
 }
 
-void UActionConsumablesIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
+void UActionConsumablesIcon::InvokeReset(
+	UUserWidget* BaseWidgetPtr
+	)
 {
 	if (BaseWidgetPtr)
 	{
@@ -70,7 +72,9 @@ void UActionConsumablesIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
+void UActionConsumablesIcon::ResetToolUIByData(
+	const TSharedPtr<FBasicProxy>& BasicProxyPtr
+	)
 {
 	bIsReady_Previous = false;
 
@@ -80,18 +84,24 @@ void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Ba
 	{
 		if (
 			BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables)
-			)
+		)
 		{
 			ProxyPtr = DynamicCastSharedPtr<FConsumableProxy>(BasicProxyPtr);
 
-			if (ProxyPtr && ProxyPtr->Num > 0)
+			if (ProxyPtr && ProxyPtr->GetNum() > 0)
 			{
 				OnValueChangedDelegateHandle =
-					ProxyPtr->CallbackContainerHelper.AddOnValueChanged(std::bind(&ThisClass::SetNum, this, std::placeholders::_2));
+					ProxyPtr->CallbackContainerHelper.AddOnValueChanged(
+					                                                    std::bind(
+						                                                     &ThisClass::SetNum,
+						                                                     this,
+						                                                     std::placeholders::_1
+						                                                    )
+					                                                   );
 
 				SetLevel();
 				SetItemType();
-				SetNum(ProxyPtr->Num);
+				SetNum(ProxyPtr->GetNum());
 				SetCanRelease(true);
 				SetRemainingCooldown(true, 0.f, 0.f);
 				SetInputRemainPercent(false, 0.f);
@@ -111,9 +121,10 @@ void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Ba
 	SetInputRemainPercent(false, 0.f);
 }
 
-void UActionConsumablesIcon::EnableIcon(bool bIsEnable)
+void UActionConsumablesIcon::EnableIcon(
+	bool bIsEnable
+	)
 {
-
 }
 
 void UActionConsumablesIcon::UpdateState()
@@ -126,7 +137,7 @@ void UActionConsumablesIcon::UpdateState()
 		auto bCooldownIsReady = ProxyPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
 		SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
 
-		SetCanRelease(bCooldownIsReady && (ProxyPtr->Num > 0));
+		SetCanRelease(bCooldownIsReady && (ProxyPtr->GetNum() > 0));
 	}
 }
 
@@ -138,7 +149,7 @@ void UActionConsumablesIcon::SetRemainingCooldown(
 	bool bCooldownIsReady,
 	float RemainingTime,
 	float Percent
-)
+	)
 {
 	if (bCooldownIsReady)
 	{
@@ -181,7 +192,9 @@ void UActionConsumablesIcon::SetRemainingCooldown(
 	}
 }
 
-void UActionConsumablesIcon::SetCanRelease(bool bIsReady_In)
+void UActionConsumablesIcon::SetCanRelease(
+	bool bIsReady_In
+	)
 {
 	if (bIsReady_In)
 	{
@@ -228,11 +241,7 @@ void UActionConsumablesIcon::SetItemType()
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
-			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(ProxyPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
-				{
-					ImagePtr->SetBrushFromTexture(ProxyPtr->GetIcon().Get());
-				}));
+			AsyncLoadText(ProxyPtr->GetIcon(), ImagePtr);
 		}
 		else
 		{
@@ -241,7 +250,9 @@ void UActionConsumablesIcon::SetItemType()
 	}
 }
 
-void UActionConsumablesIcon::SetNum(int32 NewNum)
+void UActionConsumablesIcon::SetNum(
+	int32 NewNum
+	)
 {
 	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(FActionConsumablesIcon::Get().Number));
 	if (!NumTextPtr)
@@ -260,17 +271,23 @@ void UActionConsumablesIcon::SetNum(int32 NewNum)
 	}
 }
 
-void UActionConsumablesIcon::SetInputRemainPercent(bool bIsAcceptInput, float Percent)
+void UActionConsumablesIcon::SetInputRemainPercent(
+	bool bIsAcceptInput,
+	float Percent
+	)
 {
 	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(FActionConsumablesIcon::Get().WaitInputPercent));
 	if (UIPtr)
 	{
-		UIPtr->SetVisibility(bIsAcceptInput ?  ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		UIPtr->SetVisibility(bIsAcceptInput ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 		UIPtr->SetPercent(Percent);
 	}
 }
 
-void UActionConsumablesIcon::SetDurationPercent(bool bIsHaveDuration, float Percent)
+void UActionConsumablesIcon::SetDurationPercent(
+	bool bIsHaveDuration,
+	float Percent
+	)
 {
 }
 
@@ -285,7 +302,7 @@ void UActionConsumablesIcon::NativeDestruct()
 {
 	if (OnValueChangedDelegateHandle)
 	{
-		OnValueChangedDelegateHandle->UnBindCallback();
+		OnValueChangedDelegateHandle.Reset();
 	}
 
 	Super::NativeDestruct();

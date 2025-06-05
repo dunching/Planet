@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "Skill_Talent_NuQi.h"
 
 #include "State_Talent_NuQi.generated.h"
 
 UCLASS()
-class PLANET_API UState_Talent_NuQi : public UMyUserWidget
+class PLANET_API UState_Talent_NuQi : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

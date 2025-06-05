@@ -7,7 +7,7 @@
 #include <GameplayTagContainer.h>
 
 #include "UIInterfaces.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "ItemProxy_Minimal.h"
 
@@ -15,11 +15,12 @@
 
 struct FBasicProxy;
 struct FToolProxy;
+struct FConsumableProxy;
 
 struct FStreamableHandle;
 
 UCLASS()
-class PLANET_API UToolIcon : public UMyUserWidget, public IItemProxyIconInterface
+class PLANET_API UToolIcon : public UUserWidget_Override, public IItemProxyIconInterface
 {
 	GENERATED_BODY()
 
@@ -34,8 +35,6 @@ public:
 	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
-
-	TSharedPtr<FToolProxy> GetToolProxy()const;
 
 	TSharedPtr<FConsumableProxy> GetConsumablesProxy()const;
 

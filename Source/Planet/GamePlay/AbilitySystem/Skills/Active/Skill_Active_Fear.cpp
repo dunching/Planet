@@ -16,21 +16,18 @@
 #include "KismetCollisionHelper.h"
 #include "KismetGravityLibrary.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "CS_RootMotion.h"
-#include "CS_RootMotion_FlyAway.h"
-#include "CS_PeriodicStateModify_Fear.h"
 
 bool USkill_Active_Fear::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
@@ -105,33 +102,6 @@ void USkill_Active_Fear::ExcuteTasks()
 				{
 					TargetSet.Add(TargetCharacterPtr);
 				}
-			}
-
-			// 伤害
-			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-
-			auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-			for (const auto& Iter : TargetSet)
-			{
-				FGAEventData GAEventData(Iter, CharacterPtr);
-
-				GAEventData.SetBaseDamage(Damage);
-
-				GAEventDataPtr->DataAry.Add(GAEventData);
-			}
-			ICPtr->SendEventImp(GAEventDataPtr);
-
-			// 控制效果
-			for (const auto& Iter : TargetSet)
-			{
-				auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Fear(Duration);
-
-				GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-				GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = Iter;
-
-				ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 			}
 		}
 	}

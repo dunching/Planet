@@ -1,17 +1,20 @@
-// Zowee. All Rights Reserved.
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 #pragma once
 
 #include "CoreMinimal.h"
 
-#include <GenerateType.h>
+#include <GenerateTypes.h>
 
-#include "GameplayTagContainer.h"
 #include "CharacterAttibutes.h"
+#include "ItemProxy_Description.h"
 
 #include "CharactersInfo.generated.h"
 
 class AHumanCharacter_AI;
 
+/**
+ * 角色成长属性变化
+ */
 USTRUCT(BlueprintType)
 struct PLANET_API FTableRowProxy_CharacterGrowthAttribute : public FTableRowBase
 {
@@ -19,42 +22,15 @@ struct PLANET_API FTableRowProxy_CharacterGrowthAttribute : public FTableRowBase
 	
 	FTableRowProxy_CharacterGrowthAttribute();
 
-// 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-// 	FCharacterAttributes CharacterAttributes;
-
-	// 每级增加的属性
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TArray<FCharacterAttributes> CharacterAttributesPerLevel;
-};
-
-USTRUCT(BlueprintType)
-struct PLANET_API FTableRowProxy_CharacterType : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 LevelExperience = 100;
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSubclassOf<AHumanCharacter_AI>CharacterClass;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FString Title;
-};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Max_HP = 50;
 
-// NPC分配的技能
-USTRUCT(BlueprintType)
-struct PLANET_API FTableRowProxy_AICharacter_Allocation : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag FirstWeaponSocketInfo;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag SecondWeaponSocketInfo;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Max_Stamina = 10;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag ActiveSkillSet_1;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag ActiveSkillSet_2;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Max_Mana = 100;
 };

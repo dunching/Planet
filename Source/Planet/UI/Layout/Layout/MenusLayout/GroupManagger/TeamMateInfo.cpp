@@ -24,13 +24,14 @@
 #include "ItemProxy_Minimal.h"
 #include "CharacterBase.h"
 #include "PlanetControllerInterface.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAttibutes.h"
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "ItemProxy_Character.h"
+#include "TeamMatesHelperComponent.h"
 
 struct FTeamMateInfo : public TStructVariable<FTeamMateInfo>
 {
@@ -107,39 +108,21 @@ void UTeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyP
 
 			GroupMateProxyPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicProxyPtr);
 			{
-				auto UIPtr = Cast<UImage>(GetWidgetFromName(FTeamMateInfo::Get().Icon));
-				if (UIPtr)
+				auto ImagePtr = Cast<UImage>(GetWidgetFromName(FTeamMateInfo::Get().Icon));
+				if (ImagePtr)
 				{
-					FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-					AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(GroupMateProxyPtr->GetIcon().ToSoftObjectPath(), [this, UIPtr]()
-						{
-							UIPtr->SetBrushFromTexture(GroupMateProxyPtr->GetIcon().Get());
-						}));
+					AsyncLoadText(GroupMateProxyPtr->GetIcon(),ImagePtr );
 				}
 			}
 			{
 				auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FTeamMateInfo::Get().Text));
 				if (UIPtr)
 				{
-					auto CharacterAttributesSPtr =
-						GroupMateProxyPtr->CharacterAttributesSPtr;
-					if (GroupMateProxyPtr->Name.IsEmpty())
-					{
-						UIPtr->SetText(
-							FText::FromString(FString::Printf(TEXT("%s(%d)"),
-								*GroupMateProxyPtr->Title,
-								GroupMateProxyPtr->Level))
-						);
-					}
-					else
-					{
-						UIPtr->SetText(
-							FText::FromString(FString::Printf(TEXT("%s %s(%d)"),
-								*GroupMateProxyPtr->Title,
-								*GroupMateProxyPtr->Name,
-								GroupMateProxyPtr->Level))
-						);
-					}
+					UIPtr->SetText(
+						FText::FromString(FString::Printf(TEXT("%s(%d)"),
+							*GroupMateProxyPtr->GetDisplayTitle(),
+							GroupMateProxyPtr->GetLevel()))
+					);
 				}
 			}
 		}
@@ -163,6 +146,7 @@ void UTeamMateInfo::SynMember2Config(int32 Index )
 	{
 		return;
 	}
-	auto GMCPtr = PCPtr->GetGroupSharedInfo();
+	auto GMCPtr = PCPtr->GetGroupManagger();
 	GMCPtr->GetTeamMatesHelperComponent()->UpdateTeammateConfig(GroupMateProxyPtr, Index);
+
 }

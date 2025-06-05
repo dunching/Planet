@@ -9,43 +9,32 @@
 namespace MyProgressBar
 {
 	const FName ProgressBar = TEXT("ProgressBar");
-
+	
+	const FName ProgressBar_Overlay = TEXT("ProgressBar_Overlay");
+	
 	const FName Text = TEXT("Text");
 }
 
 void UMyProgressBar::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	ValueChanged();
+	OverlayValueChanged();
 }
 
 void UMyProgressBar::NativeDestruct()
 {
 	if (OnMaxPPValueChanged)
 	{
-		OnMaxPPValueChanged->UnBindCallback();
+		OnMaxPPValueChanged.Reset();
 	}
 	if (OnPPValueChanged)
 	{
-		OnPPValueChanged->UnBindCallback();
+		OnPPValueChanged.Reset();
 	}
 
 	Super::NativeDestruct();
-}
-
-void UMyProgressBar::SetDataSource(FBasePropertySet& Property)
-{
-	{
-		SetMaxValue(Property.GetMaxValue());
-		OnMaxPPValueChanged = Property.AddOnMaxValueChanged(
-			std::bind(&ThisClass::SetMaxValue, this, std::placeholders::_2)
-		);
-	}
-	{
-		SetCurrentValue(Property.GetCurrentValue());
-		OnPPValueChanged = Property.AddOnValueChanged(
-			std::bind(&ThisClass::SetCurrentValue, this, std::placeholders::_2)
-		);
-	}
 }
 
 void UMyProgressBar::SetDataSource(
@@ -69,6 +58,19 @@ void UMyProgressBar::SetDataSource(
 	ValueChanged();
 }
 
+void UMyProgressBar::SetOverlayDataSource(
+	UAbilitySystemComponent* AbilitySystemComponentPtr,
+	FGameplayAttribute Attribute,
+	float Value
+	)
+{
+	AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+	Attribute
+		).AddUObject(this, &ThisClass::SetOverlayValue);
+	OverlayValue = Value;
+
+}
+
 void UMyProgressBar::SetCurrentValue(int32 InCurrentValue)
 {
 	CurrentValue = InCurrentValue;
@@ -76,9 +78,9 @@ void UMyProgressBar::SetCurrentValue(int32 InCurrentValue)
 	ValueChanged();
 }
 
-void UMyProgressBar::SetCurrentValue_Re(const FOnAttributeChangeData& InCurrentValue)
+void UMyProgressBar::SetCurrentValue_Re(const FOnAttributeChangeData& AttributeChangeData)
 {
-	CurrentValue = InCurrentValue.NewValue;
+	CurrentValue = AttributeChangeData.NewValue;
 
 	ValueChanged();
 }
@@ -90,11 +92,20 @@ void UMyProgressBar::SetMaxValue(int32 InMaxValue)
 	ValueChanged();
 }
 
-void UMyProgressBar::SetMaxValue_Re(const FOnAttributeChangeData& InMaxValue)
+void UMyProgressBar::SetMaxValue_Re(const FOnAttributeChangeData& AttributeChangeData)
 {
-	MaxValue = InMaxValue.NewValue;
+	MaxValue = AttributeChangeData.NewValue;
 
 	ValueChanged();
+}
+
+void UMyProgressBar::SetOverlayValue(
+	const FOnAttributeChangeData& AttributeChangeData
+	)
+{
+	OverlayValue = AttributeChangeData.NewValue;
+
+	OverlayValueChanged();
 }
 
 void UMyProgressBar::ValueChanged()
@@ -106,12 +117,47 @@ void UMyProgressBar::ValueChanged()
 			UIPtr->SetText(FText::FromString(*FString::Printf(TEXT("%d/%d"), CurrentValue, MaxValue)));
 		}
 	}
-	const auto Percent = static_cast<float>(CurrentValue) / MaxValue;
+
+	if (MaxValue > 0)
+	{
+		const auto Percent = static_cast<float>(CurrentValue) / MaxValue;
+		{
+			auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(MyProgressBar::ProgressBar));
+			if (UIPtr)
+			{
+				UIPtr->SetPercent(Percent);
+			}
+		}
+	}
+	else
 	{
 		auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(MyProgressBar::ProgressBar));
 		if (UIPtr)
 		{
-			UIPtr->SetPercent(Percent);
+			UIPtr->SetPercent(0);
+		}
+	}
+}
+
+void UMyProgressBar::OverlayValueChanged()
+{
+	if (MaxValue > 0)
+	{
+		const auto Percent = FMath::Clamp( static_cast<float>(OverlayValue) / MaxValue,0,1);
+		{
+			auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(MyProgressBar::ProgressBar_Overlay));
+			if (UIPtr)
+			{
+				UIPtr->SetPercent(Percent);
+			}
+		}
+	}
+	else
+	{
+		auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(MyProgressBar::ProgressBar_Overlay));
+		if (UIPtr)
+		{
+			UIPtr->SetPercent(0);
 		}
 	}
 }

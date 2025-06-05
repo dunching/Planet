@@ -4,15 +4,14 @@
 
 #include "CoreMinimal.h"
 
-#include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
-#include "GroupSharedInterface.h"
 
 #include "Character/GravityCharacter.h"
 
-#include "ItemProxy_Minimal.h"
+#include "GroupManaggerInterface.h"
 #include "PlanetAbilitySystemComponent.h"
 #include "SceneActorInteractionInterface.h"
+#include "TemplateHelper.h"
 
 #include "CharacterBase.generated.h"
 
@@ -25,10 +24,11 @@ class ASceneActor;
 class UCharacterTitle;
 class UCharacterRisingTips;
 
+class USkeletalMeshComponent;
 class UAnimInstanceBase;
 class UEquipmentInteractionComponent;
 class UHoldItemComponent;
-class UInputProcessorSubSystem;
+class UInputProcessorSubSystem_Imp;
 class UZYInputComponent;
 class USceneActorPropertyComponent;
 class UPlanetGameplayAbility;
@@ -40,97 +40,123 @@ class UStateProcessorComponent;
 class UTeamMatesHelperComponent;
 class UCharacterAbilitySystemComponent;
 class UInteractiveConsumablesComponent;
+class USceneActorInteractionComponent;
 class UCharacterTitleComponent;
 class UProxyProcessComponent;
 class UInteractiveToolComponent;
 class UConversationComponent;
 class UWidgetComponent;
-class AGroupSharedInfo;
+class AGroupManagger;
+
+struct FCharacterProxy;
 
 UCLASS()
-class PLANET_API ACharacterBase : 
+class PLANET_API ACharacterBase :
 	public AGravityCharacter,
 	public IPlanetAbilitySystemInterface,
-	public IGroupSharedInterface
+	public IGroupManaggerInterface,
+	public ISceneActorInteractionInterface
 {
 	GENERATED_BODY()
 
 public:
-
 	using FCharacterProxyType = FCharacterProxy;
 
-	using FTeamMembersChangedDelegateHandle = 
-		TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterProxyType>&)>::FCallbackHandleSPtr;
-
 	using FValueChangedDelegateHandle =
-		TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
+	TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
 
-	using FProcessedGAEventHandle = 
-		TCallbackHandleContainer<void(const FGameplayAbilityTargetData_GAReceivedEvent&)>::FCallbackHandleSPtr;
+	using FProcessedGAEventHandle =
+	TCallbackHandleContainer<void(
+		const FGameplayAbilityTargetData_GAReceivedEvent&
+		
+		)>::FCallbackHandleSPtr;
 
-	using FOnInitaliedGroupSharedInfo = 
-		TCallbackHandleContainer<void()>;
+	using FOnInitaliedGroupSharedInfo =
+	TCallbackHandleContainer<void()>;
 
-	ACharacterBase(const FObjectInitializer& ObjectInitializer);
+	ACharacterBase(
+		const FObjectInitializer& ObjectInitializer
+		);
 
 	virtual ~ACharacterBase();
 
-	virtual void PossessedBy(AController* NewController) override;
+	virtual void PossessedBy(
+		AController* NewController
+		) override;
 
 	virtual void UnPossessed() override;
-	
-	virtual void OnRep_Controller()override;
-	
-	virtual void InteractionSceneActor(ASceneActor* SceneObjPtr);
-	
-	virtual void InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr);
-	
+
+	virtual void OnRep_Controller() override;
+
+	virtual void SetActorHiddenInGame(
+		bool bNewHidden
+		) override;
+
 	UFUNCTION(BlueprintPure, Category = "Character")
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	AGroupSharedInfo* GetGroupSharedInfo()const;
+	/**
+	 * ROLE_AutonomousProxy的数据准备好时
+	 */
+	UFUNCTION()
+	virtual void OnRep_GroupSharedInfoChanged();
 
-	UInventoryComponent* GetInventoryComponent()const;
+	AGroupManagger* GetGroupManagger() const;
 
-	UCharacterAttributesComponent* GetCharacterAttributesComponent()const;
+	UInventoryComponent* GetInventoryComponent() const;
 
-	UTalentAllocationComponent* GetTalentAllocationComponent()const;
+	UCharacterAttributesComponent* GetCharacterAttributesComponent() const;
 
-	UCharacterAbilitySystemComponent* GetCharacterAbilitySystemComponent()const;
-	
-	UStateProcessorComponent* GetStateProcessorComponent()const;
+	UTalentAllocationComponent* GetTalentAllocationComponent() const;
 
-	UProxyProcessComponent* GetProxyProcessComponent()const;
+	UCharacterAbilitySystemComponent* GetCharacterAbilitySystemComponent() const;
 
-	UConversationComponent* GetConversationComponent()const;
+	UStateProcessorComponent* GetStateProcessorComponent() const;
 
-	UCharacterTitleComponent* GetCharacterTitleComponent()const;
+	UProxyProcessComponent* GetProxyProcessComponent() const;
 
-	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy()const;
-	
-	template<typename Type = UAnimInstanceBase>
+	UConversationComponent* GetConversationComponent() const;
+
+	UCharacterTitleComponent* GetCharacterTitleComponent() const;
+
+	virtual USceneActorInteractionComponent* GetSceneActorInteractionComponent() const override;
+
+	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy() const;
+
+	USkeletalMeshComponent* GetCopyPoseMesh() const;
+
+	template <typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
 
-	virtual bool IsGroupmate(ACharacterBase*TargetCharacterPtr)const;
+	virtual bool IsGroupmate(
+		ACharacterBase* TargetCharacterPtr
+		) const;
 
-	virtual bool IsTeammate(ACharacterBase* TargetCharacterPtr)const;
+	virtual bool IsTeammate(
+		ACharacterBase* TargetCharacterPtr
+		) const;
 
-	ACharacterBase* GetFocusActor() const;
+	TObjectPtr<ACharacterBase> GetFocusActor() const;
 
 	UFUNCTION(NetMulticast, Reliable)
-	void SwitchAnimLink_Client(EAnimLinkClassType AnimLinkClassType);
-	
+	void SwitchAnimLink_Client(
+		EAnimLinkClassType AnimLinkClassType
+		);
+
 	UFUNCTION(NetMulticast, Reliable)
-	void SetCampType(ECharacterCampType CharacterCampType);
+	void SetCampType(
+		ECharacterCampType CharacterCampType
+		);
 
 	// 确认是否是一个有效的选中目标，比如目标在隐身、或“无法选中”、重伤倒地状态时为不可已被选中
-	bool GetIsValidTarget()const;
+	bool GetIsValidTarget() const;
 
 	FOnInitaliedGroupSharedInfo OnInitaliedGroupSharedInfo;
-	
-protected:
 
-	virtual void OnConstruction(const FTransform& Transform) override;
+protected:
+	virtual void OnConstruction(
+		const FTransform& Transform
+		) override;
 
 	virtual void PostInitializeComponents() override;
 
@@ -138,68 +164,86 @@ protected:
 
 	virtual void Destroyed() override;
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void EndPlay(
+		const EEndPlayReason::Type EndPlayReason
+		) override;
 
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+		) const override;
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void SpawnDefaultController() override;
 
-	virtual void SpawnDefaultController()override;
+	virtual void OnGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
 
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+	virtual void HasbeenInteracted(
+		ACharacterBase* CharacterPtr
+		) override;
 
-	UFUNCTION()
-	virtual void OnRep_GroupSharedInfoChanged();
+	virtual void HasBeenLookingAt(
+		ACharacterBase* CharacterPtr
+		) override;
 
-	UFUNCTION(Server, Reliable)
-	virtual void InteractionSceneObj_Server(ASceneActor* SceneObjPtr);
-	
+	virtual void HasBeenStartedLookAt(
+		ACharacterBase* CharacterPtr
+		) override;
+
+	virtual void HasBeenEndedLookAt() override;
+
 	UFUNCTION(BlueprintImplementableEvent)
-	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);
-	
-	void OnCharacterGroupMateChanged(
-		EGroupMateChangeType GroupMateChangeType,
-		const TSharedPtr<FCharacterProxyType>& TargetCharacterProxyPtr
-	);
+	void SwitchAnimLink(
+		EAnimLinkClassType AnimLinkClassType
+		);
+
+	UPROPERTY(Category=Character, EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<USkeletalMeshComponent> CopyPoseMeshPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
-	
+
 	UPROPERTY()
 	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;
-	
+
 	UPROPERTY()
 	TObjectPtr<UStateProcessorComponent> StateProcessorComponentPtr = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UCharacterAbilitySystemComponent> AbilitySystemComponentPtr = nullptr;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UCharacterTitleComponent> CharacterTitleComponentPtr = nullptr;
-	
+
 	UPROPERTY()
 	TObjectPtr<UProxyProcessComponent> ProxyProcessComponentPtr = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ConversationBorder)
 	TObjectPtr<UConversationComponent> ConversationComponentPtr = nullptr;
-	
-	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
-	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
 
-	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;
+	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
+	TObjectPtr<AGroupManagger> GroupManaggerPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WolrdProcess)
+	TObjectPtr<USceneActorInteractionComponent> SceneActorInteractionComponentPtr = nullptr;
 
 private:
+	void OnHPChanged(
+		const FOnAttributeChangeData& CurrentValue
+		);
 
-	void OnHPChanged(const FOnAttributeChangeData& CurrentValue);
-	
-	void OnMoveSpeedChanged(const FOnAttributeChangeData& CurrentValue);
-	
-	void OnMoveSpeedChangedImp(float Value);
-	
-	UFUNCTION(NetMulticast, Unreliable)
-	void OnProcessedGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
+	void OnMoveSpeedChanged(
+		const FOnAttributeChangeData& CurrentValue
+		);
 
-	void OnDeathing(const FGameplayTag Tag, int32 Count);
+	void OnMoveSpeedChangedImp(
+		float Value
+		);
+
+	void OnDeathing(
+		const FGameplayTag Tag,
+		int32 Count
+		);
 
 	void DoDeathing();
 
@@ -208,15 +252,14 @@ private:
 	FValueChangedDelegateHandle MoveSpeedChangedHandle;
 
 	FProcessedGAEventHandle ProcessedGAEventHandle;
-	
+
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	UPROPERTY(Transient)
 	TObjectPtr<AController> OriginalAIController;
-
 };
 
-template<typename Type>
+template <typename Type>
 Type* ACharacterBase::GetAnimationIns()
 {
 	auto CurSkeletalMeshCompPtr = GetMesh();

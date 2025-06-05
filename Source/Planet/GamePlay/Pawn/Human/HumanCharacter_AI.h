@@ -6,13 +6,17 @@
 
 #include "CharacterAttributesComponent.h"
 #include "HumanCharacter.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "SceneActorInteractionComponent.h"
+#include "StateProcessorComponent.h"
 
 #include "HumanCharacter_AI.generated.h"
 
+class UNiagaraComponent;
 class UAIComponent;
+class AGuideInteraction_HumanCharacter_AI;
 class UResourceBoxStateTreeComponent;
+class AGroupManagger_NPC;
 
 /**
  *
@@ -23,7 +27,22 @@ class PLANET_API USceneCharacterAIInteractionComponent : public USceneActorInter
 	GENERATED_BODY()
 
 public:
-	// virtual UGameplayTasksComponent* GetGameplayTasksComponent(const UGameplayTask& Task) const override;
+	using FOwnerType = AHumanCharacter_AI;
+
+	virtual void BeginPlay() override;
+	
+	virtual void StartInteractionItem(
+		const TSubclassOf<AGuideInteractionBase>& Item
+		) override;
+	
+	virtual void ChangedInterationState(
+		const TSubclassOf<AGuideInteractionBase>& Item,
+		bool bIsEnable
+	) override;
+
+private:
+	
+	void UpdatePromt()const;
 };
 
 /**
@@ -35,9 +54,35 @@ class PLANET_API UCharacterAIAttributesComponent : public UCharacterAttributesCo
 	GENERATED_BODY()
 
 public:
+	virtual void SetCharacterID(
+		const FGuid& InCharacterID
+	) override;
+};
 
-	virtual void SetCharacterID(const FGuid& InCharacterID)override;
+/**
+ *
+ */
+UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
+class PLANET_API UCharacterNPCStateProcessorComponent : public UStateProcessorComponent
+{
+	GENERATED_BODY()
 
+public:
+	using FOwnerType = AHumanCharacter_AI;
+
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+	) const override;
+
+	virtual TArray<TWeakObjectPtr<ACharacterBase>> GetTargetCharactersAry() const override;
+
+	void SetTargetCharactersAry(
+		const TWeakObjectPtr<ACharacterBase>& TargetCharacter
+	);
+
+private:
+	UPROPERTY(Replicated)
+	TWeakObjectPtr<ACharacterBase> TargetCharacter = nullptr;
 };
 
 UCLASS()
@@ -47,45 +92,63 @@ class PLANET_API AHumanCharacter_AI :
 	GENERATED_BODY()
 
 public:
-	AHumanCharacter_AI(const FObjectInitializer& ObjectInitializer);
+	AHumanCharacter_AI(
+		const FObjectInitializer& ObjectInitializer
+	);
 
 	virtual void BeginPlay() override;
 
-	virtual void PossessedBy(AController* NewController) override;
+	virtual void PossessedBy(
+		AController* NewController
+	) override;
 
-	virtual void HasBeenStartedLookAt(ACharacterBase* InCharacterPtr)override;
+	virtual void SpawnDefaultController() override;
 
-	virtual void HasBeenLookingAt(ACharacterBase* InCharacterPtr)override;
+	UCharacterNPCStateProcessorComponent* GetCharacterNPCStateProcessorComponent() const;
 
-	virtual void HasBeenEndedLookAt()override;
+	AGroupManagger_NPC* GetGroupManagger_NPC() const;
 
-	void SetGroupSharedInfo(AGroupSharedInfo* GroupSharedInfoPtr);
+	TObjectPtr<UNiagaraComponent>  GetNiagaraComponent() const;
 
-	void SetCharacterID(const FGuid& InCharacterID);
+	virtual void HasBeenStartedLookAt(
+		ACharacterBase* InCharacterPtr
+	) override;
+
+	virtual void HasBeenLookingAt(
+		ACharacterBase* InCharacterPtr
+	) override;
+
+	virtual void HasBeenEndedLookAt() override;
+
+	void SetGroupSharedInfo(
+		AGroupManagger* GroupManaggerPtr
+	);
+
+	void SetCharacterID(
+		const FGuid& InCharacterID
+	);
 
 	UAIComponent* GetAIComponent() const;
 
-#if WITH_EDITORONLY_DATA
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn")
-	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
-#endif
-
 protected:
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+	) const override;
 
 	virtual void OnRep_GroupSharedInfoChanged() override;
 
 	// virtual TSharedPtr<FCharacterProxy> GetCharacterProxy()const override;
 
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+	virtual void OnGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+	) override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "StateTree")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TObjectPtr<UAIComponent> AIComponentPtr = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WolrdProcess)
-	TObjectPtr<UGameplayTasksComponent> GameplayTasksComponentPtr = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
-	UWidgetComponent* InteractionWidgetCompoentPtr = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
+	TObjectPtr<UNiagaraComponent> NiagaraComponentPtr = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interaction)
+	UWidgetComponent* InteractionWidgetCompoentPtr = nullptr;
 };

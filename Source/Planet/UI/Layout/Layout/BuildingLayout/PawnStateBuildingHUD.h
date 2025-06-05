@@ -4,17 +4,18 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 
 #include "PawnStateBuildingHUD.generated.h"
 
 class UToolsMenu;
 
-struct FCharacterAttributes;
+
 
 struct FToolsSocketInfo;
 struct FConsumableSocketInfo;
@@ -24,8 +25,8 @@ struct FConsumableSocketInfo;
  */
 UCLASS()
 class PLANET_API UPawnStateBuildingHUD :
-	public UMyUserWidget,
-	public IHUDInterface
+	public UUserWidget_Override,
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -39,13 +40,17 @@ public:
 
 	virtual void NativeDestruct()override;
 
-	virtual void ResetUIByData()override;
+	// virtual void ResetUIByData()override;
 // 
 // 	TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>GetTools();
 // 
 // 	TMap<FGameplayTag, TSharedPtr<FConsumableSocketInfo>>GetConsumables();
 
 protected:
+
+	virtual void Enable() override;
+	
+	virtual void DisEnable() override;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey ToolSocket1;
@@ -70,8 +75,6 @@ protected:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey ToolSocket8;
-
-	FCharacterAttributes* PawnDataStructPtr = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName ItemMenu;

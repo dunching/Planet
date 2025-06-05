@@ -20,7 +20,7 @@
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "ItemProxyDragDropOperation.h"
-#include "ItemProxyDragDropOperationWidget.h"
+#include "ItemProxy_Consumable.h"
 #include "GameplayTagsLibrary.h"
 #include "TemplateHelper.h"
 
@@ -64,7 +64,6 @@ void UToolIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
 	{
 		if (BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 		{
-			ProxyPtr = DynamicCastSharedPtr<FToolProxy>(BasicProxyPtr);
 		}
 		else if (BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 		{
@@ -100,11 +99,6 @@ void UToolIcon::EnableIcon(bool bIsEnable)
 
 }
 
-TSharedPtr<FToolProxy> UToolIcon::GetToolProxy() const
-{
-	return DynamicCastSharedPtr<FToolProxy>(ProxyPtr);
-}
-
 TSharedPtr<FConsumableProxy> UToolIcon::GetConsumablesProxy() const
 {
 	return DynamicCastSharedPtr<FConsumableProxy>(ProxyPtr);
@@ -126,18 +120,13 @@ void UToolIcon::SetNum()
 	{
 		if (ProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 		{
-			auto TempProxyPtr = DynamicCastSharedPtr<FToolProxy>(ProxyPtr);
-			if (TempProxyPtr)
-			{
-				NewNum = TempProxyPtr->GetNum();
-			}
 		}
 		else if (ProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 		{
 			auto TempProxyPtr = DynamicCastSharedPtr<FConsumableProxy>(ProxyPtr);
 			if (TempProxyPtr)
 			{
-				NewNum = TempProxyPtr->GetCurrentValue();
+				NewNum = TempProxyPtr->GetNum();
 			}
 		}
 	}
@@ -168,11 +157,7 @@ void UToolIcon::SetItemType()
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
-			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(ProxyPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
-				{
-					ImagePtr->SetBrushFromTexture(ProxyPtr->GetIcon().Get());
-				}));
+			AsyncLoadText(ProxyPtr->GetIcon(),ImagePtr );
 		}
 		else
 		{

@@ -1,4 +1,3 @@
-
 #include "STT_RotateToFaceEntry.h"
 
 #include <NavigationSystem.h>
@@ -7,9 +6,12 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_ReleaseSkill.h"
-#include "STE_AICharacterController.h"
-#include "Planet.h"
+#include "STE_Assistance.h"
+#include "PlanetModule.h"
 #include "PlanetPlayerController.h"
+#include "STE_CharacterBase.h"
+#include "Kismet/KismetMaterialLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 
 namespace STT_RotateToFaceEntry
 {
@@ -18,61 +20,32 @@ namespace STT_RotateToFaceEntry
 	FName Donut_OuterRadius = TEXT("Donut.OuterRadius");
 }
 
-FSTT_RotateToFaceEntry::FSTT_RotateToFaceEntry() :
-	Super()
-{
-}
-
 const UStruct* FSTT_RotateToFaceEntry::GetInstanceDataType() const
 {
 	return FInstanceDataType::StaticStruct();
 }
 
-EStateTreeRunStatus FSTT_RotateToFaceEntry::EnterState(
-	FStateTreeExecutionContext& Context,
-	const FStateTreeTransitionResult& Transition
-)const
-{
-	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-	if (!InstanceData.CharacterPtr)
-	{
-		return EStateTreeRunStatus::Failed;
-	}
-
-	return PerformMoveTask(Context);
-}
-
-void FSTT_RotateToFaceEntry::ExitState(
-	FStateTreeExecutionContext& Context,
-	const FStateTreeTransitionResult& Transition
-)const
-{
-	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-
-	if (InstanceData.AIControllerPtr)
-	{
-		InstanceData.AIControllerPtr->ClearFocus(EAIFocusPriority::Gameplay);
-	}
-
-	Super::ExitState(Context, Transition);
-}
-
-EStateTreeRunStatus FSTT_RotateToFaceEntry::Tick( 
+EStateTreeRunStatus FSTT_RotateToFaceEntry::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
 ) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	if (InstanceData.AIControllerPtr->GetFocusActor())
+	if (InstanceData.GloabVariable->TargetCharacterPtr.IsValid())
 	{
-		const float AngleTolerance = 5.f;
+		const float AngleTolerance = FMath::DegreesToRadians(5.0f);
 
-		const auto PCRot = InstanceData.AIControllerPtr->GetControlRotation();
 		const auto PawnRot = InstanceData.CharacterPtr->GetActorRotation();
 
+		const auto TargetRot = UKismetMathLibrary::MakeRotFromZX(
+			FVector::UpVector,
+			InstanceData.GloabVariable->TargetCharacterPtr->GetActorLocation() - InstanceData.CharacterPtr->
+			GetActorLocation()
+		);
+
 		// Gravity?
-		if (PCRot.EqualsOrientation(PawnRot, AngleTolerance))
+		if (PawnRot.EqualsOrientation(TargetRot, AngleTolerance))
 		{
 			return EStateTreeRunStatus::Succeeded;
 		}
@@ -85,16 +58,41 @@ EStateTreeRunStatus FSTT_RotateToFaceEntry::Tick(
 	return Super::Tick(Context, DeltaTime);
 }
 
-EStateTreeRunStatus FSTT_RotateToFaceEntry::PerformMoveTask(FStateTreeExecutionContext& Context)const
+EStateTreeRunStatus FSTT_IsFaceToTarget::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	if (InstanceData.CharacterPtr && InstanceData.AIControllerPtr)
+	if (InstanceData.GloabVariable->TargetCharacterPtr.IsValid())
 	{
-		check(InstanceData.CharacterPtr != InstanceData.TargetCharacterPtr);
-		InstanceData.AIControllerPtr->SetFocus(InstanceData.TargetCharacterPtr.Get());
+		const float AngleTolerance = FMath::DegreesToRadians(5.0f);
 
-		return EStateTreeRunStatus::Running;
+		const auto PawnRot = InstanceData.CharacterPtr->GetActorRotation();
+
+		const auto TargetRot = UKismetMathLibrary::MakeRotFromZX(
+			FVector::UpVector,
+			InstanceData.GloabVariable->TargetCharacterPtr->GetActorLocation() - InstanceData.CharacterPtr->
+			GetActorLocation()
+		);
+
+		// Gravity?
+		if (PawnRot.EqualsOrientation(TargetRot, AngleTolerance))
+		{
+			if (InstanceData.GloabVariable)
+			{
+				return EStateTreeRunStatus::Running;
+			}
+			else
+			{
+				return EStateTreeRunStatus::Succeeded;
+			}
+		}
 	}
+	else
+	{
+	}
+
 	return EStateTreeRunStatus::Failed;
 }

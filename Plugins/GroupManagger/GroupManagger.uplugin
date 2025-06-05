@@ -1,0 +1,36 @@
+{
+	"FileVersion": 1,
+	"Version": 1,
+	"VersionName": "1",
+	"FriendlyName": "GroupManagger",
+	"Category": "Other",
+	"CreatedBy": "武侯笑笑生",
+	"Modules": [
+		{
+			"Name": "GroupManagger",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "GameplayAbilities",
+			"Enabled": true
+		},
+		{
+			"Name": "ItemProxy",
+			"Enabled": true
+		},
+		{
+			"Name": "Utils",
+			"Enabled": true
+		},
+		{
+			"Name": "NetAbilitySystem",
+			"Enabled": true
+		}
+	]
+}

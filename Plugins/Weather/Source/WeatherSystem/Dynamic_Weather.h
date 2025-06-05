@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include <GameplayTagContainer.h>
 
 #include "Dynamic_Weather.generated.h"
@@ -11,8 +12,8 @@ UCLASS(Blueprintable)
 class UDS_Weather_Settings : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
-public:
 
+public:
 };
 
 UCLASS()
@@ -21,23 +22,36 @@ class WEATHER_API ADynamic_Weather : public AActor
 	GENERATED_BODY()
 
 public:
+	ADynamic_Weather(
+		const FObjectInitializer& ObjectInitializer
+		);
 
-	ADynamic_Weather(const FObjectInitializer& ObjectInitializer);
+	virtual void BeginPlay() override;
 
-	virtual void BeginPlay()override;
+	virtual void EndPlay(
+		const EEndPlayReason::Type EndPlayReason
+		) override;
 
-	void UpdateWeather(const FGameplayTag& WeatherType);
-	
+	// UFUNCTION(NetMulticast, Unreliable)
+	void UpdateWeather(
+		const FGameplayTag& WeatherType
+		);
+
+	FGameplayTag GetCurrentWeather() const;
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateSeasonCPP();
 
 protected:
-	
 	UFUNCTION(BlueprintImplementableEvent)
-	void UpdateWeatherCPP(UPrimaryDataAsset* DS_Weather_SettingsPtr);
+	void UpdateWeatherCPP(
+		UPrimaryDataAsset* DS_Weather_SettingsPtr
+		);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TMap<FGameplayTag, TSoftObjectPtr<UPrimaryDataAsset>>WeatherMap;
+	TMap<FGameplayTag, TSoftObjectPtr<UPrimaryDataAsset>> WeatherMap;
+
+	FGameplayTag CurrentWeather;
 };
 
 namespace WeatherSettings

@@ -13,8 +13,13 @@ public class PlanetServerTarget : TargetRules
         DefaultBuildSettings = BuildSettingsVersion.Latest;
 
 		ExtraModuleNames.AddRange( new string[] {
-            "Planet",
-            "Tools",
+	        
+			"AssetRef",
+			"CommonType",
+			"GameOptions",
+			"GameplayTagsLibrary",
+			"Planet",
+			"Tools",
         } );
 	}
 }

@@ -4,9 +4,9 @@
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "TaskNode_Interaction.h"
-#include "GuideActor.h"
-#include "InputProcessorSubSystem.h"
+
+#include "GuideActorBase.h"
+#include "InputProcessorSubSystemBase.h"
 #include "InteractionList.h"
 #include "MainHUD.h"
 #include "MainHUDLayout.h"
@@ -43,10 +43,6 @@ void UInteractionItem::NativeConstruct()
 	UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnClicked);
 }
 
-void UInteractionItem::ResetUIByData()
-{
-}
-
 void UInteractionItem::SetData(const FOnInteractionItemClicked & InOnInteractionItemClicked)
 {
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FInteractionItem::Get().Text));
@@ -56,6 +52,16 @@ void UInteractionItem::SetData(const FOnInteractionItemClicked & InOnInteraction
 	}
 
 	UIPtr->SetText(FText::FromString(UTextSubSystem::GetInstance()->GetText(TextCollect::CharacterInteraction)));
+}
+
+void UInteractionItem::Enable()
+{
+	ILayoutItemInterfacetion::Enable();
+}
+
+void UInteractionItem::DisEnable()
+{
+	ILayoutItemInterfacetion::DisEnable();
 }
 
 void UInteractionItem::OnClicked()

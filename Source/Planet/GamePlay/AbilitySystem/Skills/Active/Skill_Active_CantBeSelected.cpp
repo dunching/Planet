@@ -5,16 +5,11 @@
 
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
-#include "CS_RootMotion.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
 #include "CharacterAttibutes.h"
-#include "CharacterAttributesComponent.h"
-#include "KismetGravityLibrary.h"
-#include "CS_PeriodicStateModify_Stagnation.h"
-#include "CS_PeriodicStateModify_CantBeSelected.h"
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
 
@@ -41,13 +36,7 @@ void USkill_Active_CantBeSelected::ActivateAbility(
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 		ExcuteTasks();
 
-		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
-		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
-		CharacterStateInfoSPtr->DataChanged();
 
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 		{
 			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
@@ -72,7 +61,6 @@ void USkill_Active_CantBeSelected::EndAbility(
 	bool bWasCancelled
 )
 {
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -81,26 +69,6 @@ void USkill_Active_CantBeSelected::ExcuteTasks()
 {
 	if (CharacterPtr)
 	{
-		{
-			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_CantBeSelected(Duration);
-
-			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = CharacterPtr;
-
-			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-
-			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
-		}
-		{
-			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Stagnation(Duration);
-
-			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = CharacterPtr;
-
-			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-
-			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
-		}
 	}
 }
 
@@ -111,9 +79,6 @@ void USkill_Active_CantBeSelected::DurationDelegate(UAbilityTask_TimerHelper*, f
 	{
 		if (CharacterStateInfoSPtr)
 		{
-			CharacterStateInfoSPtr->TotalTime = CurrentIntervalTime;
-			CharacterStateInfoSPtr->DataChanged();
-			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 		}
 	}
 #endif

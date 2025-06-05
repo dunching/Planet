@@ -1,11 +1,17 @@
 #include "EffectItem.h"
 
+#include "AbilitySystemComponent.h"
 #include "Engine/AssetManager.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
-#include "CS_Base.h"
+#include "GameplayEffect.h"
+
 #include "TemplateHelper.h"
 #include "CharacterStateInfo.h"
+#include "GameplayTagsLibrary.h"
+#include "ItemProxy_Description.h"
+#include "DataTableCollection.h"
+#include "StateTagExtendInfo.h"
 
 namespace EffectItem
 {
@@ -20,25 +26,9 @@ namespace EffectItem
 	const FName TextCanvas = TEXT("TextCanvas");
 }
 
-void UEffectItem::SetData(const TSharedPtr<FCharacterStateInfo>& InCharacterStateInfoSPtr)
-{
-	// CharacterStateInfoSPtr = InCharacterStateInfoSPtr;
-	//
-	// DataChangedHandle = CharacterStateInfoSPtr->DataChanged.AddCallback(std::bind(&ThisClass::OnUpdate, this));
-	//
-	// SetTexutre(CharacterStateInfoSPtr->DefaultIcon);
-	//
-	// OnUpdate();
-}
-
-void UEffectItem::SetData(const FActiveGameplayEffect* InActiveGameplayEffectPtr)
-{
-	ActiveGameplayEffectPtr = InActiveGameplayEffectPtr;
-
-	Handle = ActiveGameplayEffectPtr->Handle;
-}
-
-void UEffectItem::SetNum(int32 NewNum)
+void UEffectItem::SetNum(
+	int32 NewNum
+)
 {
 	SetSetNumIsDisplay(true);
 	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(EffectItem::Text));
@@ -58,7 +48,9 @@ void UEffectItem::SetNum(int32 NewNum)
 	}
 }
 
-void UEffectItem::SetSetNumIsDisplay(bool bIsDisplay)
+void UEffectItem::SetSetNumIsDisplay(
+	bool bIsDisplay
+)
 {
 	{
 		auto UIPtr = GetWidgetFromName(EffectItem::TextCanvas);
@@ -70,7 +62,10 @@ void UEffectItem::SetSetNumIsDisplay(bool bIsDisplay)
 	}
 }
 
-void UEffectItem::SetPercent(bool bIsInversion, float Percent)
+void UEffectItem::SetPercent(
+	bool bIsInversion,
+	float Percent
+)
 {
 	SetPercentIsDisplay(true);
 	auto UIPtr = Cast<UImage>(GetWidgetFromName(EffectItem::ProgressBar));
@@ -85,7 +80,9 @@ void UEffectItem::SetPercent(bool bIsInversion, float Percent)
 	}
 }
 
-void UEffectItem::SetPercentIsDisplay(bool bIsDisplay)
+void UEffectItem::SetPercentIsDisplay(
+	bool bIsDisplay
+)
 {
 	{
 		auto UIPtr = GetWidgetFromName(EffectItem::ProgressBar);
@@ -97,18 +94,62 @@ void UEffectItem::SetPercentIsDisplay(bool bIsDisplay)
 	}
 }
 
-void UEffectItem::SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr)
+void UEffectItem::SetTexutre(
+)
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(EffectItem::Icon));
-	if (ImagePtr)
+	auto ActiveGameplayEffectPtr = AbilitySystemComponentPtr->GetActiveGameplayEffect(Handle);
+	if (!ActiveGameplayEffectPtr)
 	{
-		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(
-			TexturePtr.ToSoftObjectPath(), [this, ImagePtr, TexturePtr]()
-			{
-				ImagePtr->SetBrushFromTexture(TexturePtr.Get());
-			}));
+		return;
 	}
+
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(EffectItem::Icon));
+	if (!ImagePtr)
+	{
+		return;
+	}
+
+	FGameplayTagContainer OutContainer;
+	ActiveGameplayEffectPtr->Spec.GetAllAssetTags(OutContainer);
+
+	for (const auto& Iter : OutContainer)
+	{
+		if (Iter.MatchesTag(UGameplayTagsLibrary::Proxy_Skill))
+		{
+			auto SceneProxyExtendInfoPtr = GetTableRowProxy(Iter);
+			if (!SceneProxyExtendInfoPtr)
+			{
+				return;
+			}
+
+			AsyncLoadText(SceneProxyExtendInfoPtr->ItemProxy_Description.LoadSynchronous()->DefaultIcon, ImagePtr);
+
+			return;
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
+		{
+			auto SceneProxyExtendInfoPtr = GetTableRowProxy(Iter);
+			if (!SceneProxyExtendInfoPtr)
+			{
+				return;
+			}
+
+			AsyncLoadText(SceneProxyExtendInfoPtr->ItemProxy_Description.LoadSynchronous()->DefaultIcon, ImagePtr);
+
+			return;
+		}
+	}
+}
+
+void UEffectItem::SetData(
+	const TObjectPtr<UAbilitySystemComponent>& InAbilitySystemComponentPtr,
+	FActiveGameplayEffectHandle NewActiveGameplayEffectHandle
+)
+{
+	AbilitySystemComponentPtr = InAbilitySystemComponentPtr;
+	Handle = NewActiveGameplayEffectHandle;
+
+	SetTexutre();
 }
 
 void UEffectItem::NativeConstruct()
@@ -123,28 +164,46 @@ void UEffectItem::NativeDestruct()
 {
 	if (DataChangedHandle)
 	{
-		DataChangedHandle->UnBindCallback();
+		DataChangedHandle.Reset();
 	}
 
 	Super::NativeDestruct();
 }
 
-void UEffectItem::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+void UEffectItem::NativeTick(
+	const FGeometry& MyGeometry,
+	float InDeltaTime
+)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
+	auto ActiveGameplayEffectPtr = AbilitySystemComponentPtr->GetActiveGameplayEffect(Handle);
+	if (!ActiveGameplayEffectPtr)
+	{
+		RemoveFromParent();
+		return;
+	}
+
+	if (!ActiveGameplayEffectPtr)
+	{
+		return;
+	}
 	FGameplayTagContainer OutContainer;
 	ActiveGameplayEffectPtr->Spec.GetAllAssetTags(OutContainer);
 	if (!OutContainer.IsEmpty())
 	{
-		// SetTexutre(CharacterStateInfoSPtr->DefaultIcon);
-
 		OnUpdate();
 	}
 }
 
 void UEffectItem::OnUpdate()
 {
+	auto ActiveGameplayEffectPtr = AbilitySystemComponentPtr->GetActiveGameplayEffect(Handle);
+	if (!ActiveGameplayEffectPtr)
+	{
+		return;
+	}
+
 	if (ActiveGameplayEffectPtr->Handle != Handle)
 	{
 		RemoveFromParent();
@@ -169,7 +228,7 @@ void UEffectItem::OnUpdate()
 				RemoveFromParent();
 			}
 		}
-	break;
+		break;
 	default:
 		{
 			// 没写
@@ -183,6 +242,6 @@ void UEffectItem::OnUpdate()
 				SetPercentIsDisplay(false);
 			}
 		}
-	break;
+		break;
 	}
 }

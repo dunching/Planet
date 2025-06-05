@@ -6,35 +6,61 @@
 
 #include "GameFramework/HUD.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include "LayoutCommon.h"
+#include "LayoutInterfacetion.h"
+#include "TemplateHelper.h"
 
 #include "MainHUDLayout.generated.h"
 
+class UOverlaySlot;
 class UGetItemInfosList;
 class UInteractionList;
 class UMainMenuLayout;
-class UConversationLayout;
+class UInteractionConversationLayout;
+class UInteractionOptionsLayout;
+class URegularActionLayout;
 
 UCLASS()
-class PLANET_API UMainHUDLayout : public UMyUserWidget
+class PLANET_API UMainHUDLayout : public UUserWidget_Override
 {
 	GENERATED_BODY()
 
 public:
+	using FOnLayoutChanged = TCallbackHandleContainer<void(
+		ELayoutCommon
+		)>;
+
+	virtual void NativeConstruct() override;
 
 	// 
-	void SwitchToNewLayout(ELayoutCommon LayoutCommon);
+	void SwitchToNewLayout(
+		ELayoutCommon LayoutCommon,
+		const ILayoutInterfacetion::FOnQuit& OnQuit
+		);
 
-	UMainMenuLayout *GetMenuLayout();
-	
-	UConversationLayout *GetConversationLayout();
-	
+	UMainMenuLayout* GetMenuLayout();
+
+	UInteractionConversationLayout* GetConversationLayout();
+
+	UInteractionOptionsLayout* GetInteractionOptionsLayout();
+
+	URegularActionLayout* GetRegularActionLayout() const;
+
 	// 获取物品的提示
 	UGetItemInfosList* GetItemInfos();
 
-	void SwitchIsLowerHP(bool bIsLowerHP);
+	UOverlaySlot* DisplayWidget(
+		const TSubclassOf<UUserWidget>& WidgetClass,
+		const std::function<void(UUserWidget*)>& Initializer
+ 
+		);
+
+	void SwitchIsLowerHP(
+		bool bIsLowerHP
+		);
 
 	// UInteractionList* GetInteractionList();
 
+	FOnLayoutChanged OnLayoutChanged;
 };

@@ -6,6 +6,7 @@
 
 #include "Weapon_Base.h"
 #include "PlanetGameplayAbility.h"
+#include "PlanetWeapon_Base.h"
 #include "Skill_Base.h"
 #include "ProjectileBase.h"
 
@@ -36,7 +37,7 @@ protected:
 };
 
 UCLASS()
-class PLANET_API AWeapon_Bow : public AWeapon_Base
+class PLANET_API AWeapon_Bow : public APlanetWeapon_Base
 {
 	GENERATED_BODY()
 
@@ -44,7 +45,7 @@ public:
 
 	AWeapon_Bow(const FObjectInitializer& ObjectInitializer);
 
-	virtual void AttachToCharacter(ACharacterBase* CharacterPtr)override;
+	virtual void AttachToCharacterBase(ACharacterBase* CharacterPtr)override;
 
 	USkeletalMeshComponent* GetMesh()const;
 	
@@ -52,13 +53,17 @@ public:
 
 protected:
 
+	virtual void BeginPlay()override;
+	
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FTransform BowIdleTransform = FTransform::Identity;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FTransform BowTransform = FTransform::Identity;
+	FTransform BowShootTransform = FTransform::Identity;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FName Bow_Socket;

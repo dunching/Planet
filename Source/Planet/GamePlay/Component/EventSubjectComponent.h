@@ -8,6 +8,8 @@
 
 #include "EventSubjectComponent.generated.h"
 
+struct FOnEffectedTargetCallback;
+
 /*
  * 事务由转发
  * 仅玩家具备
@@ -21,19 +23,10 @@ class UEventSubjectComponent :
 
 public:
 	
-	using FMakedDamageDelegate = TCallbackHandleContainer<void(const FReceivedEventModifyDataCallback&)>;
+	using FMakedDamageDelegate = TCallbackHandleContainer<void(const FOnEffectedTargetCallback&)>;
 
 	static FName ComponentName;
 
 	UEventSubjectComponent(const FObjectInitializer& ObjectInitializer);
-
-	// 对“其他”角色造成的影响（伤害、控制）
-	UFUNCTION(NetMulticast, Reliable)
-	void ReceivedEventModifyDataCallback(
-		const FReceivedEventModifyDataCallback& ReceivedEventModifyDataCallback
-		);
-	
-	// 对“其他”角色造成的影响（伤害、控制）
-	FMakedDamageDelegate MakedDamageDelegate;
 
 };

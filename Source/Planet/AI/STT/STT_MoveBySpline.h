@@ -9,7 +9,7 @@
 #include "StateTreeTaskBase.h"
 #include "StateTreeExecutionContext.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "STT_MoveBySpline.generated.h"
 
@@ -22,8 +22,10 @@ struct FAIMoveRequest;
 
 class UAITask_MoveBySpline;
 class AHumanCharacter;
+class AHumanCharacter_AI;
 class AHumanAIController;
-class UGloabVariable;
+class UGloabVariable_Character;
+class AGeneratorNPCs_Patrol;
 
 namespace EPathFollowingResult { enum Type : int; }
 
@@ -33,19 +35,22 @@ struct PLANET_API FStateTreeCheckTarget_SplineTaskInstanceData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter> CharacterPtr = nullptr;
+	TObjectPtr<AHumanCharacter_AI> CharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 	
 	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable* GloabVariable = nullptr;
+	UGloabVariable_Character* GloabVariable = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = Parameter)
-	USplineComponent* SPlinePtr = nullptr;
+	UPROPERTY(EditAnywhere, Category = Output)
+	bool bIsEntryAttackTarget = false;
 
 	UPROPERTY(EditAnywhere, Category = Parameter)
 	int32 MaxDistance = 1000;
+
+	UPROPERTY(Transient)
+	USplineComponent* SPlinePtr = nullptr;
 
 };
 
@@ -57,6 +62,11 @@ struct PLANET_API FSTT_CheckTarget_Spline : public FStateTreeAIActionTaskBase
 	using FInstanceDataType = FStateTreeCheckTarget_SplineTaskInstanceData;
 
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context, 
+		const FStateTreeTransitionResult& Transition
+	) const override;
 
 	virtual EStateTreeRunStatus Tick(
 		FStateTreeExecutionContext& Context,
@@ -73,14 +83,11 @@ struct PLANET_API FStateTreeMoveBySplineTaskInstanceData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter> CharacterPtr = nullptr;
+	TObjectPtr<AHumanCharacter_AI> CharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 	
-	UPROPERTY(EditAnywhere, Category = Parameter)
-	USplineComponent* SPlinePtr = nullptr;
-
 	UPROPERTY(Transient)
 	TObjectPtr<UAITask_MoveBySpline> AITaskPtr = nullptr;
 	
@@ -125,6 +132,9 @@ struct PLANET_API FStateTreeMoveBySplineTaskInstanceData
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
 
+	UPROPERTY(Transient)
+	USplineComponent* SPlinePtr = nullptr;
+
 };
 
 USTRUCT()
@@ -160,7 +170,7 @@ struct PLANET_API FSTT_MoveBySpline : public FStateTreeAIActionTaskBase
 		FAIMoveRequest& MoveRequest
 	) const;
 
-	virtual EStateTreeRunStatus PerformMoveTask(
+	virtual EStateTreeRunStatus PerformGameplayTask(
 		FStateTreeExecutionContext& Context, 
 		AAIController& Controller
 	) const;

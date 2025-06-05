@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Common/GenerateType.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 #include "MenuInterface.h"
 
@@ -22,7 +22,7 @@ class AHumanCharacter;
  */
 UCLASS()
 class PLANET_API UTeamMatesList :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IMenuInterface
 {
 	GENERATED_BODY()
@@ -39,13 +39,15 @@ public:
 
 	virtual void NativeDestruct() override;
 
-	virtual void SyncData() override;
+	virtual void DisEnableMenu() override;
 
+	virtual EMenuType GetMenuType()const override final;
+	
 	AHumanCharacter* HumanCharacterPtr = nullptr;
 
 protected:
 	
-	virtual void ResetUIByData() override;
+	virtual void EnableMenu() override;
 
 	void OnWeaponProxyChanged(
 		UTeamMateInfo*UIPtr,

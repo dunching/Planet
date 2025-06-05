@@ -1,2 +1,1 @@
-﻿
-#include "SceneProxyTable.h"
+﻿#include "SceneProxyTable.h"

@@ -1,4 +1,3 @@
-
 #include "HUD_TeamInfo.h"
 
 #include <Kismet/GameplayStatics.h>
@@ -6,13 +5,14 @@
 #include <Components/Border.h>
 
 #include "PlanetControllerInterface.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "TeamMateInfo.h"
 #include "HUD_TeamMateInfo.h"
 #include "CharacterBase.h"
 #include "TemplateHelper.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "ItemProxy_Character.h"
+#include "TeamMatesHelperComponent.h"
 
 struct FHUD_TeamInfo : public TStructVariable<FHUD_TeamInfo>
 {
@@ -21,41 +21,39 @@ struct FHUD_TeamInfo : public TStructVariable<FHUD_TeamInfo>
 	const FName FollowOpetion = TEXT("FollowOpetion");
 
 	const FName AssistanceOption = TEXT("AssistanceOption");
+
+	const FName FireTarget = TEXT("FireTarget");
 };
 
 void UHUD_TeamInfo::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	ResetUIByData();
 }
 
 void UHUD_TeamInfo::NativeDestruct()
 {
-	if (TeammateOptionChangedDelegateContainer)
-	{
-		TeammateOptionChangedDelegateContainer->UnBindCallback();
-	}
-
 	Super::NativeDestruct();
 }
 
-FReply UHUD_TeamInfo::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
+FReply UHUD_TeamInfo::NativeOnKeyDown(
+	const FGeometry& InGeometry,
+	const FKeyEvent& InKeyEvent
+)
 {
 	if (InKeyEvent.GetKey() == EKeys::F1)
 	{
-
 	}
 	else if (InKeyEvent.GetKey() == EKeys::F2)
 	{
-
 	}
 
 	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
 
-void UHUD_TeamInfo::ResetUIByData()
+void UHUD_TeamInfo::Enable()
 {
+	ILayoutItemInterfacetion::Enable();
+	
 	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(FHUD_TeamInfo::Get().VerticalBox));
 	if (!PanelPtr)
 	{
@@ -70,12 +68,12 @@ void UHUD_TeamInfo::ResetUIByData()
 	auto ChidrensAry = PanelPtr->GetAllChildren();
 	int32 Index = 0;
 
-	auto GMCPtr = CharacterPtr->GetGroupSharedInfo();
+	auto GMCPtr = CharacterPtr->GetGroupManagger();
 
 	auto MembersHelperSPtr = GMCPtr->GetTeamMatesHelperComponent();
 	if (MembersHelperSPtr)
 	{
-		for (auto Iter : MembersHelperSPtr->MembersSet)
+		for (auto Iter : MembersHelperSPtr->GetMembersSet())
 		{
 			if (Index < ChidrensAry.Num())
 			{
@@ -96,10 +94,28 @@ void UHUD_TeamInfo::ResetUIByData()
 	}
 
 	TeammateOptionChangedDelegateContainer = MembersHelperSPtr->TeammateOptionChanged.AddCallback(
-		std::bind(&ThisClass::OnTeammateOptionChanged, this, std::placeholders::_1, std::placeholders::_2
-		));
+		std::bind(
+			&ThisClass::OnTeammateOptionChanged,
+			this,
+			std::placeholders::_1,
+			std::placeholders::_2
+		)
+	);
 
-	OnTeammateOptionChanged(GMCPtr->GetTeamMatesHelperComponent()->GetTeammateOption(), GMCPtr->GetTeamMatesHelperComponent()->OwnerCharacterProxyPtr);
+	OnTeammateOptionChanged(
+		GMCPtr->GetTeamMatesHelperComponent()->GetTeammateOption(),
+		GMCPtr->GetTeamMatesHelperComponent()->GetOwnerCharacterProxy()
+	);
+}
+
+void UHUD_TeamInfo::DisEnable()
+{
+	if (TeammateOptionChangedDelegateContainer)
+	{
+		TeammateOptionChangedDelegateContainer.Reset();
+	}
+
+	ILayoutItemInterfacetion::DisEnable();
 }
 
 void UHUD_TeamInfo::OnTeammateOptionChanged(
@@ -107,42 +123,82 @@ void UHUD_TeamInfo::OnTeammateOptionChanged(
 	const TSharedPtr<FCharacterProxyType>& LeaderPCPtr
 )
 {
+	switch (TeammateOption)
 	{
-		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FHUD_TeamInfo::Get().FollowOpetion));
-		if (BorderPtr)
+	case ETeammateOption::kFollow:
 		{
-			switch (TeammateOption)
 			{
-			case ETeammateOption::kFollow:
-			{
-				BorderPtr->SetVisibility(ESlateVisibility::Visible);
+				auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FHUD_TeamInfo::Get().FollowOpetion));
+				if (BorderPtr)
+				{
+					BorderPtr->SetVisibility(ESlateVisibility::Visible);
+				}
 			}
-			break;
-			case ETeammateOption::kAssistance:
 			{
-				BorderPtr->SetVisibility(ESlateVisibility::Hidden);
+				auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FHUD_TeamInfo::Get().AssistanceOption));
+				if (BorderPtr)
+				{
+					BorderPtr->SetVisibility(ESlateVisibility::Hidden);
+				}
 			}
-			break;
+			{
+				auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FHUD_TeamInfo::Get().FireTarget));
+				if (BorderPtr)
+				{
+					BorderPtr->SetVisibility(ESlateVisibility::Hidden);
+				}
 			}
 		}
-	}
-	{
-		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FHUD_TeamInfo::Get().AssistanceOption));
-		if (BorderPtr)
+		break;
+	case ETeammateOption::kAssistance:
 		{
-			switch (TeammateOption)
 			{
-			case ETeammateOption::kFollow:
-			{
-				BorderPtr->SetVisibility(ESlateVisibility::Hidden);
+				auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FHUD_TeamInfo::Get().FollowOpetion));
+				if (BorderPtr)
+				{
+					BorderPtr->SetVisibility(ESlateVisibility::Hidden);
+				}
 			}
-			break;
-			case ETeammateOption::kAssistance:
 			{
-				BorderPtr->SetVisibility(ESlateVisibility::Visible);
+				auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FHUD_TeamInfo::Get().AssistanceOption));
+				if (BorderPtr)
+				{
+					BorderPtr->SetVisibility(ESlateVisibility::Visible);
+				}
 			}
-			break;
+			{
+				auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FHUD_TeamInfo::Get().FireTarget));
+				if (BorderPtr)
+				{
+					BorderPtr->SetVisibility(ESlateVisibility::Hidden);
+				}
 			}
 		}
+		break;
+	case ETeammateOption::kFireTarget:
+		{
+			{
+				auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FHUD_TeamInfo::Get().FollowOpetion));
+				if (BorderPtr)
+				{
+					BorderPtr->SetVisibility(ESlateVisibility::Hidden);
+				}
+			}
+			{
+				auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FHUD_TeamInfo::Get().AssistanceOption));
+				if (BorderPtr)
+				{
+					BorderPtr->SetVisibility(ESlateVisibility::Hidden);
+				}
+			}
+			{
+				auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FHUD_TeamInfo::Get().FireTarget));
+				if (BorderPtr)
+				{
+					BorderPtr->SetVisibility(ESlateVisibility::Visible);
+				}
+			}
+		}
+		break;
 	}
 }

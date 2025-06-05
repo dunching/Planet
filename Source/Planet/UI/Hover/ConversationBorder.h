@@ -7,10 +7,9 @@
 #include <GameplayTagContainer.h>
 
 #include "AIComponent.h"
-#include "MyUserWidget.h"
-#include "GenerateType.h"
-#include "TaskNode.h"
-#include "TaskNode_Character.h"
+#include "UserWidget_Override.h"
+#include "GenerateTypes.h"
+#include "STT_CommonData.h"
 
 #include "ConversationBorder.generated.h"
 
@@ -23,7 +22,7 @@ struct FOnAttributeChangeData;
  *
  */
 UCLASS()
-class PLANET_API UConversationBorder : public UMyUserWidget
+class PLANET_API UConversationBorder : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

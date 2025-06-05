@@ -1,4 +1,4 @@
-// Copyright 2020 Dan Kestranek.
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "BasicFutures_Dash.h"
 
@@ -16,13 +16,16 @@
 #include "ProxyProcessComponent.h"
 
 #include "CharacterAbilitySystemComponent.h"
+#include "HumanCharacter_Player.h"
 #include "Planet_Tools.h"
+#include "PlayerComponent.h"
+#include "Tools.h"
 
 static TAutoConsoleVariable<int32> SkillDrawDebugDash(
-	TEXT("Skill.DrawDebug.Dash"),
-	0,
-	TEXT("")
-	TEXT(" default: 0"));
+                                                      TEXT("Skill.DrawDebug.Dash"),
+                                                      0,
+                                                      TEXT("")
+                                                      TEXT(" default: 0"));
 
 UBasicFutures_Dash::UBasicFutures_Dash() :
 	Super()
@@ -62,6 +65,18 @@ void UBasicFutures_Dash::PreActivate(
 
 	if (CharacterPtr)
 	{
+#if UE_EDITOR || UE_CLIENT
+		if (
+			(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+		)
+		{
+			if (CharacterPtr->IsA(AHumanCharacter_Player::StaticClass()))
+			{
+				auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(CharacterPtr);
+				PlayerCharacterPtr->GetPlayerComponent()->SetCameraType(ECameraType::kDashing);
+			}
+		}
+#endif
 	}
 }
 
@@ -108,7 +123,7 @@ void UBasicFutures_Dash::ApplyCost(
 			MakeOutgoingGameplayEffectSpec(CostGE->GetClass(), GetAbilityLevel());
 
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
-		SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_ModifyItem_PP, -Consume);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_ModifyItem_Stamina, -Consume);
 
 		ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
 	}
@@ -158,6 +173,18 @@ void UBasicFutures_Dash::EndAbility(
 {
 	if (CharacterPtr)
 	{
+#if UE_EDITOR || UE_CLIENT
+		if (
+			(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+		)
+		{
+			if (CharacterPtr->IsA(AHumanCharacter_Player::StaticClass()))
+			{
+				auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(CharacterPtr);
+				PlayerCharacterPtr->GetPlayerComponent()->SetCameraType(ECameraType::kAction);
+			}
+		}
+#endif
 	}
 
 #ifdef WITH_EDITOR
@@ -187,7 +214,7 @@ bool UBasicFutures_Dash::CanActivateAbility(
 	if (CharacterPtr)
 	{
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		if (CharacterAttributes->GetPP() >= Consume)
+		if (CharacterAttributes->GetStamina() >= Consume)
 		{
 			return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 		}
@@ -206,24 +233,24 @@ void UBasicFutures_Dash::OnGameplayTaskDeactivated(UGameplayTask& Task)
 	}
 }
 
-void UBasicFutures_Dash::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	AbilityTags.AddTag(UGameplayTagsLibrary::Dash);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
-
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_IntoFly);
-
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::FlyAway);
-
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Stun);
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
-
-	// 在运动时不激活
-}
+// void UBasicFutures_Dash::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	// // AbilityTags.AddTag(UGameplayTagsLibrary::Dash);
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
+//
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_IntoFly);
+//
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_RootMotion_FlyAway);
+//
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Stun);
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
+//
+// 	// 在运动时不激活
+// }
 
 void UBasicFutures_Dash::OnRemoveAbility(
 	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec

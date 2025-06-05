@@ -14,7 +14,7 @@
 class UPathFollowingComponent;
 class UNavigationQueryFilter;
 
-UCLASS(config = Game)
+UCLASS()
 class GRAVITY_API AGravityPlayerController : public APlayerController
 {
 	GENERATED_BODY()

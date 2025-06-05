@@ -6,8 +6,7 @@
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
-#include "GenerateType.h"
-#include "GAEvent_Send.h"
+#include "GenerateTypes.h"
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
@@ -75,7 +74,7 @@ void USkill_Talent_NuQi::OnRemoveAbility(
 {
 	if (OnValueChanged)
 	{
-		OnValueChanged->UnBindCallback();
+		OnValueChanged.Reset();
 	}
 
 	if (CharacterPtr)
@@ -213,7 +212,6 @@ void USkill_Talent_NuQi::StartFuryState()
 
 		ModifyPropertyMap.Add(ECharacterPropertyType::AD, 50);
 
-		CharacterPtr->GetCharacterAbilitySystemComponent()->SendEvent2Self(ModifyPropertyMap, SkillProxyPtr->GetProxyType());
 	}
 }
 
@@ -223,7 +221,6 @@ void USkill_Talent_NuQi::StopFuryState()
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetCharacterAbilitySystemComponent()->SendEvent2Self(GetAllData(), SkillProxyPtr->GetProxyType());
 	}
 
 	if (EffectItemPtr)

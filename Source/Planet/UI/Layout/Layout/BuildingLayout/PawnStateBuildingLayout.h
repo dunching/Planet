@@ -4,17 +4,18 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 
 #include "PawnStateBuildingLayout.generated.h"
 
 class UToolsMenu;
 
-struct FCharacterAttributes;
+
 
 struct FToolsSocketInfo;
 struct FConsumableSocketInfo;
@@ -24,10 +25,13 @@ struct FConsumableSocketInfo;
  */
 UCLASS()
 class PLANET_API UPawnStateBuildingLayout :
-	public UMyUserWidget
+	public UUserWidget_Override,
+	public ILayoutInterfacetion
 {
 	GENERATED_BODY()
 
 public:
 
+	virtual ELayoutCommon GetLayoutType() const override final;
+	
 };

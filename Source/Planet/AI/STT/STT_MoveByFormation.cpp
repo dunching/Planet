@@ -6,6 +6,7 @@
 #include <Components/SplineComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
 
+#include "AIComponent.h"
 #include "AITask_MoveBySpline.h"
 #include "AS_Character.h"
 #include "HumanAIController.h"
@@ -13,6 +14,7 @@
 #include "Helper_RootMotionSource.h"
 #include "CharacterAttributesComponent.h"
 #include "GravityMovementComponent.h"
+#include "HumanCharacter_AI.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> DrawDebugSTT_MoveByFormation(
@@ -33,7 +35,7 @@ EStateTreeRunStatus FSTT_MoveByFormation::EnterState(
 		return EStateTreeRunStatus::Failed;
 	}
 
-	InstanceData.CharacterPtr->GetGravityMovementComponent()->bForceRotation = true;
+	InstanceData.CharacterPtr->GetGravityMovementComponent()->bForceRotation_OrientToMovement = true;
 
 	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(InstanceData.AIControllerPtr->FindComponentByInterface(UGameplayTaskOwnerInterface::StaticClass()));
 	if (!InstanceData.TaskOwner)
@@ -41,7 +43,7 @@ EStateTreeRunStatus FSTT_MoveByFormation::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
-	return PerformMoveTask(Context, *InstanceData.AIControllerPtr); 
+	return PerformGameplayTask(Context, *InstanceData.AIControllerPtr); 
 }
 
 void FSTT_MoveByFormation::ExitState(
@@ -52,7 +54,7 @@ void FSTT_MoveByFormation::ExitState(
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	InstanceData.CharacterPtr->GetCharacterMovement()->RemoveRootMotionSourceByID(InstanceData.RootMotionSourceID);
 
-	InstanceData.CharacterPtr->GetGravityMovementComponent()->bForceRotation = false;
+	InstanceData.CharacterPtr->GetGravityMovementComponent()->bForceRotation_OrientToMovement = false;
 
 	Super::ExitState(Context, Transition);
 }
@@ -70,7 +72,7 @@ EStateTreeRunStatus FSTT_MoveByFormation::Tick(
 	return EStateTreeRunStatus::Failed;
 }
 
-EStateTreeRunStatus FSTT_MoveByFormation::PerformMoveTask(
+EStateTreeRunStatus FSTT_MoveByFormation::PerformGameplayTask(
 	FStateTreeExecutionContext& Context,
 	AAIController& Controller
 ) const
@@ -86,7 +88,7 @@ EStateTreeRunStatus FSTT_MoveByFormation::PerformMoveTask(
 		InstanceData.CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
 	RootMotionSourcePtr->Settings.SetFlag(ERootMotionSourceSettingsFlags::IgnoreZAccumulate);
 
-	RootMotionSourcePtr->FormationPtr = InstanceData.AIControllerPtr->PathFollowComponentPtr;
+	RootMotionSourcePtr->FormationPtr = InstanceData.CharacterPtr->GetAIComponent()->PathFollowComponentPtr;
 	RootMotionSourcePtr->Duration = -1.f;
 
 	InstanceData.RootMotionSourceID =

@@ -1,13 +1,18 @@
-
 #include "MainMenuLayout.h"
 
+#include "GroupManagger.h"
+#include "LayoutCommon.h"
 #include "Components/WidgetSwitcher.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "UICommon.h"
 #include "UIInterfaces.h"
 #include "MenuInterface.h"
+#include "PlanetControllerInterface.h"
+#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 
-struct FMenuLayout : public TStructVariable<FMenuLayout>
+struct FMainMenuLayout : public TStructVariable<FMainMenuLayout>
 {
 	FName WidgetSwitcher = TEXT("WidgetSwitcher");
 };
@@ -27,80 +32,83 @@ void UMainMenuLayout::NativeDestruct()
 
 void UMainMenuLayout::Enable()
 {
+	ILayoutInterfacetion::Enable();
 }
 
 void UMainMenuLayout::DisEnable()
 {
-	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMenuLayout::Get().WidgetSwitcher));
+	SyncData();
+
+	auto PCPtr =
+		Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	auto GMCPtr = PCPtr->GetGroupManagger();
+	GMCPtr->GetTeamMatesHelperComponent()->SpwanTeammateCharacter();
+
+	ILayoutInterfacetion::DisEnable();
+}
+
+ELayoutCommon UMainMenuLayout::GetLayoutType() const
+{
+	return ELayoutCommon::kMenuLayout;
+}
+
+void UMainMenuLayout::SyncData()
+{
+	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainMenuLayout::Get().WidgetSwitcher));
 	if (UIPtr)
 	{
 		const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
 		auto MenuInterfacePtr = Cast<IMenuInterface>(UIPtr->GetWidgetAtIndex(CurrentIndex));
 		if (MenuInterfacePtr)
 		{
-			MenuInterfacePtr->SyncData();
+			MenuInterfacePtr->DisEnableMenu();
 		}
 	}
 }
 
-void UMainMenuLayout::SwitchViewer(EMenuType MenuType)
+void UMainMenuLayout::SwitchViewer(
+	EMenuType MenuType
+)
 {
-	auto Lambda = [this](int32 Index)
+	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainMenuLayout::Get().WidgetSwitcher));
+	if (UIPtr)
+	{
 		{
-			auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMenuLayout::Get().WidgetSwitcher));
-			if (UIPtr)
+			auto MenuInterfacePtr = Cast<IMenuInterface>(UIPtr->GetActiveWidget());
+			if (MenuInterfacePtr)
 			{
-				const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
-				if (CurrentIndex == Index)
+				if (MenuInterfacePtr->GetMenuType() == MenuType)
 				{
 					// 这里不太对啊？
-					auto MenuInterfacePtr = Cast<IMenuInterface>(UIPtr->GetWidgetAtIndex(Index));
-					if (MenuInterfacePtr)
-					{
-						MenuInterfacePtr->ResetUIByData();
-					}
-
+					MenuInterfacePtr->EnableMenu();
 					return;
 				}
-				{
-					auto MenuInterfacePtr = Cast<IMenuInterface>(UIPtr->GetWidgetAtIndex(CurrentIndex));
-					if (MenuInterfacePtr)
-					{
-						MenuInterfacePtr->SyncData();
-					}
-				}
-				UIPtr->SetActiveWidgetIndex(Index);
-				auto MenuInterfacePtr = Cast<IMenuInterface>(UIPtr->GetWidgetAtIndex(Index));
-				if (MenuInterfacePtr)
-				{
-					MenuInterfacePtr->ResetUIByData();
-				}
-			}
-		};
 
-	switch (MenuType)
-	{
-	case EMenuType::kAllocationSkill:
-	{
-		Lambda(0);
-	}
-	break;
-	case EMenuType::kAllocationTalent:
-	{
-		Lambda(1);
-	}
-	break;
-	case EMenuType::kGroupManagger:
-	{
-		Lambda(2);
-	}
-	break;
-	case EMenuType::kRaffle:
-	{
-		Lambda(1);
-	}
-	break;
-	default:
-		break;
+				MenuInterfacePtr->DisEnableMenu();
+			}
+		}
+
+		auto ChildrensAry = UIPtr->GetAllChildren();
+		for (auto Iter : ChildrensAry)
+		{
+			auto MenuInterfacePtr = Cast<IMenuInterface>(Iter);
+			if (!MenuInterfacePtr)
+			{
+				continue;
+			}
+			if (MenuInterfacePtr->GetMenuType() != MenuType)
+			{
+				continue;
+			}
+			MenuInterfacePtr->EnableMenu();
+			UIPtr->SetActiveWidget(Iter);
+			OnMenuLayoutChanged(MenuType);
+			break;
+		}
 	}
 }

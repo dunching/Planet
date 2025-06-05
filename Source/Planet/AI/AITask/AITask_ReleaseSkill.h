@@ -35,11 +35,10 @@ protected:
 
 	virtual void Activate() override;
 
+	virtual void TickTask(float DeltaTime) override;
+
 	virtual void OnDestroy(bool bInOwnerFinished) override;
 	
-	UFUNCTION()
-	bool PerformTask(float Delta);
-
 	void StopReleaseSkill();
 
 	void OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr);
@@ -47,8 +46,6 @@ protected:
 	TMap<UGameplayAbility*, FGameplayTag>ReleasingSkillMap;
 
 	ACharacterBase* CharacterPtr = nullptr;
-
-	FTSTicker::FDelegateHandle TickDelegateHandle;
 
 	const float Frequency = 1.f;
 

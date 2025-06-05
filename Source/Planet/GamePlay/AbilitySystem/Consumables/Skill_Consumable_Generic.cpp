@@ -6,12 +6,13 @@
 #include "AbilityTask_PlayMontage.h"
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
-#include "GAEvent_Helper.h"
+
 #include "Consumable_Test.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "CS_PeriodicPropertyModify.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
+#include "ItemProxy_Consumable.h"
+#include "DataTableCollection.h"
 #include "SceneProxyTable.h"
 
 USkill_Consumable_Generic::USkill_Consumable_Generic() :
@@ -63,7 +64,7 @@ bool USkill_Consumable_Generic::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (ProxyPtr->Num <= 0)
+	if (ProxyPtr->GetNum() <= 0)
 	{
 		return false;
 	}
@@ -81,8 +82,8 @@ bool USkill_Consumable_Generic::CommitAbility(
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		ProxyPtr->Num--;
-		ProxyPtr->Update2Client();
+		ProxyPtr->ModifyNum(-1);
+		ProxyPtr->UpdateData();
 	}
 #endif
 
@@ -112,7 +113,7 @@ void USkill_Consumable_Generic::ApplyCooldown(const FGameplayAbilitySpecHandle H
 
 		// 公共冷却
 		{
-			auto AbilitySystemComponentPtr = CharacterPtr->GetGroupSharedInfo()->GetAbilitySystemComponent();
+			auto AbilitySystemComponentPtr = CharacterPtr->GetGroupManagger()->GetAbilitySystemComponent();
 			auto SkillCommonCooldownInfoMap = ProxyPtr->GetTableRowProxy_Consumable()->CommonCooldownInfoMap;
 			for (const auto Iter : SkillCommonCooldownInfoMap)
 			{
@@ -169,11 +170,11 @@ void USkill_Consumable_Generic::PerformAction(
 void USkill_Consumable_Generic::SpawnActor()
 {
 #if UE_EDITOR || UE_SERVER
-	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() > ROLE_SimulatedProxy)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() > ROLE_Authority)
 	{
 		FActorSpawnParameters ActorSpawnParameters;
 		ActorSpawnParameters.Owner = CharacterPtr;
-		ConsumableActorPtr = GetWorld()->SpawnActor<AConsumable_Test>(
+		ConsumableActorPtr = GetWorld()->SpawnActor<APlanet_Consumable_Base>(
 			ProxyPtr->GetTableRowProxy_Consumable()->Consumable_Class, ActorSpawnParameters
 		);
 
@@ -188,7 +189,7 @@ void USkill_Consumable_Generic::SpawnActor()
 void USkill_Consumable_Generic::ExcuteTasks()
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
 		if (CharacterPtr)
 		{
@@ -232,8 +233,10 @@ void USkill_Consumable_Generic::ExcuteTasks()
 
 void USkill_Consumable_Generic::PlayMontage()
 {
-#if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+	)
 	{
 		auto HumanMontage = ProxyPtr->GetTableRowProxy_Consumable()->HumanMontage;
 		if (HumanMontage)
@@ -255,7 +258,6 @@ void USkill_Consumable_Generic::PlayMontage()
 			TaskPtr->ReadyForActivation();
 		}
 	}
-#endif
 }
 
 void USkill_Consumable_Generic::OnPlayMontageEnd()

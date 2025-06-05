@@ -6,9 +6,10 @@
 #include "Components/HorizontalBox.h"
 #include "Components/Border.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/ProgressBar.h"
 
 #include "PlanetPlayerState.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "ActionSkillsIcon.h"
@@ -17,15 +18,18 @@
 #include "AS_Character.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "MyProgressBar.h"
-#include "MyBaseProperty.h"
+#include "BasePropertyWidget.h"
 #include "LogWriter.h"
 #include "State_Talent_NuQi.h"
 #include "State_Talent_YinYang.h"
 #include "GameplayTagsLibrary.h"
-#include "InventoryComponent.h"
+#include "ItemProxy_Skills.h"
+#include "ItemProxy_Weapon.h"
 
 struct FPawnStateActionHUD : public TStructVariable<FPawnStateActionHUD>
 {
+	const FName ExperienceProgressBar = TEXT("ExperienceProgressBar");
+
 	const FName ActiveSkill1 = TEXT("ActiveSkill1");
 
 	const FName ActiveSkill2 = TEXT("ActiveSkill2");
@@ -38,13 +42,23 @@ struct FPawnStateActionHUD : public TStructVariable<FPawnStateActionHUD>
 
 	const FName WeaponActiveSkill2 = TEXT("WeaponActiveSkill2");
 
-	const FName TalentStateSocket = TEXT("TalentStateSocket");
+	const FName PassiveSkill1 = TEXT("PassiveSkill1");
 
-	const FName AD = TEXT("AD");
+	const FName PassiveSkill2 = TEXT("PassiveSkill2");
 
-	const FName AD_Penetration = TEXT("AD_Penetration");
+	const FName PassiveSkill3 = TEXT("PassiveSkill3");
 
-	const FName AD_Resistance = TEXT("AD_Resistance");
+	const FName PassiveSkill4 = TEXT("PassiveSkill4");
+
+	const FName PassiveSkill5 = TEXT("PassiveSkill5");
+
+	const FName CriticalDamage = TEXT("CriticalDamage");
+
+	const FName CriticalHitRate = TEXT("CriticalHitRate");
+
+	const FName HitRate = TEXT("HitRate");
+
+	const FName Evade = TEXT("Evade");
 
 	const FName MoveSpeed = TEXT("MoveSpeed");
 
@@ -56,9 +70,7 @@ struct FPawnStateActionHUD : public TStructVariable<FPawnStateActionHUD>
 
 	const FName Mana = TEXT("Mana");
 
-	const FName Shield = TEXT("Shield");
-
-	const FName Gold = TEXT("Gold");
+	const FName Metal = TEXT("Metal");
 
 	const FName Wood = TEXT("Wood");
 
@@ -66,7 +78,7 @@ struct FPawnStateActionHUD : public TStructVariable<FPawnStateActionHUD>
 
 	const FName Fire = TEXT("Fire");
 
-	const FName Soil = TEXT("Soil");
+	const FName Earth = TEXT("Earth");
 };
 
 void UPawnStateActionHUD::NativeConstruct()
@@ -78,27 +90,19 @@ void UPawnStateActionHUD::NativeConstruct()
 	{
 		return;
 	}
-	
+
 	BindEvent();
-	ResetUIByData();
 }
 
 void UPawnStateActionHUD::NativeDestruct()
 {
-	for (auto Iter : OnAllocationSkillChangedDelegateAry)
-	{
-		Iter->UnBindCallback();
-	}
-
-	if (OnCanAciveSkillChangedHandle)
-	{
-		OnCanAciveSkillChangedHandle->UnBindCallback();
-	}
-
 	Super::NativeDestruct();
 }
 
-void UPawnStateActionHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+void UPawnStateActionHUD::NativeTick(
+	const FGeometry& MyGeometry,
+	float InDeltaTime
+	)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
@@ -111,6 +115,11 @@ void UPawnStateActionHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 			FPawnStateActionHUD::Get().ActiveSkill4,
 			FPawnStateActionHUD::Get().WeaponActiveSkill1,
 			FPawnStateActionHUD::Get().WeaponActiveSkill2,
+			FPawnStateActionHUD::Get().PassiveSkill1,
+			FPawnStateActionHUD::Get().PassiveSkill2,
+			FPawnStateActionHUD::Get().PassiveSkill3,
+			FPawnStateActionHUD::Get().PassiveSkill4,
+			FPawnStateActionHUD::Get().PassiveSkill5,
 		};
 
 		for (const auto& Iter : Ary)
@@ -124,8 +133,10 @@ void UPawnStateActionHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 	}
 }
 
-void UPawnStateActionHUD::ResetUIByData()
+void UPawnStateActionHUD::Enable()
 {
+	ILayoutInterfacetion::Enable();
+
 	if (!CharacterPtr)
 	{
 		return;
@@ -133,171 +144,118 @@ void UPawnStateActionHUD::ResetUIByData()
 	{
 		auto CharacterAttributeSetPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		auto AbilitySystemComponentPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+		BindProgressData(
+		                 CharacterAttributeSetPtr,
+		                 AbilitySystemComponentPtr
+		                );
+		BindExperienceProgressBar();
 		{
-			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().HP));
+			auto UIPtr = Cast<UBasePropertyWidget>(GetWidgetFromName(FPawnStateActionHUD::Get().CriticalDamage));
 			if (!UIPtr)
 			{
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetHPAttribute(),
-				CharacterAttributeSetPtr->GetHP(),
-				CharacterAttributeSetPtr->GetMax_HPAttribute(),
-				CharacterAttributeSetPtr->GetMax_HP()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetCriticalDamageAttribute(),
+			                     CharacterAttributeSetPtr->GetCriticalDamage()
+			                    );
 		}
 		{
-			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().PP));
+			auto UIPtr = Cast<UBasePropertyWidget>(GetWidgetFromName(FPawnStateActionHUD::Get().CriticalHitRate));
 			if (!UIPtr)
 			{
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetPPAttribute(),
-				CharacterAttributeSetPtr->GetPP(),
-				CharacterAttributeSetPtr->GetMax_PPAttribute(),
-				CharacterAttributeSetPtr->GetMax_PP()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetCriticalHitRateAttribute(),
+			                     CharacterAttributeSetPtr->GetCriticalHitRate()
+			                    );
 		}
 		{
-			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().Mana));
+			auto UIPtr = Cast<UBasePropertyWidget>(GetWidgetFromName(FPawnStateActionHUD::Get().HitRate));
 			if (!UIPtr)
 			{
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetManaAttribute(),
-				CharacterAttributeSetPtr->GetMana(),
-				CharacterAttributeSetPtr->GetMax_ManaAttribute(),
-				CharacterAttributeSetPtr->GetMax_Mana()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetHitRateAttribute(),
+			                     CharacterAttributeSetPtr->GetHitRate()
+			                    );
 		}
 		{
-			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().Shield));
+			auto UIPtr = Cast<UBasePropertyWidget>(GetWidgetFromName(FPawnStateActionHUD::Get().Evade));
 			if (!UIPtr)
 			{
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetShieldAttribute(),
-				CharacterAttributeSetPtr->GetShield(),
-				CharacterAttributeSetPtr->GetMax_HPAttribute(),
-				CharacterAttributeSetPtr->GetMax_HP()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetEvadeRateAttribute(),
+			                     CharacterAttributeSetPtr->GetEvadeRate()
+			                    );
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().AD));
+			auto UIPtr = Cast<UBasePropertyWidget>(GetWidgetFromName(FPawnStateActionHUD::Get().MoveSpeed));
 			if (!UIPtr)
 			{
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetShieldAttribute(),
-				CharacterAttributeSetPtr->GetShield(),
-				CharacterAttributeSetPtr->GetMax_HPAttribute(),
-				CharacterAttributeSetPtr->GetMax_HP()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetMoveSpeedAttribute(),
+			                     CharacterAttributeSetPtr->GetMoveSpeed()
+			                    );
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().AD_Penetration));
+			auto UIPtr = Cast<UBasePropertyWidget>(GetWidgetFromName(FPawnStateActionHUD::Get().GAPerformSpeed));
 			if (!UIPtr)
 			{
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetADAttribute(),
-				CharacterAttributeSetPtr->GetAD(),
-				CharacterAttributeSetPtr->GetAD_PenetrationAttribute(),
-				CharacterAttributeSetPtr->GetAD_Penetration()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetPerformSpeedAttribute(),
+			                     CharacterAttributeSetPtr->GetPerformSpeed()
+			                    );
 		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().AD_Resistance));
-			if (!UIPtr)
-			{
-				return;
-			}
-			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetAD_ResistanceAttribute(),
-				CharacterAttributeSetPtr->GetAD_Resistance()
-				);
-		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().MoveSpeed));
-			if (!UIPtr)
-			{
-				return;
-			}
-			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetMoveSpeedAttribute(),
-				CharacterAttributeSetPtr->GetMoveSpeed()
-				);
-		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().GAPerformSpeed));
-			if (!UIPtr)
-			{
-				return;
-			}
-			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetPerformSpeedAttribute(),
-				CharacterAttributeSetPtr->GetPerformSpeed()
-				);
-		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Gold));
-			if (!UIPtr)
-			{
-				return;
-			}
-			// UIPtr->SetDataSource(CharacterAttributes.GoldElement);
-		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Wood));
-			if (!UIPtr)
-			{
-				return;
-			}
-			// UIPtr->SetDataSource(CharacterAttributes.WoodElement);
-		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Water));
-			if (!UIPtr)
-			{
-				return;
-			}
-			// UIPtr->SetDataSource(CharacterAttributes.WaterElement);
-		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Fire));
-			if (!UIPtr)
-			{
-				return;
-			}
-			// UIPtr->SetDataSource(CharacterAttributes.FireElement);
-		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Soil));
-			if (!UIPtr)
-			{
-				return;
-			}
-			// UIPtr->SetDataSource(CharacterAttributes.SoilElement);
-		}
+		BindElementalData(
+		                  CharacterAttributeSetPtr,
+		                  AbilitySystemComponentPtr
+		                 );
 	}
 
 	InitialTalentUI();
 	InitialActiveSkillIcon();
 	InitialWeaponSkillIcon();
+	InitialPassiveSkillIcon();
+}
+
+void UPawnStateActionHUD::DisEnable()
+{
+	for (auto Iter : OnAllocationSkillChangedDelegateAry)
+	{
+		Iter.Reset();
+	}
+
+	if (OnCanAciveSkillChangedHandle)
+	{
+		OnCanAciveSkillChangedHandle.Reset();
+	}
+
+	if (ExperienceChangedDelegateHandle)
+	{
+		ExperienceChangedDelegateHandle.Reset();
+	}
+
+	if (LevelExperienceChangedDelegateHandle)
+	{
+		LevelExperienceChangedDelegateHandle.Reset();
+	}
+
+	ILayoutInterfacetion::DisEnable();
 }
 
 void UPawnStateActionHUD::BindEvent()
@@ -313,64 +271,32 @@ void UPawnStateActionHUD::BindEvent()
 	// 	);
 
 	OnAllocationSkillChangedDelegateAry.Add(
-		CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
-			std::bind(&ThisClass::InitialActiveSkillIcon, this)
-		));
+	                                        CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.
+	                                                      AddCallback(
+	                                                                  std::bind(
+	                                                                            &ThisClass::InitialActiveSkillIcon,
+	                                                                            this
+	                                                                           )
+	                                                                 )
+	                                       );
 
 	OnAllocationSkillChangedDelegateAry.Add(
-		CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
-			std::bind(&ThisClass::InitialWeaponSkillIcon, this)
-		));
+	                                        CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.
+	                                                      AddCallback(
+	                                                                  std::bind(
+	                                                                            &ThisClass::InitialWeaponSkillIcon,
+	                                                                            this
+	                                                                           )
+	                                                                 )
+	                                       );
 
 	OnCanAciveSkillChangedHandle = CharacterPtr->GetProxyProcessComponent()->OnCanAciveSkillChanged.AddCallback(
-		std::bind(&ThisClass::InitialActiveSkillIcon, this)
-	);
+		 std::bind(&ThisClass::InitialActiveSkillIcon, this)
+		);
 }
 
 void UPawnStateActionHUD::InitialTalentUI()
 {
-	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FPawnStateActionHUD::Get().TalentStateSocket));
-	if (!BorderPtr)
-	{
-		return;
-	}
-	BorderPtr->ClearChildren();
-
-	if (!CharacterPtr)
-	{
-		return;
-	}
-	const auto& SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetAllSocket();
-	const auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
-	for (auto Iter : SkillsMap)
-	{
-		auto ProxySPtr = InventoryComponentPtr->FindProxy_BySocket(Iter.Value);
-		bool bIsGiveTalentPassive = false;
-		if (
-			ProxySPtr
-		)
-		{
-			if (ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent_NuQi))
-			{
-				auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, State_Talent_NuQi_Class);
-				if (UIPtr)
-				{
-					BorderPtr->AddChild(UIPtr);
-					bIsGiveTalentPassive = true;
-				}
-			}
-			else if (ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent_YinYang))
-			{
-				auto UIPtr = CreateWidget<UState_Talent_YinYang>(this, Talent_YinYang_Class);
-				if (UIPtr)
-				{
-					UIPtr->TargetCharacterPtr = CharacterPtr;
-					BorderPtr->AddChild(UIPtr);
-					bIsGiveTalentPassive = true;
-				}
-			}
-		}
-	}
 }
 
 void UPawnStateActionHUD::InitialActiveSkillIcon()
@@ -391,7 +317,7 @@ void UPawnStateActionHUD::InitialActiveSkillIcon()
 
 	for (const auto& Iter : Ary)
 	{
-		auto SkillIcon = Cast<UActionSkillsIcon>(GetWidgetFromName(Iter));
+		auto SkillIcon = Cast<UActionActiveSkillsIcon>(GetWidgetFromName(Iter));
 		if (SkillIcon)
 		{
 			auto SocketIter = CharacterPtr->GetProxyProcessComponent()->FindActiveSkillBySocket(SkillIcon->IconSocket);
@@ -408,6 +334,11 @@ void UPawnStateActionHUD::InitialActiveSkillIcon()
 
 void UPawnStateActionHUD::InitialWeaponSkillIcon()
 {
+	if (!bIsActive)
+	{
+		return;
+	}
+
 	if (!CharacterPtr)
 	{
 		return;
@@ -419,7 +350,7 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 	const auto CurrentWeaponSocket = CharacterPtr->GetProxyProcessComponent()->CurrentWeaponSocket;
 
 	if (
-		CurrentWeaponSocket ==
+		CurrentWeaponSocket.Socket ==
 		UGameplayTagsLibrary::WeaponSocket_1
 	)
 	{
@@ -427,7 +358,7 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 		              GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	}
 	else if (
-		CurrentWeaponSocket ==
+		CurrentWeaponSocket.Socket ==
 		UGameplayTagsLibrary::WeaponSocket_2
 	)
 	{
@@ -436,6 +367,310 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 	}
 	else
 	{
+		{
+			auto UIPtr = Cast<UActionWeaponSkillsIcon>(
+			                                           GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill1)
+			                                          );
+			if (UIPtr)
+			{
+				UIPtr->ResetToolUIByData(nullptr);
+			}
+		}
+		{
+			auto UIPtr = Cast<UActionWeaponSkillsIcon>(
+			                                           GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill2)
+			                                          );
+			if (UIPtr)
+			{
+				UIPtr->ResetToolUIByData(nullptr);
+			}
+		}
 		return;
+	}
+
+	{
+		auto UIPtr = Cast<UActionWeaponSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill1));
+		if (UIPtr)
+		{
+			if (FirstWeaponSocketInfoSPtr.IsValid())
+			{
+				auto SocketIter = CharacterPtr->GetProxyProcessComponent()->FindWeaponSocket(
+					 FirstWeaponSocketInfoSPtr.Socket
+					);
+				if (SocketIter && SocketIter->GetWeaponSkill())
+				{
+					UIPtr->ResetToolUIByData(SocketIter->GetWeaponSkill());
+				}
+				else
+				{
+					UIPtr->ResetToolUIByData(nullptr);
+				}
+			}
+			else
+			{
+				UIPtr->ResetToolUIByData(nullptr);
+			}
+		}
+	}
+	{
+		auto UIPtr = Cast<UActionWeaponSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill2));
+		if (UIPtr)
+		{
+			if (SecondWeaponSocketInfoSPtr.IsValid())
+			{
+				auto SocketIter = CharacterPtr->GetProxyProcessComponent()->FindWeaponSocket(
+					 SecondWeaponSocketInfoSPtr.Socket
+					);
+				if (SocketIter && SocketIter->GetWeaponSkill())
+				{
+					UIPtr->ResetToolUIByData(SocketIter->GetWeaponSkill());
+				}
+				else
+				{
+					UIPtr->ResetToolUIByData(nullptr);
+				}
+			}
+			else
+			{
+				UIPtr->ResetToolUIByData(nullptr);
+			}
+		}
+	}
+}
+
+void UPawnStateActionHUD::InitialPassiveSkillIcon()
+{
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
+	auto SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveSocket();
+	TArray<FName> Ary
+	{
+		FPawnStateActionHUD::Get().PassiveSkill1,
+		FPawnStateActionHUD::Get().PassiveSkill2,
+		FPawnStateActionHUD::Get().PassiveSkill3,
+		FPawnStateActionHUD::Get().PassiveSkill4,
+		FPawnStateActionHUD::Get().PassiveSkill5,
+	};
+
+	for (const auto& Iter : Ary)
+	{
+		auto SkillIcon = Cast<UActionPassiveSkillsIcon>(GetWidgetFromName(Iter));
+		if (SkillIcon)
+		{
+			auto SocketIter = CharacterPtr->GetProxyProcessComponent()->FindPassiveSkillBySocket(SkillIcon->IconSocket);
+			if (SocketIter)
+			{
+			}
+			else
+			{
+			}
+			SkillIcon->ResetToolUIByData(SocketIter);
+		}
+	}
+}
+
+void UPawnStateActionHUD::BindExperienceProgressBar()
+{
+	auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
+	if (CharacterProxySPtr)
+	{
+		ExperienceChangedDelegateHandle = CharacterProxySPtr->ExperienceChangedDelegate.AddOnValueChanged(
+			 std::bind(&ThisClass::OnExperienceChanged, this)
+			);
+		LevelExperienceChangedDelegateHandle = CharacterProxySPtr->LevelExperienceChangedDelegate.AddOnValueChanged(
+			 std::bind(&ThisClass::OnExperienceChanged, this)
+			);
+
+		OnExperienceChanged();
+	}
+}
+
+void UPawnStateActionHUD::BindProgressData(
+	const UAS_Character* CharacterAttributeSetPtr,
+	UCharacterAbilitySystemComponent* AbilitySystemComponentPtr
+	)
+{
+	{
+		auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().HP));
+		if (!UIPtr)
+		{
+			return;
+		}
+		UIPtr->SetDataSource(
+		                     AbilitySystemComponentPtr,
+		                     CharacterAttributeSetPtr->GetHPAttribute(),
+		                     CharacterAttributeSetPtr->GetHP(),
+		                     CharacterAttributeSetPtr->GetMax_HPAttribute(),
+		                     CharacterAttributeSetPtr->GetMax_HP()
+		                    );
+		UIPtr->SetOverlayDataSource(
+		                            AbilitySystemComponentPtr,
+		                            CharacterAttributeSetPtr->GetShieldAttribute(),
+		                            CharacterAttributeSetPtr->GetShield()
+		                           );
+	}
+	{
+		auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().PP));
+		if (!UIPtr)
+		{
+			return;
+		}
+		UIPtr->SetDataSource(
+		                     AbilitySystemComponentPtr,
+		                     CharacterAttributeSetPtr->GetStaminaAttribute(),
+		                     CharacterAttributeSetPtr->GetStamina(),
+		                     CharacterAttributeSetPtr->GetMax_StaminaAttribute(),
+		                     CharacterAttributeSetPtr->GetMax_Stamina()
+		                    );
+	}
+	{
+		auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().Mana));
+		if (!UIPtr)
+		{
+			return;
+		}
+		UIPtr->SetDataSource(
+		                     AbilitySystemComponentPtr,
+		                     CharacterAttributeSetPtr->GetManaAttribute(),
+		                     CharacterAttributeSetPtr->GetMana(),
+		                     CharacterAttributeSetPtr->GetMax_ManaAttribute(),
+		                     CharacterAttributeSetPtr->GetMax_Mana()
+		                    );
+	}
+}
+
+void UPawnStateActionHUD::BindElementalData(
+	const UAS_Character* CharacterAttributeSetPtr,
+	UCharacterAbilitySystemComponent* AbilitySystemComponentPtr
+	)
+{
+	{
+		auto UIPtr = Cast<UBaseProperty_Elemental>(GetWidgetFromName(FPawnStateActionHUD::Get().Metal));
+		if (!UIPtr)
+		{
+			return;
+		}
+		UIPtr->SetDataSource(
+		                     AbilitySystemComponentPtr,
+		                     CharacterAttributeSetPtr->GetMetalValueAttribute(),
+		                     CharacterAttributeSetPtr->GetMetalValue(),
+		                     CharacterAttributeSetPtr->GetMetalLevelAttribute(),
+		                     CharacterAttributeSetPtr->GetMetalLevel(),
+		                     CharacterAttributeSetPtr->GetMetalPenetrationAttribute(),
+		                     CharacterAttributeSetPtr->GetMetalPenetration(),
+		                     CharacterAttributeSetPtr->GetMetalPercentPenetrationAttribute(),
+		                     CharacterAttributeSetPtr->GetMetalPercentPenetration(),
+		                     CharacterAttributeSetPtr->GetMetalResistanceAttribute(),
+		                     CharacterAttributeSetPtr->GetMetalResistance()
+		                    );
+	}
+	{
+		auto UIPtr = Cast<UBaseProperty_Elemental>(GetWidgetFromName(FPawnStateActionHUD::Get().Wood));
+		if (!UIPtr)
+		{
+			return;
+		}
+		UIPtr->SetDataSource(
+		                     AbilitySystemComponentPtr,
+		                     CharacterAttributeSetPtr->GetWoodValueAttribute(),
+		                     CharacterAttributeSetPtr->GetWoodValue(),
+		                     CharacterAttributeSetPtr->GetWoodLevelAttribute(),
+		                     CharacterAttributeSetPtr->GetWoodLevel(),
+		                     CharacterAttributeSetPtr->GetWoodPenetrationAttribute(),
+		                     CharacterAttributeSetPtr->GetWoodPenetration(),
+		                     CharacterAttributeSetPtr->GetWoodPercentPenetrationAttribute(),
+		                     CharacterAttributeSetPtr->GetWoodPercentPenetration(),
+		                     CharacterAttributeSetPtr->GetWoodResistanceAttribute(),
+		                     CharacterAttributeSetPtr->GetWoodResistance()
+		                    );
+	}
+	{
+		auto UIPtr = Cast<UBaseProperty_Elemental>(GetWidgetFromName(FPawnStateActionHUD::Get().Water));
+		if (!UIPtr)
+		{
+			return;
+		}
+		UIPtr->SetDataSource(
+		                     AbilitySystemComponentPtr,
+		                     CharacterAttributeSetPtr->GetWaterValueAttribute(),
+		                     CharacterAttributeSetPtr->GetWaterValue(),
+		                     CharacterAttributeSetPtr->GetWaterLevelAttribute(),
+		                     CharacterAttributeSetPtr->GetWaterLevel(),
+		                     CharacterAttributeSetPtr->GetWaterPenetrationAttribute(),
+		                     CharacterAttributeSetPtr->GetWaterPenetration(),
+		                     CharacterAttributeSetPtr->GetWaterPercentPenetrationAttribute(),
+		                     CharacterAttributeSetPtr->GetWaterPercentPenetration(),
+		                     CharacterAttributeSetPtr->GetWaterResistanceAttribute(),
+		                     CharacterAttributeSetPtr->GetWaterResistance()
+		                    );
+	}
+	{
+		auto UIPtr = Cast<UBaseProperty_Elemental>(GetWidgetFromName(FPawnStateActionHUD::Get().Fire));
+		if (!UIPtr)
+		{
+			return;
+		}
+		UIPtr->SetDataSource(
+		                     AbilitySystemComponentPtr,
+		                     CharacterAttributeSetPtr->GetFireValueAttribute(),
+		                     CharacterAttributeSetPtr->GetFireValue(),
+		                     CharacterAttributeSetPtr->GetFireLevelAttribute(),
+		                     CharacterAttributeSetPtr->GetFireLevel(),
+		                     CharacterAttributeSetPtr->GetFirePenetrationAttribute(),
+		                     CharacterAttributeSetPtr->GetFirePenetration(),
+		                     CharacterAttributeSetPtr->GetFirePercentPenetrationAttribute(),
+		                     CharacterAttributeSetPtr->GetFirePercentPenetration(),
+		                     CharacterAttributeSetPtr->GetFireResistanceAttribute(),
+		                     CharacterAttributeSetPtr->GetFireResistance()
+		                    );
+	}
+	{
+		auto UIPtr = Cast<UBaseProperty_Elemental>(GetWidgetFromName(FPawnStateActionHUD::Get().Earth));
+		if (!UIPtr)
+		{
+			return;
+		}
+		UIPtr->SetDataSource(
+		                     AbilitySystemComponentPtr,
+		                     CharacterAttributeSetPtr->GetEarthValueAttribute(),
+		                     CharacterAttributeSetPtr->GetEarthValue(),
+		                     CharacterAttributeSetPtr->GetEarthLevelAttribute(),
+		                     CharacterAttributeSetPtr->GetEarthLevel(),
+		                     CharacterAttributeSetPtr->GetEarthPenetrationAttribute(),
+		                     CharacterAttributeSetPtr->GetEarthPenetration(),
+		                     CharacterAttributeSetPtr->GetEarthPercentPenetrationAttribute(),
+		                     CharacterAttributeSetPtr->GetEarthPercentPenetration(),
+		                     CharacterAttributeSetPtr->GetEarthResistanceAttribute(),
+		                     CharacterAttributeSetPtr->GetEarthResistance()
+		                    );
+	}
+}
+
+void UPawnStateActionHUD::OnExperienceChanged()
+{
+	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().ExperienceProgressBar));
+	if (!UIPtr)
+	{
+		return;
+	}
+	auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
+	if (CharacterProxySPtr)
+	{
+		const auto Experience = CharacterProxySPtr->GetExperience();
+		const auto LevelExperience = CharacterProxySPtr->GetLevelExperience();
+
+		if (LevelExperience > 0)
+		{
+			const auto Percent = Experience / static_cast<float>(LevelExperience);
+			
+			UIPtr->SetPercent(Percent);
+		}
+		else
+		{
+			UIPtr->SetPercent(1.f);
+		}
 	}
 }

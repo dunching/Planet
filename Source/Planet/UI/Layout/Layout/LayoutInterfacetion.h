@@ -1,18 +1,19 @@
-
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include "UObject/ObjectMacros.h"
 #include "UObject/Interface.h"
 
-#include "GenerateType.h"
-#include "ItemProxy_Minimal.h"
+#include "GenerateTypes.h"
+#include "LayoutCommon.h"
 
 #include "LayoutInterfacetion.generated.h"
+
+class UMainHUDLayout;
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
 class ULayoutInterfacetion : public UInterface
@@ -24,14 +25,34 @@ class PLANET_API ILayoutInterfacetion
 {
 	GENERATED_BODY()
 
-public:
+	friend UMainHUDLayout;
 
-	virtual void Enable() = 0;
-	
-	virtual void DisEnable() = 0;
+public:
+	using FOnQuit = std::function<void()>;
+
+	virtual void Enable();
+
+	virtual void DisEnable();
+
+	virtual ELayoutCommon GetLayoutType() const = 0;
 
 protected:
+	bool bIsActive = false;
 
 private:
+	FOnQuit OnQuit;
+};
 
+UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
+class ULayoutItemInterfacetion : public ULayoutInterfacetion
+{
+	GENERATED_BODY()
+};
+
+class PLANET_API ILayoutItemInterfacetion : public ILayoutInterfacetion
+{
+	GENERATED_BODY()
+
+private:
+	virtual ELayoutCommon GetLayoutType() const override final;
 };

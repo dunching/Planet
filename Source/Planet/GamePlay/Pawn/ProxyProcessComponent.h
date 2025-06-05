@@ -6,17 +6,22 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 
-#include "GAEvent_Helper.h"
-
 #include "AllocationSkills.h"
+#include "GroupManaggerInterface.h"
 #include "ItemProxy_Character.h"
 
 #include "ProxyProcessComponent.generated.h"
 
 struct FActiveSkillProxy;
+struct FPassiveSkillProxy;
+struct FWeaponProxy;
+struct FWeaponSkillProxy;
+struct FConsumableProxy;
+
 struct FWeaponSocket;
 struct FCharacterSocket;
 struct FCharacterSocket;
+
 class ACharacterBase;
 
 /*
@@ -25,7 +30,9 @@ class ACharacterBase;
  * 仅玩家
  */
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UProxyProcessComponent : public UActorComponent
+class PLANET_API UProxyProcessComponent :
+	public UActorComponent,
+	public IGroupManaggerInterface
 {
 	GENERATED_BODY()
 
@@ -59,6 +66,8 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)override;
+
 	bool ActiveAction(
 		const FGameplayTag& CanbeActivedInfoSPtr,
 		bool bIsAutomaticStop = false
@@ -84,6 +93,8 @@ public:
 
 	TSharedPtr<FActiveSkillProxy> FindActiveSkillBySocket(const FGameplayTag& SocketTag) const;
 
+	TSharedPtr<FPassiveSkillProxy> FindPassiveSkillBySocket(const FGameplayTag& SocketTag) const;
+
 	FCharacterSocket FindActiveSkillByType(const FGameplayTag& TypeTag) const;
 #pragma endregion
 
@@ -91,8 +102,11 @@ public:
 	// 激活可用的武器
 	void ActiveWeapon();
 
-	// 切換主副武器
-	void SwitchWeapon();
+	/**
+	 * 切換主副武器
+	 * @return 是否切换成功
+	 */
+	bool SwitchWeapon();
 
 	void RetractputWeapon();
 
@@ -126,7 +140,7 @@ public:
 	FOnCanAciveSkillChanged OnCanAciveSkillChanged;
 
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentActivedSocketChanged)
-	FGameplayTag CurrentWeaponSocket;
+	FCharacterSocket CurrentWeaponSocket;
 
 protected:
 	
@@ -142,9 +156,9 @@ protected:
 
 	void Cancel(const FGameplayTag& Socket);
 
-	void SwitchWeaponImpAndCheck(const FGameplayTag& NewWeaponSocket);
+	bool SwitchWeaponImpAndCheck(const FCharacterSocket& NewWeaponSocket);
 
-	void SwitchWeaponImp(const FGameplayTag& NewWeaponSocket);
+	bool SwitchWeaponImp(const FCharacterSocket& NewWeaponSocket);
 
 	bool ActivedCorrespondingWeapon(const FGameplayTag& ActiveSkillSocketTag);
 
@@ -183,6 +197,6 @@ protected:
 	void OnRep_AllocationChanged();
 
 	UFUNCTION()
-	void OnRep_CurrentActivedSocketChanged(const FGameplayTag& OldWeaponSocket);
+	void OnRep_CurrentActivedSocketChanged();
 #pragma endregion
 };

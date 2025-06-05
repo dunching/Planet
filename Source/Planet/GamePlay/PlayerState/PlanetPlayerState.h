@@ -13,6 +13,7 @@
 
 class UPlanetAbilitySystemComponent;
 class UProxySycHelperComponent;
+class UAudioComponent;
 struct FCharacterProxy;
 struct FSceneProxyContainer;
 
@@ -28,16 +29,41 @@ public:
 
 	APlanetPlayerState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+	bool GetIsInChallenge()const;
+
+#pragma region RPC
+	UFUNCTION(Server, Reliable)
+	void SetEntryChanlleng(bool bIsEntryChanlleng);
+#pragma endregion
+	
 protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	virtual void PostInitializeComponents() override;
 
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+		) const override;
+
 	void InitialData();
-	
+
 private:
 
-	FString PlayerName;
+	void UpdatePosition();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void UpdateCurrentPosition(const FGameplayTag&NewCurrentRegionTag);
 	
+	UPROPERTY(Transient)
+	TObjectPtr<UAudioComponent>AudioComponentPtr = nullptr;
+	
+	FString PlayerName;
+
+	FGameplayTag CurrentRegionTag;
+
+	UPROPERTY(Replicated)
+	bool bIsInChallenge = false;
 };

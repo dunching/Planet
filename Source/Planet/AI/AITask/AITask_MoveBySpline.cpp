@@ -1,13 +1,30 @@
-
 #include "AITask_MoveBySpline.h"
 
 #include "UObject/Package.h"
 #include "TimerManager.h"
 #include "AISystem.h"
-#include "AIController.h"
 #include "VisualLogger/VisualLogger.h"
 #include "AIResources.h"
 #include "GameplayTasksComponent.h"
+#include "AIController.h"
+#include "Components/SplineComponent.h"
+
+#include "PlanetAIController.h"
+#include "PlanetPlayerController.h"
+
+#ifdef WITH_EDITOR
+static TAutoConsoleVariable<int32> ITask_MoveBySpline(
+	TEXT("ITask_MoveBySpline"),
+	0,
+	TEXT("")
+	TEXT(" default: 0")
+);
+#endif
+
+void UAITask_MoveBySpline::Activate()
+{
+	Super::Activate();
+}
 
 void UAITask_MoveBySpline::PerformMove()
 {
@@ -21,19 +38,31 @@ void UAITask_MoveBySpline::PerformMove()
 	ResetObservers();
 	ResetTimers();
 
-	if (Pts.IsValidIndex(Index))
+	auto Location = SPlinePtr->FindLocationClosestToWorldLocation(GetAvatarActor()->GetActorLocation(),ESplineCoordinateSpace::World);
+	MoveRequest.UpdateGoalLocation(Location);
+
+#ifdef WITH_EDITOR
+	if (ITask_MoveBySpline.GetValueOnGameThread())
 	{
-		MoveRequest.UpdateGoalLocation(Pts[Index]);
+		DrawDebugSphere(OwnerController->GetWorld(), Location, 20,20,FColor::Red, false, 10);
 	}
-	else
-	{
-		FinishMoveTask(EPathFollowingResult::Invalid);
-		return;
-	}
+#endif
 
 	// start new move request
 	FNavPathSharedPtr FollowedPath;
-	const FPathFollowingRequestResult ResultData = OwnerController->MoveTo(MoveRequest, &FollowedPath);
+	FPathFollowingRequestResult ResultData;
+	if (bIsReachedSPline)
+	{
+		auto PCPtr = Cast<APlanetAIController>(GetAIController());
+		if (PCPtr)
+		{
+			ResultData = PCPtr->MoveAlongSPline(SPlinePtr, MoveRequest, &FollowedPath);
+		}
+	}
+	else
+	{
+		ResultData = OwnerController->MoveTo(MoveRequest, &FollowedPath);
+	}
 
 	switch (ResultData.Code)
 	{
@@ -43,7 +72,9 @@ void UAITask_MoveBySpline::PerformMove()
 
 	case EPathFollowingRequestResult::AlreadyAtGoal:
 		MoveRequestID = ResultData.MoveId;
-		OnRequestFinished(ResultData.MoveId, FPathFollowingResult(EPathFollowingResult::Success, FPathFollowingResultFlags::AlreadyAtGoal));
+		OnRequestFinished(ResultData.MoveId,
+		                  FPathFollowingResult(EPathFollowingResult::Success,
+		                                       FPathFollowingResultFlags::AlreadyAtGoal));
 		break;
 
 	case EPathFollowingRequestResult::RequestSuccessful:
@@ -53,7 +84,8 @@ void UAITask_MoveBySpline::PerformMove()
 
 		if (IsFinished())
 		{
-			UE_VLOG(GetGameplayTasksComponent(), LogGameplayTasks, Error, TEXT("%s> re-Activating Finished task!"), *GetName());
+			UE_VLOG(GetGameplayTasksComponent(), LogGameplayTasks, Error, TEXT("%s> re-Activating Finished task!"),
+			        *GetName());
 		}
 		break;
 
@@ -67,25 +99,8 @@ void UAITask_MoveBySpline::OnRequestFinished(FAIRequestID RequestID, const FPath
 {
 	if (RequestID == MoveRequestID)
 	{
-// 		if (MyMoveTaskCompletedSignature.IsBound())
-// 		{
-// 			MyMoveTaskCompletedSignature.Execute(Result.Code);
-// 		}
-		Index++;
-		if (Index >= Pts.Num())
-		{
-			Index = 0;
-		}
-		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UAITask_MoveBySpline::PerformMove);
-	}
-	else if (IsActive())
-	{
-		UE_VLOG(GetGameplayTasksComponent(), LogGameplayTasks, Warning, TEXT("%s> received OnRequestFinished with not matching RequestID!"), *GetName());
+		bIsReachedSPline = true;
+		UE_VLOG(GetGameplayTasksComponent(), LogGameplayTasks, Log, TEXT("%s> received OnRequestFinished and goal tracking is active! Moving again in next tick"), *GetName());
+		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ThisClass::PerformMove);
 	}
 }
-// 
-// FMyMoveTaskCompletedSignature UAITask_MoveBySpline::GetMoveTaskCompletedSignature()
-// {
-// 	return MyMoveTaskCompletedSignature;
-// }
-// 

@@ -6,44 +6,22 @@
 
 #include "Planet_Tools.h"
 #include "ConversationBorder.h"
-#include "UICommon.h"
+#include "STT_CommonData.h"
 #include "CharacterBase.h"
 #include "CharacterTitle.h"
-#include "TaskNode.h"
+#include "GameOptions.h"
+
 #include "Components/VerticalBox.h"
-
-struct FCharacterTitleBox : public TStructVariable<FCharacterTitleBox>
-{
-	const FName VerticalBox = TEXT("VerticalBox");
-
-	const FName CharacterTitle = TEXT("CharacterTitle");
-};
 
 FName UCharacterTitleComponent::ComponentName = TEXT("CharacterTitleComponent");
 
-void UCharacterTitleBox::NativePreConstruct()
-{
-	Super::NativePreConstruct();
-}
-
-void UCharacterTitleBox::NativeConstruct()
-{
-	Super::NativeConstruct();
-	
-	SetAnchorsInViewport(FAnchors(.5f));
-	SetAlignmentInViewport(FVector2D(.5f, 1.f));
-	
-	auto UIPtr = Cast<UCharacterTitle>(GetWidgetFromName(FCharacterTitleBox::Get().CharacterTitle));
-	if (UIPtr)
-	{
-		UIPtr->SetData(CharacterPtr);
-	}
-}
-
-UCharacterTitleComponent::UCharacterTitleComponent(const FObjectInitializer& ObjectInitializer):
-	Super(ObjectInitializer)
+UCharacterTitleComponent::UCharacterTitleComponent(
+	const FObjectInitializer& ObjectInitializer
+	):
+	 Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.TickInterval = 1.f;
 }
 
 void UCharacterTitleComponent::BeginPlay()
@@ -62,101 +40,97 @@ void UCharacterTitleComponent::TickComponent(
 #if UE_EDITOR || UE_CLIENT
 	if (GetOwnerRole() < ROLE_Authority)
 	{
-		ResetPosition(DeltaTime);
+		auto PCPtr = GEngine->GetFirstLocalPlayerController(GetWorld());
+		if (PCPtr)
+		{
+			const auto Distance = FVector::Dist(GetOwner()->GetActorLocation(), PCPtr->GetPawn()->GetActorLocation());
+			SetVisibility(Distance < UGameOptions::GetInstance()->CharacterTitleDisplayRange);
+		}
+		// ResetPosition(DeltaTime);
 	}
 #endif
 }
 
-void UCharacterTitleComponent::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+void UCharacterTitleComponent::OnGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
 {
 #if UE_EDITOR || UE_CLIENT
 	if (GetOwnerRole() < ROLE_Authority)
 	{
 		auto OwnerCharacterOtr = GetOwner<FOwnerType>();
-	
+
 		float Radius = 0.f;
 		OwnerCharacterOtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
 
-		CharacterTitleBoxPtr = CreateWidget<UCharacterTitleBox>(GetWorld(), CharacterTitleBoxClass);
+		auto CharacterTitleBoxPtr = Cast<UCharacterTitleBox>(GetUserWidgetObject());
 		if (CharacterTitleBoxPtr)
 		{
-			CharacterTitleBoxPtr->CharacterPtr = OwnerCharacterOtr;
-			if (GetOwnerRole() == ROLE_AutonomousProxy)
-			{
-				CharacterTitleBoxPtr->AddToViewport(EUIOrder::kPlayer_Character_State_HUD);
-			}
-			else
-			{
-				CharacterTitleBoxPtr->AddToViewport(EUIOrder::kOtherPlayer_Character_State_HUD);
-			}
-			auto UIPtr = Cast<UVerticalBox>(CharacterTitleBoxPtr->GetWidgetFromName(FCharacterTitleBox::Get().VerticalBox));
-			if (UIPtr)
-			{
-				UIPtr->ClearChildren();
-			}
+			CharacterTitleBoxPtr->SetData(OwnerCharacterOtr);
+			// if (GetOwnerRole() == ROLE_AutonomousProxy)
+			// {
+			// 	CharacterTitleBoxPtr->AddToViewport(EUIOrder::kPlayer_Character_State_HUD);
+			// }
+			// else
+			// {
+			// 	CharacterTitleBoxPtr->AddToViewport(EUIOrder::kOtherPlayer_Character_State_HUD);
+			// }
 		}
 	}
 #endif
 }
 
-void UCharacterTitleComponent::SetCampType(ECharacterCampType CharacterCampType)
+void UCharacterTitleComponent::SetCampType(
+	ECharacterCampType CharacterCampType
+	)
 {
-	auto UIPtr = Cast<UCharacterTitle>(
-		CharacterTitleBoxPtr->GetWidgetFromName(FCharacterTitleBox::Get().CharacterTitle)
-		);
-	if (UIPtr)
+	auto CharacterTitleBoxPtr = Cast<UCharacterTitleBox>(GetUserWidgetObject());
+	if (CharacterTitleBoxPtr)
 	{
-		UIPtr->SetCampType(CharacterCampType);
+		CharacterTitleBoxPtr->SetCampType(CharacterCampType);
 	}
 }
 
-bool UCharacterTitleComponent::ResetPosition(float InDeltaTime)
+bool UCharacterTitleComponent::ResetPosition(
+	float InDeltaTime
+	)
 {
-	if (CharacterTitleBoxPtr)
-	{
-		FVector2D ScreenPosition = FVector2D::ZeroVector;
-
-		auto OwnerCharacterOtr = GetOwner<FOwnerType>();
-	
-		UGameplayStatics::ProjectWorldToScreen(
-			UGameplayStatics::GetPlayerController(this, 0),
-			OwnerCharacterOtr->GetActorLocation() - (OwnerCharacterOtr->GetGravityDirection() * (Offset + HalfHeight)),
-			ScreenPosition
-		);
-
-		CharacterTitleBoxPtr->SetPositionInViewport(ScreenPosition);
-	}
+	// if (CharacterTitleBoxPtr)
+	// {
+	// 	FVector2D ScreenPosition = FVector2D::ZeroVector;
+	//
+	// 	auto OwnerCharacterOtr = GetOwner<FOwnerType>();
+	//
+	// 	UGameplayStatics::ProjectWorldToScreen(
+	// 		UGameplayStatics::GetPlayerController(this, 0),
+	// 		OwnerCharacterOtr->GetActorLocation() - (OwnerCharacterOtr->GetGravityDirection() * (Offset + HalfHeight)),
+	// 		ScreenPosition
+	// 	);
+	//
+	// 	CharacterTitleBoxPtr->SetPositionInViewport(ScreenPosition);
+	// }
 
 	return true;
 }
 
-void UCharacterTitleComponent::DisplaySentence(const FTaskNode_Conversation_SentenceInfo& Sentence) 
+void UCharacterTitleComponent::DisplaySentence(
+	const FTaskNode_Conversation_SentenceInfo& Sentence
+	)
 {
-	if (ConversationBorderPtr)
+	auto CharacterTitleBoxPtr = Cast<UCharacterTitleBox>(GetUserWidgetObject());
+	if (!CharacterTitleBoxPtr)
 	{
-		ConversationBorderPtr->SetSentence(Sentence);
+		return;
 	}
-	else
-	{
-		ConversationBorderPtr = CreateWidget<UConversationBorder>(GetWorld(), ConversationBorderClass);
-		if (ConversationBorderPtr)
-		{
-			ConversationBorderPtr->CharacterPtr = GetOwner<ACharacterBase>();
-			ConversationBorderPtr->SetSentence(Sentence);
-			auto UIPtr = Cast<UVerticalBox>(CharacterTitleBoxPtr->GetWidgetFromName(FCharacterTitleBox::Get().VerticalBox));
-			if (UIPtr)
-			{
-				UIPtr->AddChild(ConversationBorderPtr);
-			}
-		}
-	}
+	CharacterTitleBoxPtr->DisplaySentence(Sentence);
 }
 
 void UCharacterTitleComponent::CloseConversationborder()
 {
-	if (ConversationBorderPtr)
+	auto CharacterTitleBoxPtr = Cast<UCharacterTitleBox>(GetUserWidgetObject());
+	if (!CharacterTitleBoxPtr)
 	{
-		ConversationBorderPtr->RemoveFromParent();
-		ConversationBorderPtr = nullptr;
+		return;
 	}
+	CharacterTitleBoxPtr->CloseConversationborder();
 }

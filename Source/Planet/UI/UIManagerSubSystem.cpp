@@ -16,7 +16,7 @@
 #include "PawnStateConsumablesHUD.h"
 #include "FocusTitle.h"
 #include "PlanetPlayerController.h"
-#include "FocusIcon.h"
+#include "Tools.h"
 #include "MainHUDLayout.h"
 
 struct FUIManagerSubSystem : public TStructVariable<FUIManagerSubSystem>
@@ -37,12 +37,15 @@ struct FUIManagerSubSystem : public TStructVariable<FUIManagerSubSystem>
 UUIManagerSubSystem* UUIManagerSubSystem::GetInstance()
 {
 	return Cast<UUIManagerSubSystem>(
-		USubsystemBlueprintLibrary::GetGameInstanceSubsystem(GetWorldImp(), UUIManagerSubSystem::StaticClass())
-	);
+	                                 USubsystemBlueprintLibrary::GetGameInstanceSubsystem(
+		                                  GetWorldImp(),
+		                                  UUIManagerSubSystem::StaticClass()
+		                                 )
+	                                );
 }
 
 UUIManagerSubSystem::UUIManagerSubSystem() :
-	Super()
+                                           Super()
 {
 }
 
@@ -50,25 +53,104 @@ UUIManagerSubSystem::~UUIManagerSubSystem()
 {
 }
 
-void UUIManagerSubSystem::Initialize(FSubsystemCollectionBase& Collection)
+void UUIManagerSubSystem::Initialize(
+	FSubsystemCollectionBase& Collection
+	)
 {
 	Super::Initialize(Collection);
 }
 
-void UUIManagerSubSystem::SwitchLayout(ELayoutCommon MainHUDType)
+UMainHUDLayout* UUIManagerSubSystem::GetMainHUDLayout() const
 {
-	UGameplayStatics::GetPlayerController(this, 0)->GetHUD<AMainHUD>()->SwitchLayout(MainHUDType);
+	return UGameplayStatics::GetPlayerController(this, 0)->GetHUD<AMainHUD>()->GetMainHUDLayout();
 }
 
-void UUIManagerSubSystem::SwitchMenuLayout(EMenuType MenuType)
+void UUIManagerSubSystem::SwitchLayout(
+	ELayoutCommon MainHUDType,
+	const ILayoutInterfacetion::FOnQuit& OnQuit
+	)
 {
-	auto MenuLayoutPtr = UGameplayStatics::GetPlayerController(this, 0)
-	                     ->GetHUD<AMainHUD>()
-	                     ->GetMainHUDLayout()
-	                     ->GetMenuLayout();
+	GetMainHUDLayout()->SwitchToNewLayout(MainHUDType, OnQuit);
+}
+
+FString UUIManagerSubSystem::GetLayoutName(
+	ELayoutCommon MainHUDType
+	) const
+{
+	FString Result = TEXT("");
+	switch (MainHUDType)
+	{
+	case ELayoutCommon::kEmptyLayout:
+		break;
+	case ELayoutCommon::kActionLayout:
+		break;
+	case ELayoutCommon::kMenuLayout:
+		break;
+	case ELayoutCommon::kEndangeredLayout:
+		break;
+	case ELayoutCommon::kOptionLayout:
+		break;
+	case ELayoutCommon::kConversationLayout:
+		break;
+	case ELayoutCommon::kTransactionLayout:
+		break;
+	case ELayoutCommon::kBuildingLayout:
+		break;
+	case ELayoutCommon::kViewTasksLayout:
+		break;
+	case ELayoutCommon::kTransitionLayout:
+		break;
+	case ELayoutCommon::kObserverLayout:
+		break;
+	default: ;
+	}
+	return Result;
+}
+
+void UUIManagerSubSystem::SwitchMenuLayout(
+	EMenuType MenuType
+	)
+{
+	auto MenuLayoutPtr = GetMainHUDLayout()->GetMenuLayout();
 
 	if (MenuLayoutPtr)
 	{
 		MenuLayoutPtr->SwitchViewer(MenuType);
 	}
+}
+
+FString UUIManagerSubSystem::GetMenuLayoutName(
+	EMenuType MenuType
+	) const
+{
+	FString Result = TEXT("");
+	switch (MenuType)
+	{
+	case EMenuType::kEmpty:
+		break;
+	case EMenuType::kAllocationSkill:
+		{
+			Result = TEXT("AllocationSkills");
+		}
+		break;
+	case EMenuType::kAllocationTalent:
+		break;
+	case EMenuType::kGroupManagger:
+		{
+			Result = TEXT("GroupManagger");
+		}
+		break;
+	case EMenuType::kRaffle:
+		break;
+	case EMenuType::kViewTask:
+		break;
+	case EMenuType::kViewMap:
+		break;
+	}
+	return Result;
+}
+
+UMainMenuLayout* UUIManagerSubSystem::GetMainMenuLayout() const
+{
+	return GetMainHUDLayout()->GetMenuLayout();
 }

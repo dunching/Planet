@@ -28,8 +28,6 @@ ATool_PickAxe::ATool_PickAxe(const FObjectInitializer& ObjectInitializer) :
 
 void ATool_PickAxe::DoActionByCharacter(AHumanCharacter* CharacterPtr, EEquipmentActionType ActionType)
 {
-	Super::DoActionByCharacter(CharacterPtr, ActionType);
-
 	switch (ActionType)
 	{
 	case EEquipmentActionType::kStartAction:
@@ -57,7 +55,7 @@ void ATool_PickAxe::DoActionByCharacter(AHumanCharacter* CharacterPtr, EEquipmen
 	}
 }
 
-void ATool_PickAxe::AttachToCharacter(ACharacterBase* CharacterPtr)
+void ATool_PickAxe::AttachToCharacter(ACharacter* CharacterPtr)
 {
 	Super::AttachToCharacter(CharacterPtr);
 

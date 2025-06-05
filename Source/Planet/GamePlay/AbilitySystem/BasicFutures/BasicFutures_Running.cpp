@@ -1,4 +1,4 @@
-// Copyright 2020 Dan Kestranek.
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "BasicFutures_Running.h"
 
@@ -15,57 +15,51 @@
 #include "Planet_Tools.h"
 #include "AbilityTask_TimerHelper.h"
 #include "AS_Character.h"
+#include "GameplayCameraHelper.h"
+#include "HumanCharacter_Player.h"
 
 UBasicFutures_Running::UBasicFutures_Running() :
-	Super()
+                                               Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UBasicFutures_Running::InitalDefaultTags()
+void UBasicFutures_Running::IntervalTick(
+	UAbilityTask_TimerHelper*,
+	float Interval,
+	float InDuration
+	)
 {
-	Super::InitalDefaultTags();
-
-	if (GetWorldImp())
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		AbilityTags.AddTag(UGameplayTagsLibrary::State_Locomotion_Run);
-		ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Locomotion_Run);
-	}
-}
-
-void UBasicFutures_Running::IntervalTick(UAbilityTask_TimerHelper*, float Interval, float InDuration)
-{
-	if (Interval > InDuration)
-	{
-		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		if (
-			CharacterAttributes->GetPP() >=
-			RunningConsume.GetCurrentValue()
-		)
+		if (Interval > InDuration)
 		{
-			TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+			// 停止输入时
+			const auto Velocity = 10.f;
+			if (
+				(CharacterPtr->GetCharacterMovement()->GetCurrentAcceleration().Length() < Velocity) &&
+				(CharacterPtr->GetCharacterMovement()->RequestedVelocity.Length() < Velocity)
+			)
+			{
+				K2_CancelAbility();
+				return;
+			}
 
-			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
-				CharacterPtr);
-
-			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-			FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-			GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
-
-			GAEventData.DataModify.Add(ECharacterPropertyType::PP, -RunningConsume.GetCurrentValue());
-
-			GAEventDataPtr->DataAry.Add(GAEventData);
-
-			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-			ICPtr->SendEventImp(GAEventDataPtr);
-		}
-		else
-		{
-			K2_CancelAbility();
+			auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+			if (
+				CharacterAttributes->GetStamina() >=
+				RunningConsume.GetCurrentValue()
+			)
+			{
+			}
+			else
+			{
+				K2_CancelAbility();
+			}
 		}
 	}
+#endif
 }
 
 void UBasicFutures_Running::PreActivate(
@@ -74,9 +68,14 @@ void UBasicFutures_Running::PreActivate(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 	const FGameplayEventData* TriggerEventData /*= nullptr */
-)
+	)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
+	UGameplayCameraHelper::SwitchGaplayCameraType(
+												  Cast<AHumanCharacter_Player>(CharacterPtr),
+												  ECameraType::kRunning
+												 );
 }
 
 void UBasicFutures_Running::ActivateAbility(
@@ -84,7 +83,7 @@ void UBasicFutures_Running::ActivateAbility(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
-)
+	)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
@@ -93,35 +92,43 @@ void UBasicFutures_Running::ActivateAbility(
 #if UE_EDITOR || UE_SERVER
 		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 		{
-			// //
-			// {
-			// 	auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-			// 	TaskPtr->SetInfinite(1.f);
-			// 	TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::IntervalTick);
-			// 	TaskPtr->ReadyForActivation();
-			// }
-			//
-			// TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-			//
-			// ModifyPropertyMap.Add(
-			// 	ECharacterPropertyType::MoveSpeed,
-			// 	RunningSpeedOffset.GetCurrentValue()
-			// );
-			//
-			// CharacterPtr->GetCharacterAbilitySystemComponent()->SendEvent2Self(
-			// 	ModifyPropertyMap,
-			// 	UGameplayTagsLibrary::State_Locomotion_Run
-			// );
+			CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
+			// 加速的效果
+			{
+				FGameplayEffectSpecHandle SpecHandle =
+					MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->OnceGEClass, GetAbilityLevel());
 
-			FGameplayEffectSpecHandle SpecHandle =
-				MakeOutgoingGameplayEffectSpec(GE_RunningClass, GetAbilityLevel());
+				// SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(UGameplayTagsLibrary::GEData_Info);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed);
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                               UGameplayTagsLibrary::BaseFeature_Run,
+				                                               RunningSpeedOffset.CurrentValue
+				                                              );
 
-			// SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(UGameplayTagsLibrary::GEData_Info);
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary);
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed);
-			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::DataSource_Character, RunningSpeedOffset.CurrentValue);
+				ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+			}
+			// 消耗的效果
+			{
+				FGameplayEffectSpecHandle SpecHandle =
+					MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->ForeverGEClass, GetAbilityLevel());
 
-			ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+				// SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(UGameplayTagsLibrary::GEData_Info);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina);
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                               UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+				                                               -RunningConsume.CurrentValue
+				                                              );
+
+				RunningCostGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+			}
+			{
+				auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+				TaskPtr->SetInfinite(1.f);
+				TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::IntervalTick);
+				TaskPtr->ReadyForActivation();
+			}
 		}
 #endif
 	}
@@ -133,34 +140,36 @@ void UBasicFutures_Running::EndAbility(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	bool bReplicateEndAbility,
 	bool bWasCancelled
-)
+	)
 {
 	if (CharacterPtr)
 	{
 #if UE_EDITOR || UE_SERVER
 		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 		{
-			// TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-			//
-			// ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, 0);
-			//
-			// CharacterPtr->GetCharacterAbilitySystemComponent()->ClearData2Self(
-			// 	ModifyPropertyMap, 
-			// 	UGameplayTagsLibrary::State_Locomotion_Run
-			// );
-
 			FGameplayEffectSpecHandle SpecHandle =
-				MakeOutgoingGameplayEffectSpec(GE_CancelRunningClass, GetAbilityLevel());
+				MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->OnceGEClass, GetAbilityLevel());
 
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary);
+			// SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(UGameplayTagsLibrary::GEData_Info);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed);
-			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::DataSource_Character, RunningSpeedOffset.CurrentValue);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			                                               UGameplayTagsLibrary::BaseFeature_Run,
+			                                               RunningSpeedOffset.CurrentValue
+			                                              );
 
 			ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+
+			BP_RemoveGameplayEffectFromOwnerWithHandle(RunningCostGEHandle);
 		}
 #endif
 	}
 
+	UGameplayCameraHelper::SwitchGaplayCameraType(
+												  Cast<AHumanCharacter_Player>(CharacterPtr),
+												  ECameraType::kAction
+												 );
+	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -170,7 +179,7 @@ bool UBasicFutures_Running::CanActivateAbility(
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
 	const FGameplayTagContainer* TargetTags /*= nullptr*/,
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
-) const
+	) const
 {
 	if (CharacterPtr)
 	{
@@ -178,7 +187,7 @@ bool UBasicFutures_Running::CanActivateAbility(
 		{
 			auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 			if (
-				CharacterAttributes->GetPP() >=
+				CharacterAttributes->GetStamina() >=
 				RunningConsume.GetCurrentValue()
 			)
 			{
@@ -188,4 +197,13 @@ bool UBasicFutures_Running::CanActivateAbility(
 	}
 
 	return false;
+}
+
+void UBasicFutures_Running::ApplyCost(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo
+	) const
+{
+	Super::ApplyCost(Handle, ActorInfo, ActivationInfo);
 }

@@ -7,12 +7,23 @@
 #include "UICommon.h"
 #include "CharacterBase.h"
 #include "CharacterTitleComponent.h"
-#include "TaskNode.h"
+
 
 UConversationComponent::UConversationComponent(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
+}
+
+void UConversationComponent::DisplaySentence_Player(
+	const FTaskNode_Conversation_SentenceInfo& Sentence,
+	const std::function<void()>&SentenceStop_
+	)
+{
+}
+
+void UConversationComponent::CloseConversationborder_Player()
+{
 }
 
 void UConversationComponent::CloseConversationborder_Implementation()

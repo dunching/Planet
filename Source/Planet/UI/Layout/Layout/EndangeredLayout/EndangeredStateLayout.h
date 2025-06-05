@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "HUDInterface.h"
 #include "LayoutInterfacetion.h"
 
@@ -15,25 +15,33 @@
 
 class UToolsMenu;
 
-struct FCharacterAttributes;
+
 
 struct FToolsSocketInfo;
 struct FConsumableSocketInfo;
 
 /**
- *
+ * 濒死状态
  */
 UCLASS()
 class PLANET_API UEndangeredStateLayout :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public ILayoutInterfacetion
 {
 	GENERATED_BODY()
 
 public:
 
+	virtual void NativeConstruct()override;
+
 	virtual void Enable()override;
 	
 	virtual void DisEnable()override;
 
+	virtual ELayoutCommon GetLayoutType() const  override final;
+	
+private:
+
+	UFUNCTION()
+	void OnClicked();
 };

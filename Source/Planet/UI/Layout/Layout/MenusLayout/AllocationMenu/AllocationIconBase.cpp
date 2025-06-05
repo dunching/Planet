@@ -1,4 +1,3 @@
-
 #include "AllocationIconBase.h"
 
 #include "Components/Image.h"
@@ -12,6 +11,7 @@
 #include "AssetRefMap.h"
 #include "ItemProxyDragDropOperation.h"
 #include "ItemProxyDragDropOperationWidget.h"
+#include "Common/ProxyIcon.h"
 
 struct FAllocationIconBase : public TStructVariable<FAllocationIconBase>
 {
@@ -19,23 +19,28 @@ struct FAllocationIconBase : public TStructVariable<FAllocationIconBase>
 
 	const FName Enable = TEXT("Enable");
 
-	const FName Icon = TEXT("Icon");
+	const FName ProxyIcon = TEXT("ProxyIcon");
 };
 
-UAllocationIconBase::UAllocationIconBase(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+UAllocationIconBase::UAllocationIconBase(
+	const FObjectInitializer& ObjectInitializer
+) :
+  Super(ObjectInitializer)
 {
-
 }
 
-void UAllocationIconBase::NativeOnListItemObjectSet(UObject* ListItemObject)
+void UAllocationIconBase::NativeOnListItemObjectSet(
+	UObject* ListItemObject
+)
 {
 	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
 
 	InvokeReset(Cast<ThisClass>(ListItemObject));
 }
 
-void UAllocationIconBase::InvokeReset(UUserWidget* InBasicProxyPtr)
+void UAllocationIconBase::InvokeReset(
+	UUserWidget* InBasicProxyPtr
+)
 {
 	if (InBasicProxyPtr)
 	{
@@ -48,18 +53,20 @@ void UAllocationIconBase::InvokeReset(UUserWidget* InBasicProxyPtr)
 	}
 }
 
-void UAllocationIconBase::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
+void UAllocationIconBase::ResetToolUIByData(
+	const TSharedPtr<FBasicProxy>& InBasicProxyPtr
+)
 {
-	if (InBasicProxyPtr == BasicProxyPtr)
+	if (InBasicProxyPtr == DynamicCastSharedPtr<FBasicProxy>(BasicProxyPtr))
 	{
 		return;
 	}
 
 	auto PreviousProxyPtr = BasicProxyPtr;
-	TSharedPtr<FAllocationbleProxy> NewProxyPtr = nullptr;
+	TSharedPtr<IProxy_Allocationble> NewProxyPtr = nullptr;
 	if (InBasicProxyPtr && InBasicProxyPtr->GetProxyType().MatchesTag(ProxyType))
 	{
-		NewProxyPtr = InBasicProxyPtr;
+		NewProxyPtr = DynamicCastSharedPtr<IProxy_Allocationble>(InBasicProxyPtr);
 	}
 
 	if (!bPaseInvokeOnResetProxyEvent)
@@ -77,16 +84,20 @@ void UAllocationIconBase::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy
 	SetItemType();
 }
 
-void UAllocationIconBase::EnableIcon(bool bIsEnable)
+void UAllocationIconBase::EnableIcon(
+	bool bIsEnable
+)
 {
-
 }
 
-void UAllocationIconBase::OnDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr)
+void UAllocationIconBase::OnDragIcon(
+	bool bIsDragging,
+	const TSharedPtr<IProxy_Allocationble>& ProxyPtr
+)
 {
 	if (bIsDragging)
 	{
-		if (ProxyPtr && ProxyPtr->GetProxyType().MatchesTag(ProxyType))
+		if (ProxyPtr && DynamicCastSharedPtr<FBasicProxy>( ProxyPtr)->GetProxyType().MatchesTag(ProxyType))
 		{
 			EnableIcon(true);
 		}
@@ -101,7 +112,9 @@ void UAllocationIconBase::OnDragIcon(bool bIsDragging, const TSharedPtr<FAllocat
 	}
 }
 
-void UAllocationIconBase::SublingIconProxyChanged(const TSharedPtr<FAllocationbleProxy>& ProxyPtr)
+void UAllocationIconBase::SublingIconProxyChanged(
+	const TSharedPtr<IProxy_Allocationble>& ProxyPtr
+)
 {
 	if (BasicProxyPtr && (BasicProxyPtr == ProxyPtr))
 	{
@@ -111,27 +124,17 @@ void UAllocationIconBase::SublingIconProxyChanged(const TSharedPtr<FAllocationbl
 
 void UAllocationIconBase::SetItemType()
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FAllocationIconBase::Get().Icon));
-	if (ImagePtr)
+	auto ProxyIconPtr = Cast<UProxyIcon>(GetWidgetFromName(FAllocationIconBase::Get().ProxyIcon));
+	if (ProxyIconPtr)
 	{
-		if (BasicProxyPtr)
-		{
-			ImagePtr->SetVisibility(ESlateVisibility::Visible);
-
-			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(BasicProxyPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
-				{
-					ImagePtr->SetBrushFromTexture(BasicProxyPtr->GetIcon().Get());
-				}));
-		}
-		else
-		{
-			ImagePtr->SetVisibility(ESlateVisibility::Hidden);
-		}
+		ProxyIconPtr->ResetToolUIByData(DynamicCastSharedPtr<FBasicProxy>(BasicProxyPtr));
 	}
 }
 
-FReply UAllocationIconBase::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+FReply UAllocationIconBase::NativeOnMouseButtonDown(
+	const FGeometry& InGeometry,
+	const FPointerEvent& InMouseEvent
+)
 {
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
@@ -145,7 +148,11 @@ FReply UAllocationIconBase::NativeOnMouseButtonDown(const FGeometry& InGeometry,
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
-bool UAllocationIconBase::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+bool UAllocationIconBase::NativeOnDrop(
+	const FGeometry& InGeometry,
+	const FDragDropEvent& InDragDropEvent,
+	UDragDropOperation* InOperation
+)
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
@@ -154,7 +161,7 @@ bool UAllocationIconBase::NativeOnDrop(const FGeometry& InGeometry, const FDragD
 		auto WidgetDragPtr = Cast<UAllocationableProxyDragDropOperation>(InOperation);
 		if (WidgetDragPtr)
 		{
-			ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
+			ResetToolUIByData(DynamicCastSharedPtr<FBasicProxy>(WidgetDragPtr->SceneToolSPtr));
 
 			WidgetDragPtr->OnDrop.Broadcast(WidgetDragPtr);
 		}
@@ -163,7 +170,11 @@ bool UAllocationIconBase::NativeOnDrop(const FGeometry& InGeometry, const FDragD
 	return true;
 }
 
-void UAllocationIconBase::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+void UAllocationIconBase::NativeOnDragDetected(
+	const FGeometry& InGeometry,
+	const FPointerEvent& InMouseEvent,
+	UDragDropOperation*& OutOperation
+)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 

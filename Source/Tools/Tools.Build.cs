@@ -8,22 +8,22 @@ public class Tools : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        bEnableUndefinedIdentifierWarnings = false;
+        UndefinedIdentifierWarningLevel = WarningLevel.Error;
         bWarningsAsErrors = true;
         bEnableExceptions = true;
+
+        CppStandard = CppStandardVersion.Cpp20;
+        
+        bUseRTTI = true;
 
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
         }
 
-        CppStandard = CppStandardVersion.Cpp20;
-        bUseRTTI = true;
+        PublicIncludePaths.Add("Tools");
 
         PrivateDependencyModuleNames.AddRange(new string[] { });
-        PublicIncludePaths.Add("Tools");
-        PublicIncludePaths.Add("Tools/ThreadPoolHelper");
-        PublicIncludePaths.Add("Tools/LogHelper");
-
+        
         PrivateDependencyModuleNames.AddRange(new string[] {
             "Core",
             "CoreUObject",

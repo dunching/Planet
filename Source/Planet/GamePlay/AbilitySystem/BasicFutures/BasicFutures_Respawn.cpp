@@ -3,15 +3,19 @@
 
 #include "Components/SkeletalMeshComponent.h"
 #include "AbilitySystemComponent.h"
+#include "Perception/AIPerceptionComponent.h"
 
 #include "AbilityTask_PlayMontage.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterBase.h"
 #include "HumanAIController.h"
 #include "GameplayTagsLibrary.h"
+#include "HumanCharacter_AI.h"
 #include "HumanRegularProcessor.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HumanCharacter_Player.h"
+#include "InputProcessorSubSystem_Imp.h"
+#include "Teleport.h"
 
 void UBasicFutures_Respawn::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
@@ -28,7 +32,22 @@ void UBasicFutures_Respawn::ActivateAbility(
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-
+	//
+	// TArray<AActor*> OutActors;
+	// UGameplayStatics::GetAllActorsOfClass(this, ATeleport::StaticClass(), OutActors);
+	// for (auto Iter :OutActors)
+	// {
+	// 	TeleportPtr = Cast<ATeleport>(Iter);
+	// 	if (TeleportPtr)
+	// 	{
+	// 		break;
+	// 	}
+	// }
+	//
+	// if (TeleportPtr)
+	// {
+	// 	CharacterPtr->TeleportTo();
+	// }
 	PlayMontage(DeathMontage, 1.f);
 
 	if (
@@ -38,18 +57,18 @@ void UBasicFutures_Respawn::ActivateAbility(
 	}
 }
 
-void UBasicFutures_Respawn::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_Orient2Acce);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
-}
+// void UBasicFutures_Respawn::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRootMotion);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_Orient2Acce);
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
+// }
 
 void UBasicFutures_Respawn::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
@@ -80,6 +99,18 @@ void UBasicFutures_Respawn::OnMontageComplete()
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 		)
 	{
+		// 清除周围AI对这个Character得感知，以达到重新感知此Character
+		TArray<AActor*> OutActors;
+		UGameplayStatics::GetAllActorsOfClass(this, AHumanCharacter_AI::StaticClass(),OutActors );
+		for (auto Iter : OutActors)
+		{
+			auto HumanCharacter_AIPtr =  Cast<AHumanCharacter_AI>(Iter);
+			if (HumanCharacter_AIPtr)
+			{
+				HumanCharacter_AIPtr->GetController<AHumanAIController>()->GetAIPerceptionComponent()->ForgetActor(CharacterPtr);
+			}
+		}
+		
 		K2_CancelAbility();
 	}
 
@@ -87,6 +118,6 @@ void UBasicFutures_Respawn::OnMontageComplete()
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+		UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
 	}
 }

@@ -43,7 +43,7 @@ void UState_Talent_NuQi::NativeDestruct()
 	PRINTINVOKEINFO();
 	if (OnValueChanged)
 	{
-		OnValueChanged->UnBindCallback();
+		OnValueChanged.Reset();
 	}
 	Super::NativeDestruct();
 }

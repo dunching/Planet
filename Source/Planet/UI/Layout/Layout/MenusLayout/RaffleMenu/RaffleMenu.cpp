@@ -19,7 +19,7 @@
 #include "UICommon.h"
 #include "RaffleSubSystem.h"
 #include "Raffle_Proxy.h"
-#include "SceneProxyExtendInfo.h"
+#include "DataTableCollection.h"
 #include "ItemProxy_Container.h"
 #include "InventoryComponent.h"
 
@@ -44,11 +44,6 @@ void URaffleMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	InitialRaffleType();
-	InitialRaffleBtn();
-
-	SwitchDisplay(true);
-
 	auto UIPtr = Cast<UButton>(GetWidgetFromName(FRaffleMenu::Get().ConfirmBtn));
 	if (UIPtr)
 	{
@@ -63,8 +58,24 @@ void URaffleMenu::NativeConstruct()
 void URaffleMenu::NativeDestruct()
 {
 	Super::NativeDestruct();
+}
 
-	OnGetProxyDelegateHandle->UnBindCallback();
+void URaffleMenu::EnableMenu()
+{
+	InitialRaffleType();
+	InitialRaffleBtn();
+
+	SwitchDisplay(true);
+}
+
+void URaffleMenu::DisEnableMenu()
+{
+	OnGetProxyDelegateHandle.Reset();
+}
+
+EMenuType URaffleMenu::GetMenuType() const
+{
+	return  EMenuType::kRaffle;
 }
 
 void URaffleMenu::InitialRaffleType()
@@ -120,8 +131,6 @@ void URaffleMenu::SetHoldItemProperty(const TSharedPtr<FSceneProxyContainer>& Ne
 	if (UIPtr)
 	{
 		auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GWorld, 0));
-
-		UIPtr->ResetUIByData(CharacterPtr->GetInventoryComponent()->GetCoinUintAry());
 	}
 }
 

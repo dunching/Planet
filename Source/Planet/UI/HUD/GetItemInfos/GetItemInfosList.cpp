@@ -1,11 +1,20 @@
 #include "GetItemInfosList.h"
 
 #include <Components/VerticalBox.h>
+#include "Kismet/GameplayStatics.h"
 
+#include "CharacterBase.h"
+#include "ModifyItemProxyStrategy.h"
+#include "GameplayTagsLibrary.h"
 #include "ItemProxy_Minimal.h"
 #include "GetItemInfosItem.h"
+#include "InventoryComponent.h"
 #include "TemplateHelper.h"
 #include "ItemProxy_Character.h"
+#include "ItemProxy_Weapon.h"
+#include "ItemProxy_Coin.h"
+#include "ItemProxy_Consumable.h"
+#include "ItemProxy_Skills.h"
 
 struct FGetItemInfosList : public TStructVariable<FGetItemInfosList>
 {
@@ -31,12 +40,154 @@ void UGetItemInfosList::NativePreConstruct()
 	}
 }
 
-void UGetItemInfosList::ResetUIByData()
+void UGetItemInfosList::SetPlayerCharacter(
+	ACharacterBase* PlayeyCharacterPtr
+	)
 {
+	if (!PlayeyCharacterPtr)
+	{
+		return;
+	}
+
+	{
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_Weapon>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnWeaponProxyChanged.AddCallback(
+				                                                              std::bind(
+					                                                               &UGetItemInfosList::OnWeaponProxyChanged,
+					                                                               this,
+					                                                               std::placeholders::_1,
+					                                                               std::placeholders::_2
+					                                                              )
+				                                                             );
+			Handle->bIsAutoUnregister = false;
+		}
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_WeaponSkill>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnSkillProxyChanged.AddCallback(
+					 std::bind(
+							   &UGetItemInfosList::OnSkillProxyChanged,
+							   this,
+							   std::placeholders::_1,
+							   std::placeholders::_2
+							  )
+					);
+			Handle->bIsAutoUnregister = false;
+		}
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_ActiveSkill>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnSkillProxyChanged.AddCallback(
+					 std::bind(
+							   &UGetItemInfosList::OnSkillProxyChanged,
+							   this,
+							   std::placeholders::_1,
+							   std::placeholders::_2
+							  )
+					);
+			Handle->bIsAutoUnregister = false;
+		}
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_PassveSkill>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnSkillProxyChanged.AddCallback(
+					 std::bind(
+							   &UGetItemInfosList::OnSkillProxyChanged,
+							   this,
+							   std::placeholders::_1,
+							   std::placeholders::_2
+							  )
+					);
+			Handle->bIsAutoUnregister = false;
+		}
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_Coin>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnCoinProxyChanged.AddCallback(
+					 std::bind(
+							   &UGetItemInfosList::OnCoinProxyChanged,
+							   this,
+							   std::placeholders::_1,
+							   std::placeholders::_2,
+							   std::placeholders::_3
+							  )
+					);
+			Handle->bIsAutoUnregister = false;
+		}
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_Consumable>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnConsumableProxyChanged.AddCallback(
+					 std::bind(
+							   &UGetItemInfosList::OnConsumableProxyChanged,
+							   this,
+							   std::placeholders::_1,
+							   std::placeholders::_2
+							  )
+					);
+			Handle->bIsAutoUnregister = false;
+		}
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_Character>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnGroupmateProxyChanged.AddCallback(
+					 std::bind(
+							   &UGetItemInfosList::OnGourpmateProxyChanged,
+							   this,
+							   std::placeholders::_1,
+							   std::placeholders::_2
+							  )
+					);
+			Handle->bIsAutoUnregister = false;
+		}
+	}
 }
 
-void UGetItemInfosList::OnSkillProxyChanged(const TSharedPtr<FSkillProxy>& ProxyPtr, bool bIsAdd)
+void UGetItemInfosList::OnWeaponProxyChanged(
+	const TSharedPtr<FWeaponProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
 {
+	switch (ProxyModifyType)
+	{
+	case EProxyModifyType::kNumChanged:
+		{
+		}
+		break;
+	default:
+		{
+			return;
+		};
+	}
+
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
 	{
@@ -44,7 +195,7 @@ void UGetItemInfosList::OnSkillProxyChanged(const TSharedPtr<FSkillProxy>& Proxy
 		if (ChildNum >= MaxDisplayNum)
 		{
 			OrderAry.Add(ProxyPtr);
-			SkillPendingAry.Add({ProxyPtr, bIsAdd});
+			WeaponPendingAry.Add({ProxyPtr, ProxyModifyType});
 		}
 		else
 		{
@@ -52,7 +203,7 @@ void UGetItemInfosList::OnSkillProxyChanged(const TSharedPtr<FSkillProxy>& Proxy
 			if (WidgetPtr)
 			{
 				WidgetPtr->OnFinished.BindUObject(this, &ThisClass::OnRemovedItem);
-				WidgetPtr->ResetToolUIByData(ProxyPtr, bIsAdd);
+				WidgetPtr->ResetToolUIByData(ProxyPtr, ProxyModifyType);
 
 				UIPtr->AddChild(WidgetPtr);
 			}
@@ -60,8 +211,34 @@ void UGetItemInfosList::OnSkillProxyChanged(const TSharedPtr<FSkillProxy>& Proxy
 	}
 }
 
-void UGetItemInfosList::OnCoinProxyChanged(const TSharedPtr<FCoinProxy>& ProxyPtr, bool bIsAdd, int32 Num)
+void UGetItemInfosList::OnSkillProxyChanged(
+	const TSharedPtr<FSkillProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
 {
+	switch (ProxyModifyType)
+	{
+	case EProxyModifyType::kNumChanged:
+		{
+			if (ProxyPtr)
+			{
+				if (ProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
+				{
+					return;
+				}
+			}
+			else
+			{
+				return;
+			}
+		}
+		break;
+	default:
+		{
+			return;
+		};
+	}
+
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
 	{
@@ -69,7 +246,7 @@ void UGetItemInfosList::OnCoinProxyChanged(const TSharedPtr<FCoinProxy>& ProxyPt
 		if (ChildNum >= MaxDisplayNum)
 		{
 			OrderAry.Add(ProxyPtr);
-			CoinPendingAry.Add({ProxyPtr, bIsAdd, Num});
+			SkillPendingAry.Add({ProxyPtr, ProxyModifyType});
 		}
 		else
 		{
@@ -77,7 +254,7 @@ void UGetItemInfosList::OnCoinProxyChanged(const TSharedPtr<FCoinProxy>& ProxyPt
 			if (WidgetPtr)
 			{
 				WidgetPtr->OnFinished.BindUObject(this, &ThisClass::OnRemovedItem);
-				WidgetPtr->ResetToolUIByData(ProxyPtr, bIsAdd, Num);
+				WidgetPtr->ResetToolUIByData(ProxyPtr, ProxyModifyType);
 
 				UIPtr->AddChild(WidgetPtr);
 			}
@@ -85,9 +262,74 @@ void UGetItemInfosList::OnCoinProxyChanged(const TSharedPtr<FCoinProxy>& ProxyPt
 	}
 }
 
-void UGetItemInfosList::OnConsumableProxyChanged(const TSharedPtr<FConsumableProxy>& ProxyPtr,
-                                                EProxyModifyType ProxyModifyType)
+void UGetItemInfosList::OnCoinProxyChanged(
+	const TSharedPtr<FCoinProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType,
+	int32 Num
+	)
 {
+	switch (ProxyModifyType)
+	{
+	case EProxyModifyType::kNumChanged:
+		{
+			if (Num == 0)
+			{
+				return;
+			}
+		}
+		break;
+	default:
+		{
+			return;
+		};
+	}
+
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
+	if (UIPtr)
+	{
+		const auto ChildNum = UIPtr->GetChildrenCount();
+		if (ChildNum >= MaxDisplayNum)
+		{
+			OrderAry.Add(ProxyPtr);
+			CoinPendingAry.Add({ProxyPtr, ProxyModifyType, Num});
+		}
+		else
+		{
+			auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
+			if (WidgetPtr)
+			{
+				WidgetPtr->OnFinished.BindUObject(this, &ThisClass::OnRemovedItem);
+				WidgetPtr->ResetToolUIByData(ProxyPtr, ProxyModifyType, Num);
+
+				UIPtr->AddChild(WidgetPtr);
+
+				//
+				UGameplayStatics::SpawnSound2D(
+				                               this,
+				                               GetCoinsSoundRef.LoadSynchronous()
+				                              );
+			}
+		}
+	}
+}
+
+void UGetItemInfosList::OnConsumableProxyChanged(
+	const TSharedPtr<FConsumableProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
+{
+	switch (ProxyModifyType)
+	{
+	case EProxyModifyType::kNumChanged:
+		{
+		}
+		break;
+	default:
+		{
+			return;
+		};
+	}
+
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
 	{
@@ -111,8 +353,23 @@ void UGetItemInfosList::OnConsumableProxyChanged(const TSharedPtr<FConsumablePro
 	}
 }
 
-void UGetItemInfosList::OnGourpmateProxyChanged(const TSharedPtr<FCharacterProxy>& ProxyPtr, bool bIsAdd)
+void UGetItemInfosList::OnGourpmateProxyChanged(
+	const TSharedPtr<FCharacterProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
 {
+	switch (ProxyModifyType)
+	{
+	case EProxyModifyType::kNumChanged:
+		{
+		}
+		break;
+	default:
+		{
+			return;
+		};
+	}
+
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
 	{
@@ -120,7 +377,7 @@ void UGetItemInfosList::OnGourpmateProxyChanged(const TSharedPtr<FCharacterProxy
 		if (ChildNum >= MaxDisplayNum)
 		{
 			OrderAry.Add(ProxyPtr);
-			CharacterPendingAry.Add({ProxyPtr, bIsAdd});
+			CharacterPendingAry.Add({ProxyPtr, ProxyModifyType});
 		}
 		else
 		{
@@ -128,7 +385,7 @@ void UGetItemInfosList::OnGourpmateProxyChanged(const TSharedPtr<FCharacterProxy
 			if (WidgetPtr)
 			{
 				WidgetPtr->OnFinished.BindUObject(this, &ThisClass::OnRemovedItem);
-				WidgetPtr->ResetToolUIByData(ProxyPtr, bIsAdd);
+				WidgetPtr->ResetToolUIByData(ProxyPtr, ProxyModifyType);
 
 				UIPtr->AddChild(WidgetPtr);
 			}
@@ -156,13 +413,15 @@ void UGetItemInfosList::OnRemovedItem()
 		{
 			if (OrderAry[Index] == CoinPendingAry[SecondIndex].Get<0>())
 			{
-				OnCoinProxyChanged(CoinPendingAry[
-					                  SecondIndex].Get<0>().Pin(), CoinPendingAry[SecondIndex].Get<1>(),
-				                  CoinPendingAry[SecondIndex].Get<2>()
-				);
+				OnCoinProxyChanged(
+				                   CoinPendingAry[
+					                   SecondIndex].Get<0>().Pin(),
+				                   CoinPendingAry[SecondIndex].Get<1>(),
+				                   CoinPendingAry[SecondIndex].Get<2>()
+				                  );
 
 				OrderAry.RemoveAt(Index);
-				SkillPendingAry.RemoveAt(SecondIndex);
+				CoinPendingAry.RemoveAt(SecondIndex);
 				return;
 			}
 		}
@@ -171,8 +430,10 @@ void UGetItemInfosList::OnRemovedItem()
 		{
 			if (OrderAry[Index] == ConsumablePendingAry[SecondIndex].Get<0>())
 			{
-				OnConsumableProxyChanged(ConsumablePendingAry[SecondIndex].Get<0>().Pin(),
-				                        ConsumablePendingAry[SecondIndex].Get<1>());
+				OnConsumableProxyChanged(
+				                         ConsumablePendingAry[SecondIndex].Get<0>().Pin(),
+				                         ConsumablePendingAry[SecondIndex].Get<1>()
+				                        );
 
 				OrderAry.RemoveAt(Index);
 				ConsumablePendingAry.RemoveAt(SecondIndex);
@@ -184,8 +445,10 @@ void UGetItemInfosList::OnRemovedItem()
 		{
 			if (OrderAry[Index] == CharacterPendingAry[SecondIndex].Get<0>())
 			{
-				OnGourpmateProxyChanged(CharacterPendingAry[SecondIndex].Get<0>().Pin(),
-				                       CharacterPendingAry[SecondIndex].Get<1>());
+				OnGourpmateProxyChanged(
+				                        CharacterPendingAry[SecondIndex].Get<0>().Pin(),
+				                        CharacterPendingAry[SecondIndex].Get<1>()
+				                       );
 
 				OrderAry.RemoveAt(Index);
 				CharacterPendingAry.RemoveAt(SecondIndex);

@@ -12,24 +12,25 @@
 #include "GameFramework/Controller.h"
 #include <Engine/OverlapResult.h>
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
 #include "AS_Character.h"
 #include "Weapon_PickAxe.h"
-#include "PlanetControllerInterface.h"
-#include "TeamMatesHelperComponent.h"
+#include "Tools.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "HumanCharacter.h"
 #include "CharacterAbilitySystemComponent.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "ItemProxy_Character.h"
+#include "TeamMatesHelperComponent.h"
 
 namespace Skill_GroupTherapy
 {
@@ -118,14 +119,14 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 	FCollisionQueryParams CapsuleParams;
 
 	TSet<ACharacterBase*>TeammatesSet;
-	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupSharedInfo();
+	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupManagger();
 	if (GroupMnaggerComponent)
 	{
 		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamMatesHelperComponent();
 		if (TeamsHelperSPtr)
 		{
-			TeammatesSet.Add(TeamsHelperSPtr->OwnerCharacterProxyPtr->GetCharacterActor().Get());
-			for (auto Iter : TeamsHelperSPtr->MembersSet)
+			TeammatesSet.Add(TeamsHelperSPtr->GetOwnerCharacterProxy()->GetCharacterActor().Get());
+			for (auto Iter : TeamsHelperSPtr->GetMembersSet())
 			{
 				TeammatesSet.Add(Iter->GetCharacterActor().Get());
 			}
@@ -143,30 +144,6 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 		CapsuleParams
 	))
 	{
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-		for (auto Iter : OutOverlaps)
-		{
-			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-			if (TargetCharacterPtr)
-			{
-				auto CharacterIter = TeammatesSet.Find(TargetCharacterPtr);
-				if (CharacterIter)
-				{
-					FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-					GAEventData.DataModify.Add(ECharacterPropertyType::HP, TreatmentVolume);
-
-					GAEventDataPtr->DataAry.Add(GAEventData);
-
-				}
-			}
-		}
-
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

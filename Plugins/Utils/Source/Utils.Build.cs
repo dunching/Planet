@@ -24,7 +24,6 @@ public class Utils : ModuleRules
 				
 		PrivateIncludePaths.AddRange(
 			new string[] {
-                   Path.Combine(PluginDirectory, "Source/Command"),
             }
 			);
 

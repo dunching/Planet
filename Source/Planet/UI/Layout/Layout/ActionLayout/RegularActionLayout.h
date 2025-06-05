@@ -6,11 +6,17 @@
 
 #include "GameFramework/HUD.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include "LayoutInterfacetion.h"
+#include "TemplateHelper.h"
 
 #include "RegularActionLayout.generated.h"
 
+struct FOnAttributeChangeData;
+struct FOnEffectedTargetCallback;
+
+class AGuideThread;
+class AGuideThreadBase;
 class UMainUILayout;
 class URaffleMenu;
 class UPawnStateActionHUD;
@@ -34,83 +40,114 @@ class AHorseCharacter;
 class AGeneratorNPC;
 class UFocusTitle;
 class ACharacterBase;
+class UUpgradePromt;
 
 /**
  *
  */
 UCLASS()
 class PLANET_API URegularActionLayout :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public ILayoutInterfacetion
 {
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
 
-	virtual void NativeConstruct()override;
+	virtual void NativeDestruct() override;
 
-	virtual void Enable()override;
+	virtual void Enable() override;
+
+	virtual void DisEnable() override;
+
+	virtual ELayoutCommon GetLayoutType() const override final;
+
+private:
+	void OnStartGuide(
+		AGuideThreadBase* GuideThread
+		);
+
+	void OnStopGuide(
+		AGuideThreadBase* GuideThread
+		);
+
+	UFUNCTION()
+	void OnQuitChallengeBtnClicked();
+
+	// 锁定目标时,上方显示的状态栏
+	void OnFocusCharacter(
+		ACharacterBase* TargetCharacterPtr
+		);
+
+	// 出战队员列表
+	void DisplayTeamInfo(
+		bool bIsDisplay,
+		AHumanCharacter* HumanCharacterPtr = nullptr
+		);
+
+	// 效果栏（buff、debuff）
+	UEffectsList* InitialEffectsList(bool bIsDisplay);
+
+	// 进度条/工具
+	UProgressTips* ViewProgressTips(
+		bool bIsViewMenus
+		);
+
+	void OnHPChanged(
+		const FOnAttributeChangeData&
 	
-	virtual void DisEnable()override;
+		);
+
+	void OnFocusDestruct(
+		UUserWidget* UIPtr
+		);
+
+protected:
+	void OnEffectOhterCharacter(
+		const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
+		);
 
 #pragma region MenusUI
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UBackpackMenu>BackpackMenuClass;
+	TSubclassOf<UCharacterRisingTips>FightingTipsClass;
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UPawnStateActionHUD>PawnStateActionHUDClass;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUpgradePromt>UpgradePromtClass;
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UPawnStateConsumablesHUD>PawnStateConsumablesHUDClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UPawnStateBuildingHUD>PawnStateBuildingHUDClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UEffectsList>EffectsListClass;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UProgressTips>ProgressTipsClass;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UFocusTitle>FocusTitleClass;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UHUD_TeamInfo>HUD_TeamInfoClass;
 #pragma endregion MenusUI
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName PawnBuildingStateHUDSocket;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName GroupMatesManaggerSocket;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName TalentAllocationSocket;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName EffectsListSocket;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName ProgressTipsSocket;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName HUD_TeamSocket;
-
-protected:
-
-	// 锁定目标时,上方显示的状态栏
-	void OnFocusCharacter(ACharacterBase* TargetCharacterPtr);
-
-	// 出战队员列表
-	void DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr = nullptr);
-
-	// 效果栏（buff、debuff）
-	UEffectsList* InitialEffectsList();
-
-	// 进度条/工具
-	UProgressTips* ViewProgressTips(bool bIsViewMenus);
-
+	
+	UPROPERTY(Transient)
 	UFocusIcon* FocusIconPtr = nullptr;
 
+	TObjectPtr<ACharacterBase> PreviousTargetCharacterPtr = nullptr;
+
+	FDelegateHandle StartGuideDelegateHandle;
+
+	FDelegateHandle StopGuideDelegateHandle;
+
+	FDelegateHandle Max_HPChangedDelegateHandle;
+
+	FDelegateHandle HPChangedDelegateHandle;
+
+	TCallbackHandleContainer<void(
+		ACharacterBase*
+	
+		)>::FCallbackHandleSPtr FocusCharacterDelegateSPtr;
+
+	TCallbackHandleContainer<void(
+		const FOnEffectedTargetCallback&
+		)>::FCallbackHandleSPtr EffectOhterCharacterCallbackDelegate;
+
+	TCallbackHandleContainer<void(
+		const FOnEffectedTargetCallback&
+		)>::FCallbackHandleSPtr ReceivedOhterCharacterCallbackDelegate;
+
+private:
+	
+	TOnValueChangedCallbackContainer<uint8>::FCallbackHandleSPtr LevelChangedDelegateHandle;
+	
+	void OnLevelChanged(
+		int32 Level
+		);
 };

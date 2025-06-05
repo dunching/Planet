@@ -19,8 +19,7 @@
 
 #include "GameMode_Main.h"
 #include "PlanetPlayerState.h"
-#include "GenerateType.h"
-#include "Command/TestCommand.h"
+#include "GenerateTypes.h"
 #include "HumanInteractionWithNPC.h"
 #include "HorseViewBackpackProcessor.h"
 #include "HumanRegularProcessor.h"
@@ -38,7 +37,7 @@
 #include "ProxyProcessComponent.h"
 #include "InventoryComponent.h"
 #include "InputActions.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "PlanetPlayerController.h"
 #include "HumanCharacter.h"
 #include "BasicFutures_Mount.h"
@@ -118,7 +117,6 @@ void AHorseCharacter::HasbeenInteracted(ACharacterBase* CharacterPtr)
 
 		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
 
-		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(CharacterPtr, UGameplayTagsLibrary::Mount, Payload);
 	}
 }
 

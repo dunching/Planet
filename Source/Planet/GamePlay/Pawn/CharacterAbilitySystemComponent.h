@@ -7,24 +7,32 @@
 #include "AbilitySystemComponent.h"
 #include "Components/ActorComponent.h"
 
-#include "ProxyProcessComponent.h"
-#include "GAEvent_Helper.h"
-#include "GroupSharedInterface.h"
+#include "GroupManaggerInterface.h"
 #include "PlanetAbilitySystemComponent.h"
+#include "DataModifyInterface.h"
+#include "BaseData.h"
+#include "GameplayEffectDataModifyInterface.h"
+#include "GenerateTypes.h"
 
 #include "CharacterAbilitySystemComponent.generated.h"
 
 struct FGameplayAttributeData;
 
+class ATornado;
+class ATractionPoint;
 class UGAEvent_Received;
 struct FConsumableProxy;
 class UCS_PeriodicPropertyModify;
 class UCS_RootMotion;
 class UCS_Base;
 class UCS_RootMotion_KnockDown;
-class USkill_Element_Gold;
+class USkill_Element_Metal;
 class UBasicFuturesBase;
+class ACharacterBase;
 class UAbilitySystemComponent;
+class IOutputDataModifyInterface;
+class IInputDataModifyInterface;
+class IOutputDataModifyInterface;
 
 struct FGameplayEventData;
 struct FGameplayAbilityTargetData_CS_Base;
@@ -36,14 +44,15 @@ struct FGameplayAbilityTargetData_TagModify;
 struct FGameplayAbilityTargetData;
 struct FGameplayEffectCustomExecutionParameters;
 struct FGameplayEffectCustomExecutionOutput;
-struct FReceivedEventModifyDataCallback;
+struct FOnEffectedTargetCallback;
 
 TMap<ECharacterPropertyType, FBaseProperty> GetAllData();
 
 UCLASS()
 class PLANET_API UCharacterAbilitySystemComponent :
 	public UPlanetAbilitySystemComponent,
-	public IGroupSharedInterface
+	public IGroupManaggerInterface,
+	public IGameplayEffectDataModifyInterface
 {
 	GENERATED_BODY()
 
@@ -52,15 +61,24 @@ public:
 
 	using FOwnerPawnType = ACharacterBase;
 
-	using FCharacterStateChanged = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
+	using FCharacterStateChanged = TCallbackHandleContainer<void(
+		ECharacterStateType,
+		UCS_Base*
+	
+		)>;
 
-	using FMakedDamageDelegate_Deprecated = TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>;
+	using FMakedDamageDelegate = TCallbackHandleContainer<void(
+		const FOnEffectedTargetCallback&
+	
+		)>;
 
-	using FMakedDamageDelegate = TCallbackHandleContainer<void(const FReceivedEventModifyDataCallback&)>;
+	UCharacterAbilitySystemComponent(
+		const FObjectInitializer& ObjectInitializer
+		);
 
-	UCharacterAbilitySystemComponent(const FObjectInitializer& ObjectInitializer);
+	virtual void BeginPlay() override;
 
-	virtual void BeginPlay()override;
+	bool IsCantBeDamage() const;
 
 	bool IsInDeath() const;
 
@@ -72,110 +90,121 @@ public:
 
 	bool IsInFighting() const;
 
-	void OnSendEventModifyData(FGameplayAbilityTargetData_GASendEvent& OutGAEventData);
-
-	void OnSendEventModifyData(
-		UAbilitySystemComponent*AbilitySystemComponentPtr,
-		FGameplayEffectSpecHandle GameplayEffectSpecHandle
-	);
-
-	void OnReceivedEventModifyData(
-		const TMap<FGameplayTag, float>& CustomMagnitudes,
-		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-	);
-
-	void AddSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr);
-
-	void RemoveSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr);
-
-	void AddReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr);
-
-	void RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr);
-
-	void ClearData2Other(
-		const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
-		const FGameplayTag& DataSource
-	);
-
-	void ClearData2Self(
-		const TMap<ECharacterPropertyType, FBaseProperty>& ModifyPropertyMap,
-		const FGameplayTag& DataSource
-	);
-
-	void SendEvent2Other(
-		const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
-		const FGameplayTag& DataSource
-	);
-
-	// 增加
-	void SendEvent2Self(
-		const TMap<ECharacterPropertyType, FBaseProperty>& ModifyPropertyMap,
-		const FGameplayTag& DataSource
-	);
-
-	/*
-		一次性的伤害结算
-	*/
-	void SendEventImp(
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr
-	);
-
-	/*
-		周期类的标签
-	*/
-	void SendEventImp(
-		FGameplayAbilityTargetData_TagModify* GameplayAbilityTargetDataPtr
-	);
-
-	/*
-		周期类的跟运动修改
-	*/
-	void SendEventImp(
-		FGameplayAbilityTargetData_RootMotion* GameplayAbilityTargetDataPtr
-	);
-
-	/*
-		周期类的状态修改
-	*/
-	void SendEventImp(
-		FGameplayAbilityTargetData_StateModify* GameplayAbilityTargetDataPtr
-	);
-
-	/*
-		周期类的属性修改
-	*/
-	void SendEventImp(
-		FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr
-	);
-
 	void InitialBaseGAs();
 
+#pragma region 输入和输出得修正
+
+	virtual void ApplyInputData(
+		const FGameplayTagContainer & AllAssetTags,
+		TSet<FGameplayTag>& NeedModifySet,
+		const TMap<FGameplayTag, float>& CustomMagnitudes,
+		const TSet<EAdditionalModify>& AdditionalModifyAry,
+		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
+		) override;
+
+#pragma endregion
+
+#pragma region 基础GA
+
 	UFUNCTION(Server, Reliable)
-	void SwitchWalkState(bool bIsRun);
+	void SwitchWalkState(
+		bool bIsRun
+		);
 
 	// 冲刺/闪避
 	UFUNCTION(Server, Reliable)
-	void Dash(EDashDirection DashDirection);
+	void Dash(
+		EDashDirection DashDirection
+		);
 
 	// 
 	UFUNCTION(Server, Reliable)
 	void Jump();
 
-	void SwitchCantBeSelect(bool bIsCanBeSelect);
+	/**
+	 * 切换武器
+	 */
+	UFUNCTION(Server, Reliable)
+	void SwitchWeapon();
 
+	/**
+	 * 被击飞
+	 * @param Height 
+	 * Only Server
+	 */
+	UFUNCTION(Server, Reliable)
+	void HasBeenFlayAway(
+		int32 Height
+		);
+
+	/**
+	 * 被击飞
+	 * Only Server Invoke
+	 */
+	void HasbeenTornodo(
+		const TWeakObjectPtr<ATornado>& TornadoPtr
+		);
+
+	/**
+	 * 被牵引
+	 * Only Server Invoke
+	 */
+	void HasbeenTraction(
+		const TWeakObjectPtr<ATractionPoint>& TractionPointPtr
+		);
+
+	/**
+	 * 被压制
+	 * Only Server Invoke
+	 */
+	void HasbeenSuppress(
+		const TWeakObjectPtr<ACharacterBase>& InstigatorPtr,
+		const TSoftObjectPtr<UAnimMontage>& Montage,
+		float Duration
+		);
+
+	/**
+	 * 受击
+	 * Only Server Invoke
+	 */
+	void HasbeenAttacked(
+		const TWeakObjectPtr<ACharacterBase>& InstigatorPtr,
+		FVector RepelDirection
+		);
+
+	/**
+	 * 被击退
+	 * Only Server Invoke
+	 */
+	void HasBeenRepel(
+		const TWeakObjectPtr<ACharacterBase>& InstigatorPtr,
+		FVector RepelDirection,
+		int32 RepelDistance
+		);
+
+	void SwitchCantBeSelect(
+		bool bIsCanBeSelect
+		);
+
+	/**
+	 * 是否进入隐身状态
+	 * @param bIsInvisible 
+	 */
+	void SwitchInvisible(
+		bool bIsInvisible
+		);
+
+	UFUNCTION(Server, Reliable)
 	void Respawn();
 
 	// 移动至攻击范围内
 	void MoveToAttackDistance(
 		FGameplayAbilityTargetData_MoveToAttaclArea* MoveToAttaclAreaPtr
-	);
+		);
 
 	// 取消 移动至攻击范围内
 	void BreakMoveToAttackDistance();
-
-	// “受击”效果
-	void ExcuteAttackedEffect(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
 
 	// FGameplayAbilitySpecHandle SendEventHandle;
 	//
@@ -185,10 +214,27 @@ public:
 
 	// 对“其他”角色造成的影响（伤害、控制）
 	FMakedDamageDelegate MakedDamageDelegate;
-
-protected:
 	
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+	// 收到“其他”角色造成的影响（伤害、控制）
+	FMakedDamageDelegate ReceivedDamageDelegate;
+#pragma endregion
+
+public:
+	// 对“其他”角色造成的影响（伤害、控制）
+	UFUNCTION(NetMulticast, Reliable)
+	void OnEffectOhterCharacter(
+		const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
+		);
+	
+	// 收到“其他”角色造成的影响（伤害、控制）
+	UFUNCTION(NetMulticast, Reliable)
+	void OnReceivedOhterCharacter(
+		const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
+		);
+
+	virtual void OnGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
 
 	void OnGEAppliedDelegateToTarget(
 		UAbilitySystemComponent*,
@@ -202,16 +248,23 @@ protected:
 		FActiveGameplayEffectHandle
 		);
 
-	void AddSendBaseModify();
-
 	void AddReceivedBaseModify();
 
 	EAffectedDirection GetAffectedDirection(
 		ACharacterBase* TargetCharacterPtr,
 		ACharacterBase* TriggerCharacterPtr
-	);
+		);
 
-	void UpdateMap(
+	/**
+	 * 更新数据组成
+	 * @param Tag 仅为 DataSource_Character
+	 * @param Value 
+	 * @param MinValue 仅GEData_ModifyType_BaseValue_Addtive、GEData_ModifyType_Immediate_Override 生效
+	 * @param MaxValue 仅GEData_ModifyType_BaseValue_Addtive、GEData_ModifyType_Immediate_Override 生效
+	 * @param Spec 
+	 * @param GameplayAttributeDataPtr 
+	 */
+	void UpdateMapBaseValue(
 		const FGameplayTag& Tag,
 		float Value,
 		int32 MinValue,
@@ -220,25 +273,34 @@ protected:
 		const FGameplayAttributeData* GameplayAttributeDataPtr
 		);
 
-	float GetMapValue(
+	void UpdateMapTemporary(
+		const FGameplayTag& Tag,
+		float Value,
 		const FGameplayEffectSpec& Spec,
 		const FGameplayAttributeData* GameplayAttributeDataPtr
-	) const;
+		);
 
-#pragma region GAs
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	/**
+	 * 更新数据组成
+	 * @param Value 该属性之后的值
+	 * @param AllAssetTags 
+	 * @param GameplayAttributeDataPtr 
+	 */
+	void UpdateMapTemporary(
+		const FGameplayTag& ModifyTypeTag,
+		float Value,
+		const FGameplayAttributeData* GameplayAttributeDataPtr
+		);
+
+#pragma region 基础GA
+	/**
+	 * 基础GA
+	 */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities", meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<UBasicFuturesBase>> CharacterAbilitiesAry;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills")
-	TSubclassOf<USkill_Element_Gold> Skill_Element_GoldClass;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<USkill_Element_Metal> Skill_Element_GoldClass;
 #pragma endregion GAs
 
-	// 从小到大
-	std::multiset<TSharedPtr<IGAEventModifySendInterface>, FGAEventModify_key_compare> SendEventModifysMap;
-
-	std::multiset<TSharedPtr<IGAEventModifyReceivedInterface>, FGAEventModify_key_compare> ReceivedEventModifysMap;
-
-	// GameplayAttributeData的组成
-	TMap<const FGameplayAttributeData*, TMap<FGameplayTag, float>> ValueMap;
-	
 };

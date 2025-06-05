@@ -9,7 +9,7 @@
 #include "StateTreeTaskBase.h"
 #include "StateTreeExecutionContext.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "STT_MoveByFormation.generated.h"
 
@@ -22,6 +22,7 @@ struct FAIMoveRequest;
 
 class UAITask_MoveBySpline;
 class AHumanCharacter;
+class AHumanCharacter_AI;
 class AHumanAIController;
 
 USTRUCT()
@@ -30,7 +31,7 @@ struct PLANET_API FStateTreeMoveByFormationTaskInstanceData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter> CharacterPtr = nullptr;
+	TObjectPtr<AHumanCharacter_AI> CharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
@@ -104,7 +105,7 @@ struct PLANET_API FSTT_MoveByFormation : public FStateTreeAIActionTaskBase
 		const float DeltaTime
 	) const override;
 
-	virtual EStateTreeRunStatus PerformMoveTask(
+	virtual EStateTreeRunStatus PerformGameplayTask(
 		FStateTreeExecutionContext& Context, 
 		AAIController& Controller
 	) const;

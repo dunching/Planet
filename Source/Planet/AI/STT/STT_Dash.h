@@ -8,7 +8,7 @@
 #include "StateTreeExecutionContext.h"
 #include "Tasks/StateTreeAITask.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "STT_Dash.generated.h"
 
@@ -69,6 +69,6 @@ struct PLANET_API FSTT_Dash : public FStateTreeAIActionTaskBase
 		const float DeltaTime
 	) const override;
 
-	virtual FAITaskType* PerformMoveTask(FStateTreeExecutionContext& Context) const;
+	virtual FAITaskType* PerformGameplayTask(FStateTreeExecutionContext& Context) const;
 
 };

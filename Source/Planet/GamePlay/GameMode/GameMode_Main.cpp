@@ -11,7 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "ArticleBase.h"
 #include "CollisionDataStruct.h"
 #include "SaveGame/ShiYuSaveGame.h"

@@ -16,8 +16,7 @@
 
 
 #include "GameMode_Main.h"
-#include "GenerateType.h"
-#include "Command/TestCommand.h"
+#include "GenerateTypes.h"
 #include "HumanInteractionWithNPC.h"
 #include "HumanViewBackpackProcessor.h"
 #include "HumanRegularProcessor.h"
@@ -34,38 +33,30 @@
 #include "ProxyProcessComponent.h"
 #include "InventoryComponent.h"
 #include "InputActions.h"
-#include "InputProcessorSubSystem.h"
+#include "InputProcessorSubSystemBase.h"
 #include "HorseProcessor.h"
 #include "HumanProcessor.h"
 #include "PlanetPlayerController.h"
 #include "PlanetPlayerState.h"
 #include "HumanAIController.h"
 #include "CharacterTitle.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "ItemProxy_Minimal.h"
 #include "GetItemInfosList.h"
 
 #include "ItemProxy_Container.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "SceneActorInteractionComponent.h"
 
 AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	SceneActorInteractionComponentPtr = CreateDefaultSubobject<USceneActorInteractionComponent>(USceneActorInteractionComponent::ComponentName);
-}
-
-USceneActorInteractionComponent* AHumanCharacter::GetSceneActorInteractionComponent() const
-{
-	return SceneActorInteractionComponentPtr;
 }
 
 void AHumanCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	HasBeenEndedLookAt();
-	
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
@@ -106,26 +97,5 @@ void AHumanCharacter::PossessedBy(AController* NewController)
 
 void AHumanCharacter::UnPossessed()
 {
-	if (TeamMembersChangedDelegateHandle)
-	{
-		TeamMembersChangedDelegateHandle->UnBindCallback();
-	}
-
 	Super::UnPossessed();
-}
-
-void AHumanCharacter::HasbeenInteracted(ACharacterBase* CharacterPtr)
-{
-}
-
-void AHumanCharacter::HasBeenLookingAt(ACharacterBase* CharacterPtr)
-{
-}
-
-void AHumanCharacter::HasBeenStartedLookAt(ACharacterBase* CharacterPtr)
-{
-}
-
-void AHumanCharacter::HasBeenEndedLookAt()
-{
 }

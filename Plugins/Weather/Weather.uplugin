@@ -4,6 +4,7 @@
 	"VersionName": "1",
 	"FriendlyName": "Weather",
 	"Category": "Other",
+	"CreatedBy": "武侯笑笑生",
 	"CanContainContent": true,
 	"Modules": [
 		{

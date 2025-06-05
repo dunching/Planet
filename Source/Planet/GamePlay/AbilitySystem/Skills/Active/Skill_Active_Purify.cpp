@@ -16,21 +16,18 @@
 #include "KismetCollisionHelper.h"
 #include "KismetGravityLibrary.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "CS_RootMotion.h"
-#include "CS_RootMotion_FlyAway.h"
-#include "CS_PeriodicStateModify_Purify.h"
 
 USkill_Active_Purify::USkill_Active_Purify() :
 	Super()
@@ -108,14 +105,6 @@ void USkill_Active_Purify::ExcuteTasks()
 {
 	if (CharacterPtr)
 	{
-		auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Purify;
-
-		GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-		GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = CharacterPtr;
-
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-
-		ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 	}
 }
 

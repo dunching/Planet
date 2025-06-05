@@ -4,41 +4,31 @@
 
 #include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
+#include "Components/WidgetComponent.h"
 
-#include "ReceivedEventModifyDataCallback.h"
-#include "MyUserWidget.h"
-#include "GenerateType.h"
-#include "GroupSharedInterface.h"
-#include "TaskNode.h"
+#include "OnEffectedTargetCallback.h"
+#include "UserWidget_Override.h"
+#include "GenerateTypes.h"
+#include "GroupManaggerInterface.h"
+
 
 #include "CharacterTitleComponent.generated.h"
 
 class UPAD_TaskNode_Preset_Conversation;
 class UConversationBorder;
+class UCharacterTitle;
 class ACharacterBase;
-class AGroupSharedInfo;
+class AGroupManagger;
 
-UCLASS()
-class PLANET_API UCharacterTitleBox :
-	public UMyUserWidget
-{
-	GENERATED_BODY()
-
-public:
-	virtual void NativePreConstruct() override;
-
-	virtual void NativeConstruct() override;
-
-	ACharacterBase* CharacterPtr = nullptr;
-};
+struct FTaskNode_Conversation_SentenceInfo;
 
 /*
  * 角色的抬头UI，如血条
  */
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UCharacterTitleComponent :
-	public UActorComponent,
-	public IGroupSharedInterface
+	public UWidgetComponent,
+	public IGroupManaggerInterface
 {
 	GENERATED_BODY()
 
@@ -56,14 +46,14 @@ public:
 		enum ELevelTick TickType,
 		FActorComponentTickFunction* ThisTickFunction
 	) override;
-	
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)override;
+
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
 	void SetCampType(ECharacterCampType CharacterCampType);
 
 	virtual void DisplaySentence(
-		const FTaskNode_Conversation_SentenceInfo&Sentence
-		);
+		const FTaskNode_Conversation_SentenceInfo& Sentence
+	);
 
 	void CloseConversationborder();
 
@@ -76,15 +66,8 @@ protected:
 	float HalfHeight = 0.f;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UCharacterTitleBox> CharacterTitleBoxClass;
+	TSubclassOf<UCharacterTitle> CharacterTitleClass;
 
 	UPROPERTY(Transient)
-	UCharacterTitleBox* CharacterTitleBoxPtr = nullptr;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UConversationBorder> ConversationBorderClass;
-
-	UPROPERTY(Transient)
-	UConversationBorder* ConversationBorderPtr = nullptr;
-
+	UCharacterTitle* CharacterTitlePtr = nullptr;
 };

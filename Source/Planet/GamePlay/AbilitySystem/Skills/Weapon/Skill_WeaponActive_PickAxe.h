@@ -12,6 +12,31 @@ class UAnimMontage;
 class AWeapon_PickAxe;
 class ACharacterBase;
 class UAbilityTask_PlayMontage;
+class UItemProxy_Description_WeaponSkill;
+
+USTRUCT()
+struct PLANET_API FGameplayAbilityTargetData_Axe_RegisterParam :
+	public FGameplayAbilityTargetData_RegisterParam_SkillBase
+{
+	GENERATED_USTRUCT_BODY()
+
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+
+	virtual FGameplayAbilityTargetData_Axe_RegisterParam* Clone()const override;
+
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Axe_RegisterParam> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_Axe_RegisterParam>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
+};
 
 UCLASS()
 class PLANET_API USkill_WeaponActive_PickAxe : public USkill_WeaponActive_Base
@@ -20,6 +45,12 @@ class PLANET_API USkill_WeaponActive_PickAxe : public USkill_WeaponActive_Base
 
 public:
 
+	using FRegisterParamType = FGameplayAbilityTargetData_Axe_RegisterParam;
+
+	using FWeaponActorType = AWeapon_PickAxe;
+
+	using FItemProxy_DescriptionType = UItemProxy_Description_WeaponSkill;
+	
 	USkill_WeaponActive_PickAxe();
 
 	virtual void OnAvatarSet(
@@ -27,20 +58,21 @@ public:
 		const FGameplayAbilitySpec& Spec
 	) override;
 
+	virtual bool CanActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayTagContainer* SourceTags = nullptr,
+		const FGameplayTagContainer* TargetTags = nullptr,
+		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
+	) const override;
+
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
-	);
-
-	virtual void ActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData
-	);
+	) override;
 
 	virtual void OnRemoveAbility(
 		const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
@@ -79,14 +111,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Distance = 100.f;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	int32 Damage = 10;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	float AD_Damage_Magnification = .5f;
-
-	AWeapon_PickAxe* EquipmentAxePtr = nullptr;
+	FWeaponActorType* WeaponActorPtr = nullptr;
 
 	int32 MontageNum = 0;
+
+private:
+	
+	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
 
 };

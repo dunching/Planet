@@ -1,27 +1,87 @@
-
 #include "PlanetWorldSettings.h"
 
+#include "Subsystems/SubsystemBlueprintLibrary.h"
+
 #include "AssetRefMap.h"
-#include "StateTagExtendInfo.h"
-#include "SceneProxyExtendInfo.h"
-#include "GameOptions.h"
+#include "RewardsTD.h"
+#include "DataTableCollection.h"
+#include "GuideSubSystem.h"
+#include "GuideSubSystem_Imp.h"
+#include "ModifyItemProxyStrategy.h"
+#include "InputProcessorSubSystem_Imp.h"
 
-UAssetRefMap* APlanetWorldSettings::GetAssetRefMapInstance()
+void APlanetWorldSettings::PostInitializeComponents()
 {
-	return AssetRefMapClass.LoadSynchronous();
+	Super::PostInitializeComponents();
+
+	InitialModifyItemProxyStrategies();
 }
 
-USceneProxyExtendInfoMap* APlanetWorldSettings::GetSceneProxyExtendInfoMap()
+void APlanetWorldSettings::BeginPlay()
 {
-	return SceneProxyExtendInfoMapPtrClass.LoadSynchronous();
+	Super::BeginPlay();
 }
 
-UGameOptions* APlanetWorldSettings::GetGameOptions()
+UPAD_RewardsItems* APlanetWorldSettings::GetTableRow_RewardsTD() const
 {
-	if (!GameOptionsPtr)
+	return TableRow_RewardsTDRef.LoadSynchronous();
+}
+
+UAssetRefMap* APlanetWorldSettings::GetAssetRefMapInstance() const
+{
+	return AssetRefMapRef.LoadSynchronous();
+}
+
+UDataTableCollection* APlanetWorldSettings::GetSceneProxyExtendInfoMap() const
+{
+	return SceneProxyExtendInfoMapPtr.LoadSynchronous();
+}
+
+UGuideSubSystem* APlanetWorldSettings::GetGuideSubSystem() const
+{
+	return Cast<UGuideSubSystem_Imp>(
+								 USubsystemBlueprintLibrary::GetWorldSubsystem(
+																			   GetWorldImp(),
+																			   UGuideSubSystem_Imp::StaticClass()
+																			  )
+								);
+}
+
+const UPAD_ItemProxyCollection* APlanetWorldSettings::GetItemProxyCollection() const
+{
+	return PAD_ItemProxyCollectionRef.LoadSynchronous();
+}
+
+void APlanetWorldSettings::InitialModifyItemProxyStrategies()
+{
+	//
+	ModifyItemProxyStrategiesMap.Empty();
 	{
-		GameOptionsPtr = NewObject<UGameOptions>(GetWorld(), GameOptionsClass);
+		auto ModifyItemProxyStrategySPtr = MakeShared<FModifyItemProxyStrategy_Character>();
+		ModifyItemProxyStrategiesMap.Add(ModifyItemProxyStrategySPtr->GetCanOperationType(), ModifyItemProxyStrategySPtr);
 	}
-
-	return GameOptionsPtr;
+	{
+		auto ModifyItemProxyStrategySPtr = MakeShared<FModifyItemProxyStrategy_Weapon>();
+		ModifyItemProxyStrategiesMap.Add(ModifyItemProxyStrategySPtr->GetCanOperationType(), ModifyItemProxyStrategySPtr);
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = MakeShared<FModifyItemProxyStrategy_WeaponSkill>();
+		ModifyItemProxyStrategiesMap.Add(ModifyItemProxyStrategySPtr->GetCanOperationType(), ModifyItemProxyStrategySPtr);
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = MakeShared<FModifyItemProxyStrategy_ActiveSkill>();
+		ModifyItemProxyStrategiesMap.Add(ModifyItemProxyStrategySPtr->GetCanOperationType(), ModifyItemProxyStrategySPtr);
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = MakeShared<FModifyItemProxyStrategy_PassveSkill>();
+		ModifyItemProxyStrategiesMap.Add(ModifyItemProxyStrategySPtr->GetCanOperationType(), ModifyItemProxyStrategySPtr);
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = MakeShared<FModifyItemProxyStrategy_Coin>();
+		ModifyItemProxyStrategiesMap.Add(ModifyItemProxyStrategySPtr->GetCanOperationType(), ModifyItemProxyStrategySPtr);
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = MakeShared<FModifyItemProxyStrategy_Consumable>();
+		ModifyItemProxyStrategiesMap.Add(ModifyItemProxyStrategySPtr->GetCanOperationType(), ModifyItemProxyStrategySPtr);
+	}
 }

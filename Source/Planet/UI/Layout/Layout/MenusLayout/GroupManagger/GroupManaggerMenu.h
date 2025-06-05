@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "MenuInterface.h"
-#include "Common/GenerateType.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 
 #include "GroupManaggerMenu.generated.h"
@@ -17,7 +17,7 @@ struct FSceneObjContainer;
  */
 UCLASS()
 class PLANET_API UGroupManaggerMenu :
-	public UMyUserWidget, 
+	public UUserWidget_Override, 
 	public IMenuInterface
 {
 	GENERATED_BODY()
@@ -30,10 +30,12 @@ public:
 
 protected:
 
-	virtual void ResetUIByData()override;
+	virtual void EnableMenu()override;
 
-	virtual void SyncData()override;
+	virtual void DisEnableMenu()override;
 
+	virtual EMenuType GetMenuType()const override final;
+	
 private:
 
 	void ResetGroupmates();

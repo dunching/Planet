@@ -1,29 +1,42 @@
-// Zowee. All Rights Reserved.
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 #pragma once
 
 #include "CoreMinimal.h"
 
-#include <GenerateType.h>
+#include <GenerateTypes.h>
 
 #include "GameplayTagContainer.h"
 #include "ItemProxy_Minimal.h"
 
 #include "TalentInfo.generated.h"
 
-UCLASS()
-class PLANET_API UPAD_Talent_Property : public UDataAsset
+UENUM(BlueprintType, Blueprintable)
+enum class ETalentType : uint8
 {
-	GENERATED_BODY()
+	kData,
+	kPercent,
+};
+
+USTRUCT(BlueprintType)
+struct PLANET_API FTableRow_TalenSocket : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
 
 public:
 
-	// 每级 给的属性
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
-	TMap<ECharacterPropertyType, int32>AddValueMap;
-	
-	// 每级 给的 属性 结算修正
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
-	TMap<ECharacterPropertyType, float>ModifyValueMap;
-	
+	/**
+	 * 属性Tag
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
+	FGameplayTag ModifyDataTypeTag;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
+	ETalentType TalentType = ETalentType::kData;
+
+	/**
+	 * 
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
+	int32 Value = 1;
 };
  

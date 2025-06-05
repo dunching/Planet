@@ -12,12 +12,15 @@
 #include "GE_CharacterInitail.h"
 #include "CharacterAttibutes.h"
 #include "AS_Character.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "LogWriter.h"
 #include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 
-UCharacterAttributesComponent::UCharacterAttributesComponent(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+UCharacterAttributesComponent::UCharacterAttributesComponent(
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.TickInterval = 1.f;
@@ -31,7 +34,7 @@ void UCharacterAttributesComponent::TickComponent(
 	float DeltaTime,
 	enum ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction
-)
+	)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -39,6 +42,56 @@ void UCharacterAttributesComponent::TickComponent(
 	if (GetNetMode() == NM_DedicatedServer)
 	{
 		// ProcessCharacterAttributes();
+	}
+#endif
+}
+
+void UCharacterAttributesComponent::OnGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+		if (PlayerCharacterPtr )
+		{
+			// TODO. 这里失败时，等待这个值有了再进行一次刷新
+			if (!PlayerCharacterPtr->GetGroupManagger())
+			{
+				return;
+			}
+			
+			if (CharacterCategory.MatchesTag(UGameplayTagsLibrary::Proxy_Character_Player))
+			{
+				// 确认跟当前玩家的关系
+				const auto bIsMember = PlayerCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->IsMember(
+					 CharacterID
+					);
+
+				auto CharacterPtr = GetOwner<FOwnerType>();
+				CharacterPtr->SetCampType(
+				                          bIsMember ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+				                         );
+			}
+			else if (CharacterCategory.MatchesTag(UGameplayTagsLibrary::Proxy_Character_NPC_Functional))
+			{
+				auto CharacterPtr = GetOwner<FOwnerType>();
+				CharacterPtr->SetCampType(ECharacterCampType::kNeutral);
+			}
+			else if (CharacterCategory.MatchesTag(UGameplayTagsLibrary::Proxy_Character_NPC_Assistional))
+			{
+				// 确认跟当前玩家的关系
+				const auto bIsMember = PlayerCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->IsMember(
+					 CharacterID
+					);
+
+				auto CharacterPtr = GetOwner<FOwnerType>();
+				CharacterPtr->SetCampType(
+				                          bIsMember ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+				                         );
+			}
+		}
 	}
 #endif
 }
@@ -65,56 +118,13 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 	}
 
 	if (
-		CharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		CharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::State_Dying) ||
 		CharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 	)
 	{
 	}
 	else
 	{
-		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-
-		const auto DataSource = UGameplayTagsLibrary::DataSource_Regular;
-
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
-			CharacterPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-		GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
-
-		// 基础回复
-		{
-			// GAEventData.DataModify.Add(ECharacterPropertyType::HP, CharacterAttributes.HP_Replay.GetCurrentValue());
-			//
-			// if (
-			// 	CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f
-			// 	)
-			// {
-			// 	GAEventData.DataModify.Add(ECharacterPropertyType::PP, FMath::Max(1, CharacterAttributes.PP_Replay.GetCurrentValue() / 2));
-			// }
-			// else
-			// {
-			// 	GAEventData.DataModify.Add(ECharacterPropertyType::PP, CharacterAttributes.PP_Replay.GetCurrentValue());
-			// }
-			//
-			// if (
-			// 	CharacterPtr->GetCharacterAbilitySystemComponent()->IsInFighting()
-			// 	)
-			// {
-			// }
-			// else
-			// {
-			// 	GAEventData.DataModify.Add(ECharacterPropertyType::Mana, CharacterAttributes.Mana_Replay.GetCurrentValue());
-			// }
-		}
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 
@@ -126,7 +136,9 @@ float UCharacterAttributesComponent::GetRate() const
 	return Rate;
 }
 
-void UCharacterAttributesComponent::SetCharacterID(const FGuid& InCharacterID)
+void UCharacterAttributesComponent::SetCharacterID(
+	const FGuid& InCharacterID
+	)
 {
 	CharacterID = InCharacterID;
 }
@@ -138,11 +150,14 @@ FGuid UCharacterAttributesComponent::GetCharacterID() const
 
 FName UCharacterAttributesComponent::ComponentName = TEXT("CharacterAttributesComponent");
 
-void UCharacterAttributesComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UCharacterAttributesComponent::GetLifetimeReplicatedProps(
+	TArray<FLifetimeProperty>& OutLifetimeProps
+	) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ThisClass, CharacterID, COND_AutonomousOnly);
+	// DOREPLIFETIME_CONDITION(ThisClass, CharacterID, COND_AutonomousOnly);
+	DOREPLIFETIME_CONDITION(ThisClass, CharacterID, COND_InitialOnly);
 
 	//DOREPLIFETIME_CONDITION(ThisClass, CharacterAttributes, COND_SimulatedOnly);
 	// DOREPLIFETIME(ThisClass, CharacterAttributeSetPtr);
@@ -172,11 +187,13 @@ void UCharacterAttributesComponent::BeginPlay()
 				// checkNoEntry();
 			}
 		}
+		
 		// 自动回复
 		{
 			auto SpecHandle = GASPtr->MakeOutgoingSpec(GE_CharacterReplyClass, 1, GASPtr->MakeEffectContext());
 
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::DataSource_Reply);
 
 			const auto GEHandle = GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 			if (!GEHandle.IsValid())
@@ -191,7 +208,8 @@ void UCharacterAttributesComponent::BeginPlay()
 ACharacterBase* UGameplayStatics_Character::GetCharacterByID(
 	const UObject* WorldContextObject,
 	TSubclassOf<ACharacterBase> ActorClass,
-	const FGuid& CharacterID)
+	const FGuid& CharacterID
+	)
 {
 	TArray<AActor*> ActorAry;
 	UGameplayStatics::GetAllActorsOfClass(WorldContextObject, ActorClass, ActorAry);
@@ -211,26 +229,15 @@ ACharacterBase* UGameplayStatics_Character::GetCharacterByID(
 
 void UCharacterAttributesComponent::OnRep_GetCharacterProxyID()
 {
-	PRINTINVOKEINFO();
+	auto CharacterPtr = GetOwner<FOwnerType>();
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
+	CharacterPtr->OnRep_GroupSharedInfoChanged();
 }
 
 void UCharacterAttributesComponent::OnRep_CharacterID()
 {
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-		if (PlayerCharacterPtr)
-		{
-			// 确认跟当前玩家的关系
-			const auto bIsMember = PlayerCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(
-				CharacterID);
-
-			auto CharacterPtr = GetOwner<FOwnerType>();
-			CharacterPtr->SetCampType(
-				bIsMember ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
-			);
-		}
-	}
-#endif
 }

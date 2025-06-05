@@ -1,11 +1,11 @@
-// Copyright 2020 Dan Kestranek.
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 
 #include "BasicFuturesBase.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "BasicFutures_DisMount.generated.h"
 
@@ -53,7 +53,7 @@ public:
 
 protected:
 
-	void PerformAction();
+	void Perform();
 
 	void PlayMontage();
 

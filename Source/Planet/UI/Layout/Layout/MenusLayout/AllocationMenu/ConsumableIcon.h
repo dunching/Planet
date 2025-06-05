@@ -7,7 +7,7 @@
 #include "GameplayTagContainer.h"
 
 #include "UIInterfaces.h"
-#include "Common/GenerateType.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 #include "AllocationIconBase.h"
 
@@ -18,7 +18,7 @@ class UDragDropOperation;
 
 struct FSkillProxy;
 struct FConsumableProxy;
-struct FAllocationbleProxy;
+struct IProxy_Allocationble;
 
 UCLASS()
 class PLANET_API UConsumableIcon : public UAllocationIconBase
@@ -29,7 +29,7 @@ public:
 
 	UConsumableIcon(const FObjectInitializer& ObjectInitializer);
 	
-	virtual void ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& BasicProxyPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 

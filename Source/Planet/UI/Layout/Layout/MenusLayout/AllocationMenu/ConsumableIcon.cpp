@@ -31,7 +31,7 @@
 
 struct FConsumableIcon : public TStructVariable<FConsumableIcon>
 {
-	const FName Content = TEXT("Content");
+	const FName ProxyIcon = TEXT("ProxyIcon");
 
 	const FName Enable = TEXT("Enable");
 
@@ -44,7 +44,7 @@ UConsumableIcon::UConsumableIcon(const FObjectInitializer& ObjectInitializer) :
 
 }
 
-void UConsumableIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
+void UConsumableIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
 {
 	Super::ResetToolUIByData(InBasicProxyPtr);
 

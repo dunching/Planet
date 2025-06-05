@@ -4,6 +4,7 @@
 	"VersionName": "1",
 	"FriendlyName": "Gravity",
 	"Category": "Other",
+	"CreatedBy": "武侯笑笑生",
 	"Modules": [
 		{
 			"Name": "Gravity",
@@ -16,7 +17,7 @@
 	],
 	"Plugins": [
 		{
-			"Name": "ChaosVehiclesPlugin",
+			"Name": "Utils",
 			"Enabled": true
 		}
 	]

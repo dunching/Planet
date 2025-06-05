@@ -1,139 +1,103 @@
-
 #include "TalentIcon.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextBlock.h"
 
 #include "CharacterBase.h"
+#include "DataTableCollection.h"
+#include "ItemProxy_Character.h"
 #include "TalentAllocationComponent.h"
+#include "Components/Border.h"
+#include "Kismet/KismetStringLibrary.h"
 
-namespace TalentIcon
+struct FTalentIcon : public TStructVariable<FTalentIcon>
 {
 	const FName Level = TEXT("Level");
+};
+
+void UTalentIcon::SetIsEnabled(
+	bool bInIsEnabled
+	)
+{
+	if (DisEnable)
+	{
+		DisEnable->SetVisibility(bInIsEnabled ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
+	}
+
+	Super::SetIsEnabled(bInIsEnabled);
 }
 
-void UTalentIcon::ResetPoint()
+void UTalentIcon::Reset()
 {
-	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	if (CharacterPtr)
-	{
-		auto TalentAllocationComponentPtr = CharacterPtr->GetTalentAllocationComponent();
-		if (TalentAllocationComponentPtr)
-		{
-			FTalentHelper TalentHelper = GetTalentHelper();
-
-			TalentAllocationComponentPtr->Clear(TalentHelper);
-
-			ResetUI(TalentHelper);
-		}
-	}
+	UpdateNum();
 }
 
 void UTalentIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	if (CharacterPtr)
+	const auto TargetTalent = UDataTableCollection::GetInstance()->GetTableRow_TalenSocket(TalentSocket);
+	if (TargetTalent && DescriptionText)
 	{
-		auto TalentAllocationComponentPtr = CharacterPtr->GetTalentAllocationComponent();
-		if (TalentAllocationComponentPtr)
-		{
-			FTalentHelper TalentHelper = GetTalentHelper();
-
-			auto ResultPtr = TalentAllocationComponentPtr->GetCheck(TalentHelper);
-			if (ResultPtr.IconSocket.IsValid())
-			{
-				ResetUI(ResultPtr);
-			}
-			else
-			{
-				FTalentHelper TempTalentHelper;
-				TempTalentHelper.PointType = EPointType::kNone;
-
-				ResetUI(TempTalentHelper);
-			}
-		}
+		const auto NewStr = DescriptionStr.Replace(
+		                                           TEXT("{Value}"),
+		                                           *UKismetStringLibrary::Conv_IntToString(TargetTalent->Value)
+		                                          );
+		DescriptionText->SetText(FText::FromString(NewStr));
 	}
 }
 
-FReply UTalentIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+FReply UTalentIcon::NativeOnMouseButtonDown(
+	const FGeometry& InGeometry,
+	const FPointerEvent& InMouseEvent
+	)
 {
-	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	if (CharacterPtr)
+	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
-		auto TalentAllocationComponentPtr = CharacterPtr->GetTalentAllocationComponent();
-		if (TalentAllocationComponentPtr)
+		if (OnValueChanged.Execute(this, true))
 		{
-			if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
-			{
-				FTalentHelper TalentHelper = GetTalentHelper();
-
-				TalentAllocationComponentPtr->AddCheck(TalentHelper);
-				auto Result = TalentAllocationComponentPtr->GetCheck(TalentHelper);
-
-				ResetUI(Result);
-
-				OnValueChanged.ExcuteCallback(this, true);
-			}
-			else if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
-			{
-				FTalentHelper TalentHelper = GetTalentHelper();
-
-				TalentAllocationComponentPtr->SubCheck(TalentHelper);
-				auto Result = TalentAllocationComponentPtr->GetCheck(TalentHelper);
-
-				ResetUI(Result);
-			}
+			UpdateNum();
+			return FReply::Handled();
+		}
+	}
+	else if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
+	{
+		if (OnValueChanged.Execute(this, false))
+		{
+			UpdateNum();
+			return FReply::Handled();
 		}
 	}
 
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
-void UTalentIcon::ResetUI(const FTalentHelper& TalentHelper)
+void UTalentIcon::UpdateNum()
 {
-	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(TalentIcon::Level));
-	if (UIPtr)
+	if (CurrentProxyPtr)
 	{
-		switch (TalentHelper.PointType)
+		const auto& CharacterTalentRef = CurrentProxyPtr->GetCharacterTalent();
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FTalentIcon::Get().Level));
+		if (UIPtr)
 		{
-		case EPointType::kSkill:
-		case EPointType::kProperty:
-		{
-			UIPtr->SetText(FText::FromString(*FString::Printf(TEXT("%d/%d"), TalentHelper.Level, TalentHelper.TotalLevel)));
-		}
-		break;
-		default:
-		{
-			UIPtr->SetText(FText::FromString(TEXT("")));
-		}
-		break;
-		}
-	}
-}
+			int32 Num = 0;
+			if (CharacterTalentRef.AllocationMap.Contains(TalentSocket))
+			{
+				Num = CharacterTalentRef.AllocationMap[TalentSocket];
+			}
+			else
+			{
+			}
 
-FTalentHelper UTalentIcon::GetTalentHelper() const
-{
-	FTalentHelper TalentHelper;
-
-	TalentHelper.PointType = PointType;
-	TalentHelper.IconSocket = IconSocket;
-	switch (PointType)
-	{
-	case EPointType::kSkill:
-	{
-		TalentHelper.Type = PointSkillType;
+			UIPtr->SetText(
+			               FText::FromString(
+			                                 *FString::Printf(
+			                                                  TEXT("%d/%d"),
+			                                                  Num,
+			                                                  MaxNum
+			                                                 )
+			                                )
+			              );
+		}
 	}
-	break;
-	case EPointType::kProperty:
-	{
-		TalentHelper.Type = PointPropertyType;
-	}
-	break;
-	default:
-		break;
-	}
-
-	return TalentHelper;
 }

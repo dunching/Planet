@@ -7,8 +7,8 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
-#include "STE_AICharacterController.h"
-#include "Planet.h"
+#include "STE_Assistance.h"
+#include "Tools.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> DrawDebugSTT_GetPatrolPt(
@@ -49,7 +49,10 @@ EStateTreeRunStatus FSTT_GetPatrolPt::EnterState(
 		}
 #endif
 
-		return Super::EnterState(Context, Transition);
+		if (InstanceData.bRunForever)
+		{
+			return EStateTreeRunStatus::Running;
+		}
 		return EStateTreeRunStatus::Succeeded;
 	}
 

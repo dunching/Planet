@@ -5,7 +5,7 @@
 #include "CharacterBase.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttibutes.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "CharacterAttributesComponent.h"
 #include "PropertyEntrys.h"
 #include "TemplateHelper.h"

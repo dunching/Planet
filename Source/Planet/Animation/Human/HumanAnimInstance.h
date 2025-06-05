@@ -5,6 +5,7 @@
 
 #include <GameplayTagContainer.h>
 
+#include "GameplayEffectTypes.h"
 #include "Animation/AnimInstance.h"
 
 #include "TemplateHelper.h"
@@ -30,6 +31,8 @@ public:
 	using FValueChangedDelegateHandle =
 		TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
 
+	virtual void InitializeWithAbilitySystem(UAbilitySystemComponent* ASC);
+
 	virtual void NativeBeginPlay()override;
 
 	virtual void BeginDestroy() override;
@@ -43,6 +46,10 @@ public:
 
 protected:
 	
+	virtual void NativeInitializeAnimation() override;
+	
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
 	void OnMoveSpeedChanged(const FOnAttributeChangeData& CurrentValue);
 	
 	UFUNCTION(BlueprintImplementableEvent)
@@ -60,13 +67,8 @@ protected:
 	UFUNCTION(BlueprintPure, Category = "Character")
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const ;
 
-	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character State Data")
-	int32 JogSpeed = 350;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Character State Data")
-	float GroundDistance = -1.0f;
+	int32 JogSpeed = 300;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Character State Data")
 	float HorseSpeed = 0.f;
@@ -79,4 +81,13 @@ protected:
 
 	FValueChangedDelegateHandle MoveSpeedChangedHandle;
 
+#pragma region Lyra 数据
+	// Gameplay tags that can be mapped to blueprint variables. The variables will automatically update as the tags are added or removed.
+	// These should be used instead of manually querying for the gameplay tags.
+	UPROPERTY(EditDefaultsOnly, Category = "GameplayTags")
+	FGameplayTagBlueprintPropertyMap GameplayTagPropertyMap;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Character State Data")
+	float GroundDistance = -1.0f;
+#pragma endregion
 };

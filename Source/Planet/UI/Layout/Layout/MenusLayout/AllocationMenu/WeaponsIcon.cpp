@@ -37,12 +37,12 @@ UWeaponsIcon::UWeaponsIcon(const FObjectInitializer& ObjectInitializer) :
 
 }
 
-void UWeaponsIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
+void UWeaponsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
 {
 	Super::ResetToolUIByData(InBasicProxyPtr);
 
 	WeaponProxyPtr = nullptr;
-	if (BasicProxyPtr && BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
+	if (BasicProxyPtr && DynamicCastSharedPtr<FBasicProxy>(BasicProxyPtr)->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 	{
 		WeaponProxyPtr = DynamicCastSharedPtr<FWeaponProxy>(BasicProxyPtr);
 	}

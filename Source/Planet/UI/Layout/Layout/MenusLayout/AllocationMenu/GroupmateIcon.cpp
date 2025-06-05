@@ -33,7 +33,7 @@ void UGroupmateIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 }
 
-void UGroupmateIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
+void UGroupmateIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
 {
 	ProxyPtr = nullptr;
 	ProxyPtr = DynamicCastSharedPtr<FCharacterProxy>(InBasicProxyPtr);
@@ -78,11 +78,7 @@ void UGroupmateIcon::SetItemType()
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
-			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(ProxyPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
-				{
-					ImagePtr->SetBrushFromTexture(ProxyPtr->GetIcon().Get());
-				}));
+			AsyncLoadText(ProxyPtr->GetIcon(),ImagePtr );
 		}
 		else
 		{
@@ -96,7 +92,7 @@ void UGroupmateIcon::SetName()
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FGroupmateIcon::Get().Text));
 	if (UIPtr)
 	{
-		UIPtr->SetText(FText::FromString(ProxyPtr->Name));
+		UIPtr->SetText(FText::FromString(ProxyPtr->GetDisplayTitle()));
 	}
 }
 

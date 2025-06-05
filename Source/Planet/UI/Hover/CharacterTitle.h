@@ -6,21 +6,24 @@
 
 #include <GameplayTagContainer.h>
 
-#include "MyUserWidget.h"
-#include "GenerateType.h"
+#include "UserWidget_Override.h"
+#include "GenerateTypes.h"
+#include "TemplateHelper.h"
 
 #include "CharacterTitle.generated.h"
 
 class ACharacterBase;
 
 class UToolIcon;
+class UConversationBorder;
 struct FOnAttributeChangeData;
+struct FTaskNode_Conversation_SentenceInfo;
 
 /**
  *
  */
 UCLASS()
-class PLANET_API UCharacterTitle : public UMyUserWidget
+class PLANET_API UCharacterTitle : public UUserWidget_Override
 {
 	GENERATED_BODY()
 
@@ -31,39 +34,83 @@ public:
 
 	virtual void NativeDestruct() override;
 
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+	virtual void NativeTick(
+		const FGeometry& MyGeometry,
+		float InDeltaTime
+		);
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void SetCampType(ECharacterCampType CharacterCampType);
+	void SetCampType(
+		ECharacterCampType CharacterCampType
+		);
 
-	void SwitchCantBeSelect(bool bIsCanBeSelect);
+	void SwitchCantBeSelect(
+		bool bIsCantBeSelect
+		);
 
-	void SetData(ACharacterBase* CharacterPtr);
-	
+	void SetData(
+		ACharacterBase* CharacterPtr
+		);
+
 protected:
-
 	ACharacterBase* CharacterPtr = nullptr;
 
 protected:
-	void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count);
+	void OnGameplayEffectTagCountChanged(
+		const FGameplayTag Tag,
+		int32 Count
+		);
 
-	void OnHPChanged(const FOnAttributeChangeData&);
+	void OnHPChanged(
+		const FOnAttributeChangeData& OnAttributeChangeData
+		);
 
-	void SetHPChanged(float Value, float MaxValue);
+	void SetHPChanged(
+		float Value,
+		float MaxValue
+		);
 
-	void OnPPChanged(const FOnAttributeChangeData&);
+	void OnStaminaChanged(
+		const FOnAttributeChangeData& OnAttributeChangeData
+		);
 
-	void SetPPChanged(float Value, float MaxValue);
+	void SetStaminaChanged(
+		float Value,
+		float MaxValue
+		);
 
-	void OnShieldChanged(const FOnAttributeChangeData&);
+	void OnManaChanged(
+		const FOnAttributeChangeData& OnAttributeChangeData
+		);
 
-	void SetShieldChanged(float Value, float MaxValue);
+	void SetManaChanged(
+		float Value,
+		float MaxValue
+		);
+
+	void OnShieldChanged(
+		const FOnAttributeChangeData& OnAttributeChangeData
+		);
+
+	void SetShieldChanged(
+		float Value,
+		float MaxValue
+		);
 
 	void ApplyCharaterNameToTitle();
 
 	void ApplyStatesToTitle();
 
-	bool ResetPosition(float InDeltaTime);
+	void ApplyLevelToTitle();
+
+	bool ResetPosition(
+		float InDeltaTime
+		);
+
+private:
+	void OnLevelChanged(
+		int32 Level
+		);
 
 	FVector2D PreviousPt = FVector2D::ZeroVector;
 
@@ -75,7 +122,7 @@ protected:
 
 	float CurrentInterval = 0.f;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPrivateAccess = true))
 	float Offset = 0.f;
 
 	float HalfHeight = 0.f;
@@ -93,4 +140,42 @@ protected:
 	FDelegateHandle OnGameplayEffectTagCountChangedHandle;
 
 	TSet<FGameplayTag> TagSet;
+
+	TOnValueChangedCallbackContainer<uint8>::FCallbackHandleSPtr LevelChangedDelegateHandle;
+};
+
+UCLASS()
+class PLANET_API UCharacterTitleBox :
+	public UUserWidget_Override
+{
+	GENERATED_BODY()
+
+public:
+	virtual void NativePreConstruct() override;
+
+	virtual void NativeConstruct() override;
+
+	void SetCampType(
+		ECharacterCampType CharacterCampType
+		);
+
+	void SetData(
+		ACharacterBase* CharacterPtr
+		);
+
+	void DisplaySentence(
+		const FTaskNode_Conversation_SentenceInfo& Sentence
+		);
+
+	void CloseConversationborder();
+
+	UPROPERTY(Transient)
+	UConversationBorder* ConversationBorderPtr = nullptr;
+
+protected:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UConversationBorder> ConversationBorderClass;
+
+private:
+	TObjectPtr<ACharacterBase> CharacterPtr = nullptr;
 };

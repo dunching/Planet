@@ -31,6 +31,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void SetHomingTarget(ACharacterBase* TargetPtr);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void SetSpeed(float Speed);
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Projectile")
 	USphereComponent* CollisionComp = nullptr;
 

@@ -11,45 +11,69 @@
 
 struct FStreamableHandle;
 
+struct FCharacterProxy;
+
+class UTextBlock;
+class UBorder;
+
 /**
  *
  */
 UCLASS()
-class PLANET_API UTalentIcon : public UMyUserWidget
+class PLANET_API UTalentIcon : public UUserWidget_Override
 {
 	GENERATED_BODY()
 
 public:
+	/**
+	 * 插槽，增加/删除
+	 * return 是否可以更改
+	 */
+	using FDelegateHandle = TDelegate<bool(
+		UTalentIcon*,
+		bool
+		)>;
+	
+	virtual void SetIsEnabled(bool bInIsEnabled) override;
+	
+	void Reset();
 
-	// 
-	using FDelegateHandle = TCallbackHandleContainer<void(UTalentIcon*, bool)>;
+	TSharedPtr<FCharacterProxy> CurrentProxyPtr = nullptr;
 
-	void ResetPoint();
-
-	FTalentHelper GetTalentHelper()const;
+	/**
+	 * 前置条件是否满足
+	 */
+	bool bPreviousIsOK = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSet<UTalentIcon*> NextSocletIconSet;
 
 protected:
+	virtual void NativeConstruct() override;
 
-	virtual void NativeConstruct()override;
+	virtual FReply NativeOnMouseButtonDown(
+		const FGeometry& InGeometry,
+		const FPointerEvent& InMouseEvent
+		) override;
 
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString DescriptionStr = TEXT("Value+{Value}");
 
-	void ResetUI(const FTalentHelper& TalentHelper);
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* DescriptionText = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
+	UBorder* DisEnable = nullptr;
 
 public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FGameplayTag TalentSocket;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EPointType PointType = EPointType::kSkill;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EPointSkillType PointSkillType = EPointSkillType::kNuQi;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EPointPropertyType PointPropertyType = EPointPropertyType::kLiDao;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FGameplayTag IconSocket;
+	int32 MaxNum = 3;
 
 	FDelegateHandle OnValueChanged;
 
+private:
+	void UpdateNum();
 };

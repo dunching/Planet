@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
 #include "CharacterAttributesComponent.h"
 #include "UIInterfaces.h"
@@ -18,7 +18,7 @@ struct FCharacterProxy;
 
 UCLASS()
 class PLANET_API UHUD_TeamMateInfo :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IItemProxyIconInterface
 {
 	GENERATED_BODY()

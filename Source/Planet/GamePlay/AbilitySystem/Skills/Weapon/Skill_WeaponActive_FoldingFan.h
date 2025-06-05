@@ -15,13 +15,13 @@ class UAnimMontage;
 class AWeapon_FoldingFan;
 class ACharacterBase;
 class UAbilityTask_PlayMontage;
-class UAbilityTask_FlyAway;
+class UAbilityTask_ApplyRootMotion_FlyAway;
 class UAbilityTask_ASCPlayMontage;
 class ASkill_WeaponActive_FoldingFan_Projectile;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_FoldingFan_RegisterParam :
-	public FGameplayAbilityTargetData_SkillBase_RegisterParam
+struct PLANET_API FGameplayAbilityTargetData_FoldingFan_RegisterParam :
+	public FGameplayAbilityTargetData_RegisterParam_SkillBase
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -97,8 +97,6 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
 	) override;
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 	virtual bool GetNum(int32& Num)const override;
 
 	TSharedPtr<FRegisterParamType> RegisterParamSPtr = nullptr;
@@ -113,8 +111,6 @@ protected:
 	)override;
 
 	virtual	void UpdateRegisterParam(const FGameplayEventData& GameplayEventData)override;
-
-	virtual void CheckInContinue(float InWaitInputTime)override;
 
 	void PlayMontage();
 
@@ -163,13 +159,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 FallingSpeed = 100;
 
-	UPROPERTY(ReplicatedUsing = OnCurrentFanNumChanged)
 	int32 CurrentFanNum = 0;
 
 	FWeaponActorType* WeaponPtr = nullptr;
 
 	UAbilityTask_ASCPlayMontage* AbilityTask_PlayMontage_HumanPtr = nullptr;
 
-	UAbilityTask_FlyAway* RootMotionPtr = nullptr;
+	UAbilityTask_ApplyRootMotion_FlyAway* RootMotionPtr = nullptr;
 
 };

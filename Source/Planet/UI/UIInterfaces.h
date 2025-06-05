@@ -4,16 +4,17 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include "UObject/ObjectMacros.h"
 #include "UObject/Interface.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 
 #include "UIInterfaces.generated.h"
 
 struct FBasicProxy;
+struct IProxy_Allocationble;
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
 class UItemProxyIconInterface : public UInterface
@@ -55,7 +56,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr) = 0;
 	
-	virtual void ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& BasicProxyPtr) = 0;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr) = 0;
 
 	virtual void EnableIcon(bool bIsEnable) = 0;
 

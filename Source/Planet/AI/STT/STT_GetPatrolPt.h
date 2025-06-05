@@ -8,7 +8,7 @@
 #include "StateTreeExecutionContext.h"
 #include "Tasks/StateTreeAITask.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "STT_GetPatrolPt.generated.h"
 
@@ -18,7 +18,7 @@ class UAITask_SwitchWalkState;
 
 class AHumanCharacter;
 class AHumanAIController;
-class UGloabVariable;
+class UGloabVariable_Character;
 
 USTRUCT()
 struct PLANET_API FStateTreeGetPatrolPtTaskInstanceData
@@ -33,6 +33,12 @@ struct PLANET_API FStateTreeGetPatrolPtTaskInstanceData
 	
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanCharacter> TargetCharacterPtr = nullptr;
+	
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	bool bRunForever = true;
 	
 	UPROPERTY(VisibleAnywhere, Category = Out)
 	FVector Location = FVector::ZeroVector;

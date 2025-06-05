@@ -1,5 +1,7 @@
 #include "EventSubjectComponent.h"
 
+#include "OnEffectedTargetCallback.h"
+
 FName UEventSubjectComponent::ComponentName = TEXT("EventSubjectComponent");
 
 UEventSubjectComponent::UEventSubjectComponent(const FObjectInitializer& ObjectInitializer) :
@@ -9,10 +11,4 @@ UEventSubjectComponent::UEventSubjectComponent(const FObjectInitializer& ObjectI
 	PrimaryComponentTick.TickInterval = 1.f;
 
 	SetIsReplicatedByDefault(true);
-}
-
-void UEventSubjectComponent::ReceivedEventModifyDataCallback_Implementation(
-	const FReceivedEventModifyDataCallback& ReceivedEventModifyDataCallback)
-{
-	MakedDamageDelegate(ReceivedEventModifyDataCallback);
 }

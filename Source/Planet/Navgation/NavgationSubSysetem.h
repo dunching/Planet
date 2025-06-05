@@ -7,9 +7,9 @@
 #include "CoreMinimal.h"
 #include "Engine/World.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include <GameInstance/PlanetGameInstance.h>
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "ItemProxy_Minimal.h"
 
 #include "NavgationSubSysetem.generated.h"

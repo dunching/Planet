@@ -6,9 +6,10 @@
 
 #include "GameFramework/HUD.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include "TemplateHelper.h"
 #include "LayoutCommon.h"
+#include "LayoutInterfacetion.h"
 
 #include "MainHUD.generated.h"
 
@@ -25,33 +26,36 @@ class PLANET_API AMainHUD : public AHUD
 	GENERATED_BODY()
 
 public:
-
 	friend UUIManagerSubSystem;
-	
+
 	using FOnInitaliedGroupSharedInfo =
-		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+	TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
-	virtual void BeginPlay()override;
+	virtual void BeginPlay() override;
 
-	virtual void ShowHUD()override;
+	virtual void ShowHUD() override;
 
 	void InitalHUD();
-	
-	void SwitchLayout(ELayoutCommon MainHUDType);
 
-	UMainHUDLayout*GetMainHUDLayout()const;
-	
 protected:
-	
-	void OnHPChanged(const FOnAttributeChangeData&);
+	void SwitchLayout(
+		ELayoutCommon MainHUDType,
+		const ILayoutInterfacetion::FOnQuit& OnQuit
+		);
+
+	UMainHUDLayout* GetMainHUDLayout() const;
+
+	void OnHPChanged(
+		const FOnAttributeChangeData&
+		);
 
 	void OnHPChangedImp();
 
 	void InitMainHUDLayout();
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UMainHUDLayout>MainHUDLayoutClass;
-	
-	UMainHUDLayout* MainHUDLayoutPtr = nullptr;
+	TSubclassOf<UMainHUDLayout> MainHUDLayoutClass;
 
+	UPROPERTY(Transient)
+	TObjectPtr<UMainHUDLayout> MainHUDLayoutPtr = nullptr;
 };

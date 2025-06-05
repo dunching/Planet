@@ -1,5 +1,21 @@
-        // b*[^:b#/]+.*$
-		// E:\Projects\Planet_Dev\Source;E:\Projects\Planet_Dev\Plugins
+// b*[^:b#/]+.*$
+// E:\Projects\Planet_Dev\Source;E:\Projects\Planet_Dev\Plugins
+		
+		
+^(\S*\s+\S*\s+)(\S)(\S+)(.*)$
+
+\n+ClassRedirects=(OldName="/Script/Planet.$3",NewName="/Script/Planet_GuideSystem.$3")
+
+\n+StructRedirects=(OldName="/Script/Planet.$3",NewName="/Script/Planet_GuideSystem.$3")
+
+		
+		
+		
+在命令行中输入以下控制台命令，然后按 Enter ： n.bNavmeshAllowPartitionedBuildingFromEditor 1
+
+输入命令n.bNavmeshAllowPartitionedBuildingFromEditor 1
+点击 构建（Build）> 构建路径（Build Paths） ，在你的关卡中构建寻路网格体。
+
 
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
@@ -64,14 +80,12 @@ Going to:
 
 Next:
 
-	
-	AI分配技能
-	AI的逻辑修改
+	修改锁定效果和实现
+	小地图
 
 Future:
 
-	奇遇
-	任务系统(通过状态数去做)
+	地图
 
 Far future:
 

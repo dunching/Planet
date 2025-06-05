@@ -1,4 +1,3 @@
-
 #include "GetItemInfosItem.h"
 
 #include "Engine/AssetManager.h"
@@ -9,6 +8,10 @@
 #include "TextSubSystem.h"
 #include "TextCollect.h"
 #include "ItemProxy_Character.h"
+#include "ItemProxy_Coin.h"
+#include "ItemProxy_Consumable.h"
+#include "ItemProxy_Skills.h"
+#include "ItemProxy_Weapon.h"
 
 struct FGetItemInfosItem : public TStructVariable<FGetItemInfosItem>
 {
@@ -17,83 +20,189 @@ struct FGetItemInfosItem : public TStructVariable<FGetItemInfosItem>
 	const FName Text = TEXT("Text");
 };
 
-void UGetItemInfosItem::InvokeReset(UUserWidget* BaseWidgetPtr)
+void UGetItemInfosItem::InvokeReset(
+	UUserWidget* BaseWidgetPtr
+	)
 {
 }
 
-void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
+void UGetItemInfosItem::ResetToolUIByData(
+	const TSharedPtr<FBasicProxy>& BasicProxyPtr
+	)
 {
 	PlayThisAnimation();
 }
 
-void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FSkillProxy>& ProxyPtr, bool bIsAdd)
+void UGetItemInfosItem::ResetToolUIByData(
+	const TSharedPtr<FWeaponProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
 {
 	SetTexutre(ProxyPtr->GetIcon());
 
 	const auto Text =
 		FString::Printf(
-			TEXT("%s:%s"),
-			bIsAdd ? * UTextSubSystem::GetInstance()->GetText(TextCollect::GetSkill) : *UTextSubSystem::GetInstance()->GetText(TextCollect::LoseSkill),
-			*ProxyPtr->GetProxyName()
-		);
+		                TEXT("%s:%s"),
+		                ProxyModifyType == EProxyModifyType::kNumChanged ?
+			                *UTextSubSystem::GetInstance()->GetText(TextCollect::GetSkill) :
+			                *UTextSubSystem::GetInstance()->GetText(TextCollect::LoseSkill),
+		                *ProxyPtr->GetProxyName()
+		               );
 	SetText(Text);
 
 	ResetToolUIByData(ProxyPtr);
 }
 
-void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FConsumableProxy>& ProxyPtr, EProxyModifyType ProxyModifyType)
+void UGetItemInfosItem::ResetToolUIByData(
+	const TSharedPtr<FSkillProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
+{
+	SetTexutre(ProxyPtr->GetIcon());
+
+	const auto Text =
+		FString::Printf(
+		                TEXT("%s:%s"),
+		                ProxyModifyType == EProxyModifyType::kNumChanged ?
+			                *UTextSubSystem::GetInstance()->GetText(TextCollect::GetSkill) :
+			                *UTextSubSystem::GetInstance()->GetText(TextCollect::LoseSkill),
+		                *ProxyPtr->GetProxyName()
+		               );
+	SetText(Text);
+
+	ResetToolUIByData(ProxyPtr);
+}
+
+void UGetItemInfosItem::ResetToolUIByData(
+	const TSharedPtr<FConsumableProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
 {
 	SetTexutre(ProxyPtr->GetIcon());
 
 	switch (ProxyModifyType)
 	{
-	case EProxyModifyType::kAdd:
-	{
-		SetText(FString::Printf(TEXT("Get:%dX%s"), ProxyPtr->GetCurrentValue(), *ProxyPtr->GetProxyName()));
-	}
-	break;
-	case EProxyModifyType::kChange:
+	case EProxyModifyType::kNumChanged:
+		{
+			if (ProxyPtr->GetOffsetNum() > 0)
+			{
+				SetText(
+				        FString::Printf(
+				                        TEXT("%s %dX%s"),
+				                        TEXT("Get"),
+				                        ProxyPtr->GetOffsetNum(),
+				                        *ProxyPtr->GetProxyName()
+				                       )
+				       );
+			}
+			else
+			{
+				SetText(
+				        FString::Printf(
+				                        TEXT("%s %dX%s"),
+				                        TEXT("Lose"),
+				                        ProxyPtr->GetOffsetNum(),
+				                        *ProxyPtr->GetProxyName()
+				                       )
+				       );
+			}
+		}
+		break;
+	case EProxyModifyType::kPropertyChange:
 		break;
 	case EProxyModifyType::kRemove:
+		{
+			SetText(FString::Printf(TEXT("Lose:%dX%s"), ProxyPtr->GetNum(), *ProxyPtr->GetProxyName()));
+		}
 		break;
 	default:
 		break;
 	}
+
 	ResetToolUIByData(ProxyPtr);
 }
 
-void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FCoinProxy>& ProxyPtr, bool bIsAdd, int32 Num)
+void UGetItemInfosItem::ResetToolUIByData(
+	const TSharedPtr<FCoinProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType,
+	int32 Num
+	)
 {
 	SetTexutre(ProxyPtr->GetIcon());
 
-	SetText(FString::Printf(TEXT("%s %dX%s"), bIsAdd ? TEXT("Get") : TEXT("Lose"), ProxyPtr->GetCurrentValue(), *ProxyPtr->GetProxyName()));
+	switch (ProxyModifyType)
+	{
+	case EProxyModifyType::kNumChanged:
+		{
+			if (ProxyPtr->GetOffsetNum() > 0)
+			{
+				SetText(
+				        FString::Printf(
+				                        TEXT("%s %dX%s"),
+				                        TEXT("Get"),
+				                        ProxyPtr->GetOffsetNum(),
+				                        *ProxyPtr->GetProxyName()
+				                       )
+				       );
+			}
+			else
+			{
+				SetText(
+				        FString::Printf(
+				                        TEXT("%s %dX%s"),
+				                        TEXT("Lose"),
+				                        ProxyPtr->GetOffsetNum(),
+				                        *ProxyPtr->GetProxyName()
+				                       )
+				       );
+			}
+		}
+		break;
+	case EProxyModifyType::kPropertyChange:
+		break;
+	case EProxyModifyType::kRemove:
+		{
+		}
+		break;
+	default:
+		break;
+	}
 
 	ResetToolUIByData(ProxyPtr);
 }
 
-void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FCharacterProxy>& ProxyPtr, bool bIsAdd)
+void UGetItemInfosItem::ResetToolUIByData(
+	const TSharedPtr<FCharacterProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
 {
 	SetTexutre(ProxyPtr->GetIcon());
 
-	SetText(FString::Printf(TEXT("%s X%s"), bIsAdd ? TEXT("Get") : TEXT("Lose"), *ProxyPtr->GetProxyName()));
+	SetText(
+	        FString::Printf(
+	                        TEXT("%s X%s"),
+	                        ProxyModifyType == EProxyModifyType::kNumChanged ? TEXT("Get") : TEXT("Lose"),
+	                        *ProxyPtr->GetProxyName()
+	                       )
+	       );
 
 	ResetToolUIByData(ProxyPtr);
 }
 
-void UGetItemInfosItem::SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr)
+void UGetItemInfosItem::SetTexutre(
+	const TSoftObjectPtr<UTexture2D>& TexturePtr
+	)
 {
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FGetItemInfosItem::Get().Texture));
 	if (ImagePtr)
 	{
-		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(TexturePtr.ToSoftObjectPath(), [this, ImagePtr, TexturePtr]()
-			{
-				ImagePtr->SetBrushFromTexture(TexturePtr.Get());
-			}));
+		AsyncLoadText(TexturePtr, ImagePtr);
 	}
 }
 
-void UGetItemInfosItem::SetText(const FString& Text)
+void UGetItemInfosItem::SetText(
+	const FString& Text
+	)
 {
 	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(FGetItemInfosItem::Get().Text));
 	if (!NumTextPtr)
@@ -109,6 +218,8 @@ void UGetItemInfosItem::OnAnimationComplete()
 	OnFinished.ExecuteIfBound();
 }
 
-void UGetItemInfosItem::EnableIcon(bool bIsEnable)
+void UGetItemInfosItem::EnableIcon(
+	bool bIsEnable
+	)
 {
 }

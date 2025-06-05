@@ -5,38 +5,37 @@
 
 #include "GameplayAbilitySpec.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayTask_Tornado.h"
 #include "AssetRefMap.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayEffectExecutionCalculation.h"
 #include "AttributeSet.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
-#include "GenerateType.h"
-#include "PlanetPlayerState.h"
-#include "GAEvent_Send.h"
-#include "GAEvent_Received.h"
-#include "Skill_Base.h"
-#include "CS_RootMotion.h"
-#include "CS_PeriodicPropertyModify.h"
+#include "GenerateTypes.h"
 #include "AS_Character.h"
-#include "HumanRegularProcessor.h"
+#include "BasicFutures_Affected.h"
+#include "Skill_Element_Metal.h"
 #include "GameplayTagsLibrary.h"
 #include "BasicFutures_Dash.h"
+#include "BasicFutures_HasBeenFlyAway.h"
+#include "BasicFutures_HasbeenSuppress.h"
+#include "BasicFutures_HasbeenTornodo.h"
+#include "BasicFutures_HasbeenTraction.h"
 #include "BasicFutures_MoveToAttaclArea.h"
-#include "BasicFutures_Affected.h"
-#include "ReceivedEventModifyDataCallback.h"
-#include "CS_PeriodicStateModify.h"
-#include "CS_PeriodicPropertyTag.h"
-#include "CharacterTitle.h"
 #include "EventSubjectComponent.h"
-#include "GameOptions.h"
-#include "GE_Common.h"
-#include "PlanetPlayerController.h"
+#include "Tornado.h"
+#include "OnEffectedTargetCallback.h"
+#include "PlanetWeapon_Base.h"
+#include "Weapon_Base.h"
+#include "Kismet/KismetMathLibrary.h"
 
-UCharacterAbilitySystemComponent::UCharacterAbilitySystemComponent(const FObjectInitializer& ObjectInitializer):
-	Super(ObjectInitializer)
+UCharacterAbilitySystemComponent::UCharacterAbilitySystemComponent(
+	const FObjectInitializer& ObjectInitializer
+	):
+	 Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
 	SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
@@ -50,32 +49,51 @@ void UCharacterAbilitySystemComponent::BeginPlay()
 	if (GetOwnerRole() == ROLE_Authority)
 	{
 		OnGameplayEffectAppliedDelegateToTarget.AddUObject(
-			this, &ThisClass::OnGEAppliedDelegateToTarget);
+		                                                   this,
+		                                                   &ThisClass::OnGEAppliedDelegateToTarget
+		                                                  );
 		OnGameplayEffectAppliedDelegateToSelf.AddUObject(
-			this, &ThisClass::OnActiveGEAddedDelegateToSelf);
+		                                                 this,
+		                                                 &ThisClass::OnActiveGEAddedDelegateToSelf
+		                                                );
+
+
+		AddOutputModify(MakeShared<IOutputData_ProbabilityConfirmation_ModifyInterface>(100));
+
+		AddInputModify(MakeShared<IInputData_ProbabilityConfirmation_ModifyInterface>(100));
+		AddInputModify(MakeShared<IInputData_BasicData_ModifyInterface>(101));
+		AddInputModify(MakeShared<IInputData_Shield_ModifyInterface>(102));
 	}
 #endif
+}
+
+bool UCharacterAbilitySystemComponent::IsCantBeDamage() const
+{
+	return IsInDeath() || IsUnSelected();
 }
 
 bool UCharacterAbilitySystemComponent::IsInDeath() const
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	return OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(
-		UGameplayTagsLibrary::DeathingTag
-	);
+		 UGameplayTagsLibrary::State_Dying
+		);
 }
 
 bool UCharacterAbilitySystemComponent::IsUnSelected() const
 {
-	return false;
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	return OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(
+		 UGameplayTagsLibrary::State_Buff_CantBeSlected
+		);
 }
 
 bool UCharacterAbilitySystemComponent::IsRunning() const
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	return OnwerActorPtr->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-		UGameplayTagsLibrary::State_Locomotion_Run
-	);
+		 UGameplayTagsLibrary::BaseFeature_Run
+		);
 }
 
 bool UCharacterAbilitySystemComponent::IsRootMotion() const
@@ -88,364 +106,8 @@ bool UCharacterAbilitySystemComponent::IsInFighting() const
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	return OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(
-		UGameplayTagsLibrary::InFightingTag
-	);
-}
-
-void UCharacterAbilitySystemComponent::AddSendEventModify(
-	const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
-{
-	for (bool bIsContinue = true; bIsContinue;)
-	{
-		bIsContinue = false;
-		GAEventModifySPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
-		for (const auto& Iter : SendEventModifysMap)
-		{
-			if (Iter->ID == GAEventModifySPtr->ID)
-			{
-				bIsContinue = true;
-				break;
-			}
-		}
-	}
-	SendEventModifysMap.emplace(GAEventModifySPtr);
-}
-
-void UCharacterAbilitySystemComponent::RemoveSendEventModify(
-	const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
-{
-	for (auto Iter = SendEventModifysMap.begin(); Iter != SendEventModifysMap.end(); Iter++)
-	{
-		if ((*Iter)->ID == GAEventModifySPtr->ID)
-		{
-			SendEventModifysMap.erase(Iter);
-			break;
-		}
-	}
-}
-
-void UCharacterAbilitySystemComponent::AddReceviedEventModify(
-	const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr)
-{
-	for (bool bIsContinue = true; bIsContinue;)
-	{
-		bIsContinue = false;
-		GAEventModifySPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
-		for (const auto& Iter : ReceivedEventModifysMap)
-		{
-			if (Iter->ID == GAEventModifySPtr->ID)
-			{
-				bIsContinue = true;
-				break;
-			}
-		}
-	}
-	ReceivedEventModifysMap.emplace(GAEventModifySPtr);
-}
-
-void UCharacterAbilitySystemComponent::RemoveReceviedEventModify(
-	const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr)
-{
-	for (auto Iter = ReceivedEventModifysMap.begin(); Iter != ReceivedEventModifysMap.end(); Iter++)
-	{
-		if ((*Iter)->ID == GAEventModifySPtr->ID)
-		{
-			ReceivedEventModifysMap.erase(Iter);
-			break;
-		}
-	}
-}
-
-void UCharacterAbilitySystemComponent::SendEventImp(
-	FGameplayAbilityTargetData_TagModify* GameplayAbilityTargetDataSPtr
-)
-{
-	// #if UE_EDITOR || UE_SERVER
-	// 	if (GetNetMode() == NM_DedicatedServer)
-	// 	{
-	// 		FGameplayAbilitySpec Spec(UCS_PeriodicPropertyTag::StaticClass(), 1);
-	//
-	// 		FGameplayEventData* Payload = new FGameplayEventData;
-	// 		Payload->TargetData.Add(GameplayAbilityTargetDataSPtr);
-	//
-	// 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	// 		auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
-	// 		ASCPtr->GiveAbilityAndActivateOnce(
-	// 			Spec,
-	// 			Payload
-	// 		);
-	// 	}
-	// #endif
-}
-
-void UCharacterAbilitySystemComponent::SendEventImp(
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr
-)
-{
-	// #if UE_EDITOR || UE_SERVER
-	// 	if (GetNetMode() == NM_DedicatedServer)
-	// 	{
-	// 		if (GAEventDataPtr)
-	// 		{
-	// 			for (auto& Iter : GAEventDataPtr->DataAry)
-	// 			{
-	// 				if (!Iter.DataSource.IsValid())
-	// 				{
-	// 					Iter.DataSource = UGameplayTagsLibrary::DataSource_Character;;
-	// 				}
-	// 			}
-	// 		}
-	//
-	// 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	// 		if (OnwerActorPtr)
-	// 		{
-	// 			FGameplayEventData Payload;
-	//
-	// 			Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kNormal));
-	// 			Payload.TargetData.Add(GAEventDataPtr);
-	//
-	// 			auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
-	// 			ASCPtr->TriggerAbilityFromGameplayEvent(
-	// 				SendEventHandle,
-	// 				ASCPtr->AbilityActorInfo.Get(),
-	// 				UGameplayTagsLibrary::BaseFeature_Send,
-	// 				&Payload,
-	// 				*ASCPtr
-	// 			);
-	// 		}
-	// 	}
-	// #endif
-}
-
-void UCharacterAbilitySystemComponent::SendEventImp(
-	FGameplayAbilityTargetData_RootMotion* GameplayAbilityTargetDataPtr
-)
-{
-	// #if UE_EDITOR || UE_SERVER
-	// 	if (GetNetMode() == NM_DedicatedServer)
-	// 	{
-	// 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	// 		if (OnwerActorPtr)
-	// 		{
-	// 			FGameplayEventData Payload;
-	//
-	// 			Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kRootMotion));
-	// 			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
-	//
-	// 			auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
-	// 			ASCPtr->TriggerAbilityFromGameplayEvent(
-	// 				SendEventHandle,
-	// 				ASCPtr->AbilityActorInfo.Get(),
-	// 				FGameplayTag(),
-	// 				&Payload,
-	// 				*ASCPtr
-	// 			);
-	// 		}
-	// 	}
-	// #endif
-}
-
-void UCharacterAbilitySystemComponent::SendEventImp(
-	FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr
-)
-{
-	// #if UE_EDITOR || UE_SERVER
-	// 	if (GetNetMode() == NM_DedicatedServer)
-	// 	{
-	// 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	// 		if (OnwerActorPtr)
-	// 		{
-	// 			FGameplayEventData Payload;
-	//
-	// 			Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kPeriodic_PropertyModify));
-	// 			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
-	//
-	// 			auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
-	// 			ASCPtr->TriggerAbilityFromGameplayEvent(
-	// 				SendEventHandle,
-	// 				ASCPtr->AbilityActorInfo.Get(),
-	// 				FGameplayTag(),
-	// 				&Payload,
-	// 				*ASCPtr
-	// 			);
-	// 		}
-	// 	}
-	// #endif
-}
-
-void UCharacterAbilitySystemComponent::SendEventImp(
-	FGameplayAbilityTargetData_StateModify* GameplayAbilityTargetDataPtr
-)
-{
-	// #if UE_EDITOR || UE_SERVER
-	// 	if (GetNetMode() == NM_DedicatedServer)
-	// 	{
-	// 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	// 		if (OnwerActorPtr)
-	// 		{
-	// 			FGameplayEventData Payload;
-	//
-	// 			Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kPeriodic_StateTagModify));
-	// 			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
-	//
-	// 			auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
-	// 			ASCPtr->TriggerAbilityFromGameplayEvent(
-	// 				SendEventHandle,
-	// 				ASCPtr->AbilityActorInfo.Get(),
-	// 				FGameplayTag(),
-	// 				&Payload,
-	// 				*ASCPtr
-	// 			);
-	// 		}
-	// 	}
-	// #endif
-}
-
-void UCharacterAbilitySystemComponent::ClearData2Other(
-	const TMap<FOwnerPawnType*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
-	const FGameplayTag& DataSource
-)
-{
-	// auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	// if (!OnwerActorPtr)
-	// {
-	// 	return;
-	// }
-	//
-	// FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(OnwerActorPtr);
-	//
-	// GAEventDataPtr->TriggerCharacterPtr = OnwerActorPtr;
-	//
-	// for (const auto Iter : ModifyPropertyMap)
-	// {
-	// 	FGAEventData GAEventData(Iter.Key, OnwerActorPtr);
-	//
-	// 	GAEventData.DataSource = DataSource;
-	// 	GAEventData.DataModify = Iter.Value;
-	// 	GAEventData.bIsClearData = true;
-	//
-	// 	GAEventDataPtr->DataAry.Add(GAEventData);
-	// }
-	// SendEventImp(GAEventDataPtr);
-}
-
-void UCharacterAbilitySystemComponent::ClearData2Self(
-	const TMap<ECharacterPropertyType, FBaseProperty>& InModifyPropertyMap, const FGameplayTag& DataSource
-)
-{
-	// auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	// if (!OnwerActorPtr)
-	// {
-	// 	return;
-	// }
-	//
-	// TPair<FOwnerPawnType*, TMap<ECharacterPropertyType, FBaseProperty>> ModifyPropertyMap{
-	// 	OnwerActorPtr, InModifyPropertyMap
-	// };
-	//
-	// ClearData2Other({ModifyPropertyMap}, DataSource);
-}
-
-void UCharacterAbilitySystemComponent::ExcuteAttackedEffect(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
-{
-	// const auto IsNotDeathingTag = !IsInDeath();
-	// if (IsNotDeathingTag && GAEvent.Data.GetIsHited())
-	// {
-	// 	switch (GAEvent.Data.AttackEffectType)
-	// 	{
-	// 	case EAttackEffectType::kNone:
-	// 		break;
-	// 	case EAttackEffectType::kNormalAttackEffect:
-	// 		{
-	// 			FGameplayEventData Payload;
-	// 			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Affected;
-	// 			GameplayAbilityTargetDataPtr->AffectedDirection =
-	// 				GetAffectedDirection(GAEvent.Data.TargetCharacterPtr.Get(), GAEvent.TriggerCharacterPtr.Get());
-	//
-	// 			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
-	//
-	// 			auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	// 			if (OnwerActorPtr)
-	// 			{
-	// 				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-	// 					OnwerActorPtr, UGameplayTagsLibrary::Affected, Payload
-	// 				);
-	// 			}
-	// 		}
-	// 		break;
-	// 	case EAttackEffectType::kAttackEffectAndRepel:
-	// 		{
-	// 			FGameplayEventData Payload;
-	// 			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Affected;
-	// 			GameplayAbilityTargetDataPtr->AffectedDirection =
-	// 				GetAffectedDirection(GAEvent.Data.TargetCharacterPtr.Get(), GAEvent.TriggerCharacterPtr.Get());
-	// 			GameplayAbilityTargetDataPtr->RepelDistance = GAEvent.Data.RepelDistance > 0
-	// 				                                              ? GAEvent.Data.RepelDistance
-	// 				                                              : 50;
-	// 			if (!GAEvent.Data.RepelDirection.IsNearlyZero())
-	// 			{
-	// 				GameplayAbilityTargetDataPtr->RepelDirection = GAEvent.Data.RepelDirection;
-	// 			}
-	// 			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = GAEvent.Data.TriggerCharacterPtr.Get();
-	//
-	// 			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
-	//
-	// 			auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	// 			if (OnwerActorPtr)
-	// 			{
-	// 				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-	// 					OnwerActorPtr, UGameplayTagsLibrary::Affected, Payload
-	// 				);
-	// 			}
-	// 		}
-	// 		break;
-	// 	}
-	// }
-}
-
-void UCharacterAbilitySystemComponent::SendEvent2Other(
-	const TMap<FOwnerPawnType*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
-	const FGameplayTag& DataSource
-)
-{
-	// auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	// if (!OnwerActorPtr)
-	// {
-	// 	return;
-	// }
-	//
-	// FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(OnwerActorPtr);
-	//
-	// GAEventDataPtr->TriggerCharacterPtr = OnwerActorPtr;
-	//
-	// for (const auto Iter : ModifyPropertyMap)
-	// {
-	// 	FGAEventData GAEventData(Iter.Key, OnwerActorPtr);
-	//
-	// 	GAEventData.DataSource = DataSource;
-	// 	GAEventData.DataModify = Iter.Value;
-	//
-	// 	GAEventDataPtr->DataAry.Add(GAEventData);
-	// }
-	// SendEventImp(GAEventDataPtr);
-}
-
-void UCharacterAbilitySystemComponent::SendEvent2Self(
-	const TMap<ECharacterPropertyType, FBaseProperty>& InModifyPropertyMap,
-	const FGameplayTag& DataSource
-)
-{
-	// auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	// if (!OnwerActorPtr)
-	// {
-	// 	return;
-	// }
-	//
-	// TPair<FOwnerPawnType*, TMap<ECharacterPropertyType, FBaseProperty>> ModifyPropertyMap{
-	// 	OnwerActorPtr, InModifyPropertyMap
-	// };
-	//
-	// SendEvent2Other({ModifyPropertyMap}, DataSource);
+		 UGameplayTagsLibrary::InFightingTag
+		);
 }
 
 void UCharacterAbilitySystemComponent::InitialBaseGAs()
@@ -481,26 +143,24 @@ void UCharacterAbilitySystemComponent::InitialBaseGAs()
 		for (auto Iter : CharacterAbilitiesAry)
 		{
 			GiveAbility(
-				FGameplayAbilitySpec(Iter, 1)
-			);
+			            FGameplayAbilitySpec(Iter, 1)
+			           );
 		}
+
+		FGameplayAbilitySpec AbilitySpec(
+		                                 Skill_Element_GoldClass
+		                                );
+		GiveAbilityAndActivateOnce(AbilitySpec);
 #pragma region 结算效果修正
-		// 输出
 
-		// 群体伤害或治疗减益
-		// 伤害类型
-		AddSendBaseModify();
-
-		// 接收
-
-		// 基础属性
-		AddReceivedBaseModify();
 #pragma endregion 结算效果修正
 	}
 #endif
 }
 
-void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(bool bIsRun)
+void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(
+	bool bIsRun
+	)
 {
 	if (bIsRun)
 	{
@@ -508,14 +168,15 @@ void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(bool bIsRu
 		if (OnwerActorPtr)
 		{
 			if (OnwerActorPtr->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-				UGameplayTagsLibrary::State_Locomotion_Run))
+				 UGameplayTagsLibrary::State_Running
+				))
 			{
 				return;
 			}
 
 			OnwerActorPtr->GetCharacterAbilitySystemComponent()->TryActivateAbilitiesByTag(
-				FGameplayTagContainer{UGameplayTagsLibrary::State_Locomotion_Run}
-			);
+				 FGameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Run}
+				);
 		}
 	}
 	else
@@ -524,26 +185,20 @@ void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(bool bIsRu
 		if (OnwerActorPtr)
 		{
 			if (OnwerActorPtr->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-				UGameplayTagsLibrary::State_Locomotion_Run))
+				 UGameplayTagsLibrary::State_Running
+				))
 			{
-				FGameplayTagContainer GameplayTagContainer{UGameplayTagsLibrary::State_Locomotion_Run};
+				FGameplayTagContainer GameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Run};
 				OnwerActorPtr->GetCharacterAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
 			}
-
-			OnwerActorPtr->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-				UGameplayTagsLibrary::State_Locomotion_Run);
 		}
 	}
 }
 
-void UCharacterAbilitySystemComponent::Dash_Implementation(EDashDirection DashDirection)
+void UCharacterAbilitySystemComponent::Dash_Implementation(
+	EDashDirection DashDirection
+	)
 {
-	FGameplayEventData Payload;
-	auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_Dash;
-	GameplayAbilityTargetData_DashPtr->DashDirection = DashDirection;
-
-	Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
-
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
 	{
@@ -557,11 +212,17 @@ void UCharacterAbilitySystemComponent::Dash_Implementation(EDashDirection DashDi
 		// 			*ASCPtr
 		// 		);	
 
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_Dash;
+		GameplayAbilityTargetData_DashPtr->DashDirection = DashDirection;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-			OnwerActorPtr,
-			UGameplayTagsLibrary::Dash,
-			Payload
-		);
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_Dash,
+		                                                         Payload
+		                                                        );
 	}
 }
 
@@ -571,12 +232,162 @@ void UCharacterAbilitySystemComponent::Jump_Implementation()
 	if (OnwerActorPtr)
 	{
 		OnwerActorPtr->GetCharacterAbilitySystemComponent()->TryActivateAbilitiesByTag(
-			FGameplayTagContainer{UGameplayTagsLibrary::Jump}
-		);
+			 FGameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Jump}
+			);
 	}
 }
 
-void UCharacterAbilitySystemComponent::SwitchCantBeSelect(bool bIsCanBeSelect)
+void UCharacterAbilitySystemComponent::HasBeenFlayAway_Implementation(
+	int32 Height
+	)
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_ActiveParam_HasBeenFlyAway;
+		GameplayAbilityTargetData_DashPtr->Height = Height;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_HasBeenFlyAway,
+		                                                         Payload
+		                                                        );
+	}
+}
+
+void UCharacterAbilitySystemComponent::SwitchWeapon_Implementation()
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_SwitchWeapon,
+		                                                         Payload
+		                                                        );
+	}
+}
+
+void UCharacterAbilitySystemComponent::HasbeenTornodo(
+	const TWeakObjectPtr<ATornado>& TornadoPtr
+	)
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_ActiveParam_HasbeenTornodo;
+		GameplayAbilityTargetData_DashPtr->TornadoPtr = TornadoPtr;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_HasbeenTornodo,
+		                                                         Payload
+		                                                        );
+	}
+}
+
+void UCharacterAbilitySystemComponent::HasbeenTraction(
+	const TWeakObjectPtr<ATractionPoint>& TractionPointPtr
+	)
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_ActiveParam_HasbeenTraction;
+		GameplayAbilityTargetData_DashPtr->TractionPoint = TractionPointPtr;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_HasbeenTraction,
+		                                                         Payload
+		                                                        );
+	}
+}
+
+void UCharacterAbilitySystemComponent::HasbeenSuppress(
+	const TWeakObjectPtr<ACharacterBase>& InstigatorPtr,
+	const TSoftObjectPtr<UAnimMontage>& Montage,
+	float Duration
+	)
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_ActiveParam_HasbeenSuppress;
+		GameplayAbilityTargetData_DashPtr->InstigatorPtr = InstigatorPtr;
+		GameplayAbilityTargetData_DashPtr->MontageRef = Montage;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_HasbeenSuppress,
+		                                                         Payload
+		                                                        );
+	}
+}
+
+void UCharacterAbilitySystemComponent::HasbeenAttacked(
+	const TWeakObjectPtr<ACharacterBase>& InstigatorPtr,
+	FVector RepelDirection
+	)
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData = new FGameplayAbilityTargetData_Affected;
+		GameplayAbilityTargetData->TriggerCharacterPtr = InstigatorPtr;
+		GameplayAbilityTargetData->RepelDirection = RepelDirection;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData);
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_HasBeenAffected,
+		                                                         Payload
+		                                                        );
+	}
+}
+
+void UCharacterAbilitySystemComponent::HasBeenRepel(
+	const TWeakObjectPtr<ACharacterBase>& InstigatorPtr,
+	FVector RepelDirection,
+	int32 RepelDistance
+	)
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData = new FGameplayAbilityTargetData_Affected;
+		GameplayAbilityTargetData->TriggerCharacterPtr = InstigatorPtr;
+		GameplayAbilityTargetData->RepelDirection = RepelDirection;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData);
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_HasBeenAffected,
+		                                                         Payload
+		                                                        );
+	}
+}
+
+void UCharacterAbilitySystemComponent::SwitchCantBeSelect(
+	bool bIsCanBeSelect
+	)
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
@@ -590,27 +401,47 @@ void UCharacterAbilitySystemComponent::SwitchCantBeSelect(bool bIsCanBeSelect)
 	}
 }
 
-void UCharacterAbilitySystemComponent::Respawn()
+void UCharacterAbilitySystemComponent::SwitchInvisible(
+	bool bIsInvisible
+	)
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		TArray<AActor*> OutActors;
+		OnwerActorPtr->GetAttachedActors(OutActors);
+
+		for (auto ActorIter : OutActors)
+		{
+			auto WeaponPtr = Cast<APlanetWeapon_Base>(ActorIter);
+			if (WeaponPtr)
+			{
+				WeaponPtr->SetActorHiddenInGame(bIsInvisible);
+			}
+		}
+
+		OnwerActorPtr->GetCopyPoseMesh()->SetHiddenInGame(bIsInvisible);
+	}
+}
+
+void UCharacterAbilitySystemComponent::Respawn_Implementation()
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
 	{
 		FGameplayEventData Payload;
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-			OnwerActorPtr,
-			UGameplayTagsLibrary::BaseFeature_Respawn,
-			Payload
-		);
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_Respawn,
+		                                                         Payload
+		                                                        );
 	}
 }
 
 void UCharacterAbilitySystemComponent::MoveToAttackDistance(
 	FGameplayAbilityTargetData_MoveToAttaclArea* MoveToAttaclAreaPtr
-)
+	)
 {
-	FGameplayEventData Payload;
-	Payload.TargetData.Add(MoveToAttaclAreaPtr);
-
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
 	{
@@ -623,11 +454,14 @@ void UCharacterAbilitySystemComponent::MoveToAttackDistance(
 		// 			*ASCPtr
 		// 		);
 
+		FGameplayEventData Payload;
+		Payload.TargetData.Add(MoveToAttaclAreaPtr);
+
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-			OnwerActorPtr,
-			UGameplayTagsLibrary::State_MoveToAttaclArea,
-			Payload
-		);
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_MoveToLocation,
+		                                                         Payload
+		                                                        );
 	}
 }
 
@@ -638,12 +472,28 @@ void UCharacterAbilitySystemComponent::BreakMoveToAttackDistance()
 	{
 		auto GASPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
 
-		FGameplayTagContainer GameplayTagContainer{UGameplayTagsLibrary::State_MoveToAttaclArea};
+		FGameplayTagContainer GameplayTagContainer{UGameplayTagsLibrary::BaseFeature_MoveToLocation};
 		GASPtr->CancelAbilities(&GameplayTagContainer);
 	}
 }
 
-void UCharacterAbilitySystemComponent::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+void UCharacterAbilitySystemComponent::OnEffectOhterCharacter_Implementation(
+	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
+	)
+{
+	MakedDamageDelegate(ReceivedEventModifyDataCallback);
+}
+
+void UCharacterAbilitySystemComponent::OnReceivedOhterCharacter_Implementation(
+	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
+	)
+{
+	ReceivedDamageDelegate(ReceivedEventModifyDataCallback);
+}
+
+void UCharacterAbilitySystemComponent::OnGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
@@ -656,126 +506,6 @@ void UCharacterAbilitySystemComponent::OnGroupSharedInfoReady(AGroupSharedInfo* 
 		InitialBaseGAs();
 	}
 #endif
-}
-
-void UCharacterAbilitySystemComponent::AddSendBaseModify()
-{
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() < NM_DedicatedServer)
-	{
-		return;
-	}
-#endif
-
-	{
-		// 群体伤害衰减
-		struct FMyStruct : public IGAEventModifySendInterface
-		{
-			FMyStruct(int32 InPriority) :
-				IGAEventModifySendInterface(InPriority)
-			{
-			}
-
-			virtual bool Modify(TMap<FGameplayTag, float>& SetByCallerTagMagnitudes) override
-			{
-				// if (GameplayAbilityTargetData_GAEvent.DataAry.Num() > 1)
-				// {
-				// 	for (auto& Iter : GameplayAbilityTargetData_GAEvent.DataAry)
-				// 	{
-				// 		Iter.TrueDamage =
-				// 			Iter.TrueDamage / GameplayAbilityTargetData_GAEvent.DataAry.Num();
-				//
-				// 		Iter.BaseDamage =
-				// 			Iter.BaseDamage / GameplayAbilityTargetData_GAEvent.DataAry.Num();
-				//
-				// 		for (auto& ElementIter : Iter.ElementSet)
-				// 		{
-				// 			ElementIter.Get<2>() =
-				// 				ElementIter.Get<2>() / GameplayAbilityTargetData_GAEvent.DataAry.Num();
-				// 		}
-				//
-				// 		if (Iter.DataModify.Contains(ECharacterPropertyType::HP))
-				// 		{
-				// 			Iter.DataModify[ECharacterPropertyType::HP].CurrentValue =
-				// 				Iter.DataModify[ECharacterPropertyType::HP].CurrentValue /
-				// 				GameplayAbilityTargetData_GAEvent.DataAry.Num();
-				// 		}
-				// 	}
-				// }
-				return true;
-			}
-		};
-		AddSendEventModify(MakeShared<FMyStruct>(100));
-	}
-	{
-		// 元素伤害
-		struct FMyStruct : public IGAEventModifySendInterface
-		{
-			FMyStruct(int32 InPriority) :
-				IGAEventModifySendInterface(InPriority)
-			{
-			}
-
-			virtual bool Modify(TMap<FGameplayTag, float>& SetByCallerTagMagnitudes) override
-			{
-				// for (auto& Iter : GameplayAbilityTargetData_GAEvent.DataAry)
-				// {
-				// 	if (Iter.ElementSet.IsEmpty())
-				// 	{
-				// 		const auto& CharacterAttributes =
-				// 			GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->
-				// 			                                  GetCharacterAttributes();
-				//
-				// 		std::map<int32, EWuXingType, std::greater<int>> ElementMap;
-				// 		// ElementMap.emplace(CharacterAttributes.GoldElement.GetCurrentValue(), EWuXingType::kGold);
-				// 		// ElementMap.emplace(CharacterAttributes.WoodElement.GetCurrentValue(), EWuXingType::kWood);
-				// 		// ElementMap.emplace(CharacterAttributes.WaterElement.GetCurrentValue(), EWuXingType::kWater);
-				// 		// ElementMap.emplace(CharacterAttributes.FireElement.GetCurrentValue(), EWuXingType::kFire);
-				// 		// ElementMap.emplace(CharacterAttributes.SoilElement.GetCurrentValue(), EWuXingType::kSoil);
-				//
-				// 		if (ElementMap.begin()->first > 0)
-				// 		{
-				// 			const auto Tuple = MakeTuple(
-				// 				ElementMap.begin()->second,
-				// 				ElementMap.begin()->first,
-				// 				Iter.BaseDamage
-				// 			);
-				// 			Iter.ElementSet.Add(Tuple);
-				// 		}
-				// 	}
-				// }
-				return true;
-			}
-		};
-		AddSendEventModify(MakeShared<FMyStruct>(101));
-	}
-	{
-		// 自身属性
-		struct FMyStruct : public IGAEventModifySendInterface
-		{
-			FMyStruct(int32 InPriority) :
-				IGAEventModifySendInterface(InPriority)
-			{
-			}
-
-			virtual bool Modify(TMap<FGameplayTag, float>& SetByCallerTagMagnitudes) override
-			{
-				// const auto& CharacterAttributes =
-				// 	GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr.Get()->GetCharacterAttributesComponent()->
-				// 	                                  GetCharacterAttributes();
-				// for (auto& Iter : GameplayAbilityTargetData_GAEvent.DataAry)
-				// {
-				// 	// Iter.AD_Penetration += CharacterAttributes.AD_Penetration.GetCurrentValue();
-				// 	// Iter.AD_PercentPenetration += CharacterAttributes.AD_PercentPenetration.GetCurrentValue();
-				// 	// Iter.HitRate += CharacterAttributes.HitRate.GetCurrentValue();
-				// 	// Iter.CriticalHitRate += CharacterAttributes.CriticalHitRate.GetCurrentValue();
-				// 	// Iter.CriticalDamage += CharacterAttributes.CriticalDamage.GetCurrentValue();
-				// }
-				return true;
-			}
-		};
-		AddSendEventModify(MakeShared<FMyStruct>(102));
-	}
 }
 
 void UCharacterAbilitySystemComponent::AddReceivedBaseModify()
@@ -1073,9 +803,10 @@ void UCharacterAbilitySystemComponent::AddReceivedBaseModify()
 	// }
 }
 
-EAffectedDirection UCharacterAbilitySystemComponent::GetAffectedDirection(ACharacterBase* TargetCharacterPtr,
-                                                                          ACharacterBase* TriggerCharacterPtr
-)
+EAffectedDirection UCharacterAbilitySystemComponent::GetAffectedDirection(
+	ACharacterBase* TargetCharacterPtr,
+	ACharacterBase* TriggerCharacterPtr
+	)
 {
 	const FVector Vec = (TriggerCharacterPtr->GetActorLocation() - TargetCharacterPtr->GetActorLocation()).
 		GetSafeNormal();
@@ -1103,377 +834,248 @@ EAffectedDirection UCharacterAbilitySystemComponent::GetAffectedDirection(AChara
 	return EAffectedDirection::kForward;
 }
 
-void UCharacterAbilitySystemComponent::UpdateMap(
+void UCharacterAbilitySystemComponent::UpdateMapBaseValue(
 	const FGameplayTag& Tag,
 	float Value,
 	int32 MinValue,
 	int32 MaxValue,
 	const FGameplayEffectSpec& Spec,
 	const FGameplayAttributeData* GameplayAttributeDataPtr
-)
+	)
 {
 	FGameplayTagContainer AllAssetTags;
 	Spec.GetAllAssetTags(AllAssetTags);
 
 	if (!ValueMap.Contains(GameplayAttributeDataPtr))
 	{
-		ValueMap.Add(
-			GameplayAttributeDataPtr,
+		FDataComposition DataComposition;
+
+		DataComposition.DataMap = {
 			{
-				{
-					UGameplayTagsLibrary::DataSource_Regular,
-					FMath::Clamp(GameplayAttributeDataPtr->GetCurrentValue(), MinValue, MaxValue)
-				}
+				UGameplayTagsLibrary::DataSource_Character,
+				FMath::Clamp(GameplayAttributeDataPtr->GetCurrentValue(), MinValue, MaxValue)
 			}
-		);
+		};
+
+		ValueMap.Add(
+		             GameplayAttributeDataPtr,
+		             DataComposition
+		            );
 	}
 
 	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive))
 	{
 		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
 
-		if (GameplayAttributeDataMap.Contains(UGameplayTagsLibrary::DataSource_Regular))
+		if (GameplayAttributeDataMap.DataMap.Contains(UGameplayTagsLibrary::DataSource_Character))
 		{
-			GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular] += Value;
+			GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character] += Value;
 		}
 		else
 		{
-			GameplayAttributeDataMap.Add(UGameplayTagsLibrary::DataSource_Regular, Value);
+			GameplayAttributeDataMap.DataMap.Add(UGameplayTagsLibrary::DataSource_Character, Value);
 		}
 
-		GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular] =
-			FMath::Clamp(GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular], MinValue, MaxValue);
+		GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character] =
+			FMath::Clamp(
+			             GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character],
+			             MinValue,
+			             MaxValue
+			            );
 	}
-	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Immediate_Override))
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override))
 	{
 		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
 
-		if (GameplayAttributeDataMap.Contains(UGameplayTagsLibrary::DataSource_Regular))
+		if (GameplayAttributeDataMap.DataMap.Contains(UGameplayTagsLibrary::DataSource_Character))
 		{
-			GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular] = Value;
+			GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character] = Value;
 		}
 		else
 		{
-			GameplayAttributeDataMap.Add(UGameplayTagsLibrary::DataSource_Regular, Value);
+			GameplayAttributeDataMap.DataMap.Add(UGameplayTagsLibrary::DataSource_Character, Value);
 		}
 
-		GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular] =
-			FMath::Clamp(GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular], MinValue, MaxValue);
-	}
-	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary))
-	{
-		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-		GameplayAttributeDataMap.Add(Tag, Value);
-	}
-	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary))
-	{
-		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-		if (GameplayAttributeDataMap.Contains(Tag))
-		{
-			GameplayAttributeDataMap.Remove(Tag);
-		}
+		GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character] =
+			FMath::Clamp(
+			             GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character],
+			             MinValue,
+			             MaxValue
+			            );
 	}
 }
 
-float UCharacterAbilitySystemComponent::GetMapValue(
+void UCharacterAbilitySystemComponent::UpdateMapTemporary(
+	const FGameplayTag& Tag,
+	float Value,
 	const FGameplayEffectSpec& Spec,
 	const FGameplayAttributeData* GameplayAttributeDataPtr
-) const
+	)
 {
-	float Result = 0.f;
-
-	if (!ValueMap.Contains(GameplayAttributeDataPtr))
-	{
-		return Result;
-	}
-
-	auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-
-	for (auto Iter : GameplayAttributeDataMap)
-	{
-		Result += Iter.Value;
-	}
-
-	return Result;
-}
-
-void UCharacterAbilitySystemComponent::OnSendEventModifyData(FGameplayAbilityTargetData_GASendEvent& OutGAEventData)
-{
-	for (auto Iter : SendEventModifysMap)
-	{
-		// Iter->Modify(OutGAEventData);
-	}
-}
-
-void UCharacterAbilitySystemComponent::OnSendEventModifyData(
-	UAbilitySystemComponent* AbilitySystemComponentPtr,
-	FGameplayEffectSpecHandle GameplayEffectSpecHandle
-)
-{
-	// 根据自身的效果对【输出】进行一些修正
-	TArray<decltype(SendEventModifysMap)::iterator> NeedRemoveIterAry;;
-
-	for (auto Iter = SendEventModifysMap.begin(); Iter != SendEventModifysMap.end(); Iter++)
-	{
-		if ((*Iter)->Modify(GameplayEffectSpecHandle.Data->SetByCallerTagMagnitudes) && (*Iter)->bIsOnceTime)
-		{
-			NeedRemoveIterAry.Add(Iter);
-		}
-	}
-
-	for (auto Iter : NeedRemoveIterAry)
-	{
-		SendEventModifysMap.erase(Iter);
-	}
-}
-
-void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
-	const TMap<FGameplayTag, float>& CustomMagnitudes,
-	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-)
-{
-	// 获得对应GE对象
-	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
-	FGameplayEffectContextHandle Context = Spec.GetContext();
-
-	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
-
-	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
-	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
-
-	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
-	const FGameplayTagContainer* TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
-
-	FAggregatorEvaluateParameters EvaluateParameters;
-	EvaluateParameters.SourceTags = SourceTags;
-	EvaluateParameters.TargetTags = TargetTags;
-
-	// 获得来源AttributeSet
-	const auto SourceASCPtr = Cast<ThisClass>(
-		ExecutionParams.GetSourceAbilitySystemComponent());
-
-	// 获得来源AttributeSet
-	const auto SourceSet = Cast<UAS_Character>(
-		ExecutionParams.GetSourceAbilitySystemComponent()->GetAttributeSet(UAS_Character::StaticClass()));
-
-	// 获得目标AttributeSet
-	const auto TargetSet = Cast<UAS_Character>(
-		ExecutionParams.GetTargetAbilitySystemComponent()->GetAttributeSet(UAS_Character::StaticClass()));
-
-	TMap<FGameplayTag, float> SetByCallerTagMagnitudes = CustomMagnitudes;
-	SetByCallerTagMagnitudes.Append(Spec.SetByCallerTagMagnitudes);
-
 	FGameplayTagContainer AllAssetTags;
 	Spec.GetAllAssetTags(AllAssetTags);
 
-	// 如果是此类，数据在 SetByCallerTagMagnitudes
-	if (
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive) ||
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Immediate_Override)
-	)
+	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data))
 	{
-		for (const auto& Iter : SetByCallerTagMagnitudes)
+		if (ValueMap.Contains(GameplayAttributeDataPtr))
 		{
-			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
-			{
-				UpdateMap(
-					Iter.Key,
-					Iter.Value,
-					0.f,
-					SourceSet->GetMax_HP(),
-					Spec,
-					UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
-				);
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_PP))
-			{
-				UpdateMap(
-					Iter.Key,
-					Iter.Value,
-					0.f,
-					SourceSet->GetMax_PP(),
-					Spec,
-					UAS_Character::GetPPAttribute().GetGameplayAttributeData(TargetSet)
-				);
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
-			{
-				UpdateMap(
-					Iter.Key,
-					Iter.Value,
-					0.f,
-					SourceSet->GetMax_Mana(),
-					Spec,
-					UAS_Character::GetManaAttribute().GetGameplayAttributeData(TargetSet)
-				);
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base))
-			{
-				UpdateMap(
-					Iter.Key,
-					-Iter.Value,
-					0.f,
-					SourceSet->GetMax_HP(),
-					Spec,
-					UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
-				);
-			}
+			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+			GameplayAttributeDataMap.DataMap.Add(Tag, Value);
 		}
-	}
-	// 如果是此类 SetByCallerTagMagnitudes 仅为一条，且Key为数据的组成
-	else if (
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary) ||
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary)
-	)
-	{
-		if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
+		else
 		{
-			for (const auto& Iter : SetByCallerTagMagnitudes)
-			{
-				UpdateMap(
-					Iter.Key,
-					Iter.Value,
-					0.f,
-					UGameOptions::GetInstance()->MaxMoveSpeed,
-					Spec,
-					UAS_Character::GetMoveSpeedAttribute().GetGameplayAttributeData(TargetSet)
-				);
-			}
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed))
-		{
-			for (const auto& Iter : SetByCallerTagMagnitudes)
-			{
-				UpdateMap(
-					Iter.Key,
-					Iter.Value,
-					0.f,
-					UGameOptions::GetInstance()->MaxPerformSpeed,
-					Spec,
-					UAS_Character::GetPerformSpeedAttribute().GetGameplayAttributeData(TargetSet)
-				);
-			}
-		}
-	}
+			FDataComposition DataComposition;
 
-	// 根据自身的效果对【输入】进行一些修正
-	TArray<decltype(ReceivedEventModifysMap)::iterator> NeedRemoveIterAry;;
-
-	for (auto Iter = ReceivedEventModifysMap.begin(); Iter != ReceivedEventModifysMap.end(); Iter++)
-	{
-		if ((*Iter)->Modify(SetByCallerTagMagnitudes) && (*Iter)->bIsOnceTime)
-		{
-			NeedRemoveIterAry.Add(Iter);
-		}
-	}
-
-	for (auto Iter : NeedRemoveIterAry)
-	{
-		ReceivedEventModifysMap.erase(Iter);
-	}
-
-	// 如果是此类，数据在 SetByCallerTagMagnitudes
-	if (
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive) ||
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Immediate_Override)
-	)
-	{
-		for (const auto& Iter : SetByCallerTagMagnitudes)
-		{
-			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
-			{
-				const auto NewValue = GetMapValue(
-					Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet));
-
-				OutExecutionOutput.AddOutputModifier(
-					FGameplayModifierEvaluatedData(
-						UAS_Character::GetHPAttribute(),
-						EGameplayModOp::Override,
-						NewValue
-					)
-				);
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_PP))
-			{
-				OutExecutionOutput.AddOutputModifier(
-					FGameplayModifierEvaluatedData(
-						UAS_Character::GetPPAttribute(),
-						EGameplayModOp::Override,
-						GetMapValue(Spec, UAS_Character::GetPPAttribute().GetGameplayAttributeData(TargetSet))
-					)
-				);
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
-			{
-				OutExecutionOutput.AddOutputModifier(
-					FGameplayModifierEvaluatedData(
-						UAS_Character::GetManaAttribute(),
-						EGameplayModOp::Override,
-						GetMapValue(Spec, UAS_Character::GetManaAttribute().GetGameplayAttributeData(TargetSet))
-					)
-				);
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base))
-			{
-				const auto NewValue =
-					GetMapValue(Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet));
-				OutExecutionOutput.AddOutputModifier(
-					FGameplayModifierEvaluatedData(
-						UAS_Character::GetHPAttribute(),
-						EGameplayModOp::Override,
-						NewValue
-					)
-				);
-
-				// 回执
-				FReceivedEventModifyDataCallback ReceivedEventModifyDataCallback;
-
-				ReceivedEventModifyDataCallback.TargetCharacterPtr = TargetCharacterPtr;
-				ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
-
-				Instigator->GetCharacterAbilitySystemComponent()->MakedDamageDelegate(
-					ReceivedEventModifyDataCallback
-					);
-
-				if (Instigator->IsPlayerControlled())
+			DataComposition.DataMap = {
 				{
-					auto PCPtr = Instigator->GetController<APlanetPlayerController>();
-					if (PCPtr)
+					UGameplayTagsLibrary::DataSource_Character,
+					GameplayAttributeDataPtr->GetCurrentValue()
+				},
+				{
+					Tag, Value
+				}
+			};
+
+			ValueMap.Add(
+						 GameplayAttributeDataPtr,
+						 DataComposition
+						);
+		}
+
+		return;
+	}
+
+	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data))
+	{
+		if (ValueMap.Contains(GameplayAttributeDataPtr))
+		{
+			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+			if (GameplayAttributeDataMap.DataMap.Contains(Tag))
+			{
+				GameplayAttributeDataMap.DataMap.Remove(Tag);
+			}
+		}
+		else
+		{
+			FDataComposition DataComposition;
+
+			DataComposition.DataMap = {
+				{
+					UGameplayTagsLibrary::DataSource_Character,
+					GameplayAttributeDataPtr->GetCurrentValue()
+				}
+			};
+
+			ValueMap.Add(
+						 GameplayAttributeDataPtr,
+						 DataComposition
+						);
+		}
+
+		return;
+	}
+
+	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent))
+	{
+		if (ValueMap.Contains(GameplayAttributeDataPtr))
+		{
+			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+			GameplayAttributeDataMap.MagnitudeMap.Add(Tag, Value);
+		}
+		else
+		{
+			FDataComposition DataComposition;
+
+			DataComposition.DataMap = {
+				{
+					UGameplayTagsLibrary::DataSource_Character,
+					GameplayAttributeDataPtr->GetCurrentValue()
+				}
+			};
+			
+			DataComposition.MagnitudeMap = {
+				{
+					Tag, Value
+				}
+			};
+
+			ValueMap.Add(
+						 GameplayAttributeDataPtr,
+						 DataComposition
+						);
+		}
+
+		return;
+	}
+
+	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Percent))
+	{
+		if (ValueMap.Contains(GameplayAttributeDataPtr))
+		{
+			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+			if (GameplayAttributeDataMap.MagnitudeMap.Contains(Tag))
+			{
+				GameplayAttributeDataMap.MagnitudeMap.Remove(Tag);
+			}
+		}
+		else
+		{
+			FDataComposition DataComposition;
+
+			DataComposition.DataMap = {
+				{
+					UGameplayTagsLibrary::DataSource_Character,
+					GameplayAttributeDataPtr->GetCurrentValue()
+				}
+			};
+
+			ValueMap.Add(
+						 GameplayAttributeDataPtr,
+						 DataComposition
+						);
+		}
+
+		return;
+	}
+}
+
+void UCharacterAbilitySystemComponent::UpdateMapTemporary(
+	const FGameplayTag& ModifyTypeTag,
+	float Value,
+	const FGameplayAttributeData* GameplayAttributeDataPtr
+	)
+{
+	if (ValueMap.Contains(GameplayAttributeDataPtr))
+	{
+		if (ModifyTypeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive))
+		{
+			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+			for (auto& Iter : GameplayAttributeDataMap.DataMap)
+			{
+				if (Value > Iter.Value)
+				{
+					Value -= Iter.Value;
+					if (Value <= 0)
 					{
-						PCPtr->GetEventSubjectComponent()->ReceivedEventModifyDataCallback(ReceivedEventModifyDataCallback);
+						break;
 					}
+				}
+				else
+				{
+					Iter.Value = Iter.Value
+					             + Value;
+					break;
 				}
 			}
 		}
-	}
-	// 如果是此类 SetByCallerTagMagnitudes 仅为一条，且Key为数据的组成
-	else if (
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary) ||
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary)
-	)
-	{
-		if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
+		else if (ModifyTypeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override))
 		{
-			OutExecutionOutput.AddOutputModifier(
-				FGameplayModifierEvaluatedData(
-					UAS_Character::GetMoveSpeedAttribute(),
-					EGameplayModOp::Override,
-					GetMapValue(Spec, UAS_Character::GetMoveSpeedAttribute().GetGameplayAttributeData(TargetSet))
-				)
-			);
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed))
-		{
-			OutExecutionOutput.AddOutputModifier(
-				FGameplayModifierEvaluatedData(
-					UAS_Character::GetPerformSpeedAttribute(),
-					EGameplayModOp::Override,
-					GetMapValue(Spec, UAS_Character::GetPerformSpeedAttribute().GetGameplayAttributeData(TargetSet))
-				)
-			);
+			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+			GameplayAttributeDataMap.Empty();
 		}
 	}
+
+	UpdateValueMap();
 }
 
 TMap<ECharacterPropertyType, FBaseProperty> GetAllData()
@@ -1518,7 +1120,7 @@ void UCharacterAbilitySystemComponent::OnGEAppliedDelegateToTarget(
 	UAbilitySystemComponent* AbilitySystemComponentPtr,
 	const FGameplayEffectSpec& GameplayEffectSpec,
 	FActiveGameplayEffectHandle InActiveGameplayEffectHandle
-)
+	)
 {
 	auto ActiveGameplayEffectPtr = AbilitySystemComponentPtr->GetActiveGameplayEffect(InActiveGameplayEffectHandle);
 
@@ -1534,7 +1136,7 @@ void UCharacterAbilitySystemComponent::OnActiveGEAddedDelegateToSelf(
 	UAbilitySystemComponent* AbilitySystemComponentPtr,
 	const FGameplayEffectSpec& GameplayEffectSpec,
 	FActiveGameplayEffectHandle InActiveGameplayEffectHandle
-)
+	)
 {
 	auto ActiveGameplayEffectPtr = AbilitySystemComponentPtr->GetActiveGameplayEffect(InActiveGameplayEffectHandle);
 
@@ -1547,12 +1149,738 @@ void UCharacterAbilitySystemComponent::OnActiveGEAddedDelegateToSelf(
 	else if (OutContainer.HasTag(UGameplayTagsLibrary::GEData_Damage_Callback))
 	{
 		const auto Value = GameplayEffectSpec.GetSetByCallerMagnitude(
-			UGameplayTagsLibrary::GEData_Damage_Callback_IsDeath);
+		                                                              UGameplayTagsLibrary::GEData_Damage_Callback_IsDeath
+		                                                             );
 		if (Value)
 		{
 		}
 		else
 		{
+		}
+	}
+}
+
+void UCharacterAbilitySystemComponent::ApplyInputData(
+	const FGameplayTagContainer& AllAssetTags,
+	TSet<FGameplayTag>& NeedModifySet,
+	const TMap<FGameplayTag, float>& CustomMagnitudes,
+	const TSet<EAdditionalModify>& AdditionalModifyAry,
+	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
+	)
+{
+	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
+
+	// 获得对应GE对象
+	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	FGameplayEffectContextHandle Context = Spec.GetContext();
+
+	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
+
+	// 获得目标AttributeSet
+	const auto TargetSet = Cast<UAS_Character>(
+	                                           ExecutionParams.GetTargetAbilitySystemComponent()->GetAttributeSet(
+		                                            UAS_Character::StaticClass()
+		                                           )
+	                                          );
+
+	// 回执
+	FOnEffectedTargetCallback ReceivedEventModifyDataCallback;
+
+	ReceivedEventModifyDataCallback.InstigatorCharacterPtr = Instigator;
+	ReceivedEventModifyDataCallback.TargetCharacterPtr = TargetCharacterPtr;
+	ReceivedEventModifyDataCallback.AllAssetTags = AllAssetTags;
+	ReceivedEventModifyDataCallback.SetByCallerTagMagnitudes = CustomMagnitudes;
+
+	for (const auto Iter : AdditionalModifyAry)
+	{
+		switch (Iter)
+		{
+		case EAdditionalModify::kIsCritical:
+			{
+				ReceivedEventModifyDataCallback.bIsCritical = true;
+			}
+			break;
+		case EAdditionalModify::kIsEvade:
+			{
+				ReceivedEventModifyDataCallback.bIsEvade = true;
+			}
+			break;
+		}
+	}
+
+#pragma region 确认最终要应用的值
+	// 如果是此类，数据在 SetByCallerTagMagnitudes
+	if (
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive) ||
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override)
+	)
+	{
+		auto Lambda = [&ReceivedEventModifyDataCallback, &NeedModifySet, this, TargetSet, &Spec](
+			const TPair<FGameplayTag, float>& Iter,
+			const float MaxValue,
+			const FGameplayAttribute& Attribute
+			)
+		{
+			NeedModifySet.Add(Iter.Key);
+			UpdateMapBaseValue(
+			                   UGameplayTagsLibrary::DataSource_Character,
+			                   Iter.Value,
+			                   0.f,
+			                   MaxValue,
+			                   Spec,
+			                   Attribute.GetGameplayAttributeData(TargetSet)
+			                  );
+
+			ReceivedEventModifyDataCallback.TherapeuticalDose = Iter.Value;
+		};
+		for (const auto& Iter : CustomMagnitudes)
+		{
+			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
+			{
+				Lambda(Iter, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina))
+			{
+				Lambda(Iter, TargetSet->GetMax_Stamina(), UAS_Character::GetStaminaAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
+			{
+				Lambda(Iter, TargetSet->GetMax_Mana(), UAS_Character::GetManaAttribute());
+			}
+
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxHP))
+			{
+				Lambda(Iter, TargetSet->Max_Max_HP, UAS_Character::GetMax_HPAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxStamina))
+			{
+				Lambda(Iter, TargetSet->Max_Max_Stamina, UAS_Character::GetMax_StaminaAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxMana))
+			{
+				Lambda(Iter, TargetSet->Max_Max_Mana, UAS_Character::GetMax_ManaAttribute());
+			}
+
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value))
+			{
+				Lambda(Iter, TargetSet->MaxElementalValue, UAS_Character::GetMetalValueAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level))
+			{
+				Lambda(Iter, TargetSet->MaxElementalLevel, UAS_Character::GetMetalLevelAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration))
+			{
+				Lambda(Iter, TargetSet->MaxElementalPenetration, UAS_Character::GetMetalPenetrationAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration))
+			{
+				Lambda(
+				       Iter,
+				       TargetSet->MaxElementalPercentPenetration,
+				       UAS_Character::GetMetalPercentPenetrationAttribute()
+				      );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance))
+			{
+				Lambda(Iter, TargetSet->MaxElementalResistance, UAS_Character::GetMetalResistanceAttribute());
+			}
+
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Value))
+			{
+				Lambda(Iter, TargetSet->MaxElementalValue, UAS_Character::GetWoodValueAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Level))
+			{
+				Lambda(Iter, TargetSet->MaxElementalLevel, UAS_Character::GetWoodLevelAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Penetration))
+			{
+				Lambda(Iter, TargetSet->MaxElementalPenetration, UAS_Character::GetWoodPenetrationAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_PercentPenetration))
+			{
+				Lambda(
+				       Iter,
+				       TargetSet->MaxElementalPercentPenetration,
+				       UAS_Character::GetWoodPercentPenetrationAttribute()
+				      );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Resistance))
+			{
+				Lambda(Iter, TargetSet->MaxElementalResistance, UAS_Character::GetWoodResistanceAttribute());
+			}
+
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Value))
+			{
+				Lambda(Iter, TargetSet->MaxElementalValue, UAS_Character::GetWaterValueAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Level))
+			{
+				Lambda(Iter, TargetSet->MaxElementalLevel, UAS_Character::GetWaterLevelAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Penetration))
+			{
+				Lambda(Iter, TargetSet->MaxElementalPenetration, UAS_Character::GetWaterPenetrationAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_PercentPenetration))
+			{
+				Lambda(
+				       Iter,
+				       TargetSet->MaxElementalPercentPenetration,
+				       UAS_Character::GetWaterPercentPenetrationAttribute()
+				      );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Resistance))
+			{
+				Lambda(Iter, TargetSet->MaxElementalResistance, UAS_Character::GetWaterResistanceAttribute());
+			}
+
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Value))
+			{
+				Lambda(Iter, TargetSet->MaxElementalValue, UAS_Character::GetFireValueAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Level))
+			{
+				Lambda(Iter, TargetSet->MaxElementalLevel, UAS_Character::GetFireLevelAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Penetration))
+			{
+				Lambda(Iter, TargetSet->MaxElementalPenetration, UAS_Character::GetFirePenetrationAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_PercentPenetration))
+			{
+				Lambda(
+				       Iter,
+				       TargetSet->MaxElementalPercentPenetration,
+				       UAS_Character::GetFirePercentPenetrationAttribute()
+				      );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Resistance))
+			{
+				Lambda(Iter, TargetSet->MaxElementalResistance, UAS_Character::GetFireResistanceAttribute());
+			}
+
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Value))
+			{
+				Lambda(Iter, TargetSet->MaxElementalValue, UAS_Character::GetEarthValueAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Level))
+			{
+				Lambda(Iter, TargetSet->MaxElementalLevel, UAS_Character::GetEarthLevelAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Penetration))
+			{
+				Lambda(Iter, TargetSet->MaxElementalPenetration, UAS_Character::GetEarthPenetrationAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_PercentPenetration))
+			{
+				Lambda(
+				       Iter,
+				       TargetSet->MaxElementalPercentPenetration,
+				       UAS_Character::GetEarthPercentPenetrationAttribute()
+				      );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Resistance))
+			{
+				Lambda(Iter, TargetSet->MaxElementalResistance, UAS_Character::GetEarthResistanceAttribute());
+			}
+
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
+			{
+				auto Temp = Iter;
+				Temp.Value = 0 - Iter.Value;
+				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
+				ReceivedEventModifyDataCallback.Damage = Iter.Value;
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood))
+			{
+				auto Temp = Iter;
+				Temp.Value = 0 - Iter.Value;
+				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
+				ReceivedEventModifyDataCallback.Damage = Iter.Value;
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Water))
+			{
+				auto Temp = Iter;
+				Temp.Value = 0 - Iter.Value;
+				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
+				ReceivedEventModifyDataCallback.Damage = Iter.Value;
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Fire))
+			{
+				auto Temp = Iter;
+				Temp.Value = 0 - Iter.Value;
+				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
+				ReceivedEventModifyDataCallback.Damage = Iter.Value;
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth))
+			{
+				auto Temp = Iter;
+				Temp.Value = 0 - Iter.Value;
+				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
+				ReceivedEventModifyDataCallback.Damage = Iter.Value;
+			}
+		}
+	}
+	// 如果是此类 SetByCallerTagMagnitudes 仅为一条，且Key为数据的组成
+	else if (
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data) ||
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent) ||
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data) ||
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Percent)
+	)
+	{
+		auto Lambda = [&NeedModifySet, this, TargetSet, &Spec, &CustomMagnitudes](
+			const FGameplayTag& ModifyItemTag,
+			const FGameplayAttribute& Attribute
+			)
+		{
+			NeedModifySet.Add(ModifyItemTag);
+			for (const auto& Iter : CustomMagnitudes)
+			{
+				UpdateMapTemporary(
+				                   Iter.Key,
+				                   Iter.Value,
+				                   Spec,
+				                   Attribute.GetGameplayAttributeData(TargetSet)
+				                  );
+			}
+		};
+		if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed, UAS_Character::GetMoveSpeedAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed, UAS_Character::GetPerformSpeedAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Shield, UAS_Character::GetShieldAttribute());
+		}
+
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalDamage))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_CriticalDamage, UAS_Character::GetCriticalDamageAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalHitRate))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_CriticalHitRate,
+			       UAS_Character::GetCriticalHitRateAttribute()
+			      );
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_HitRate))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_HitRate, UAS_Character::GetHitRateAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_EvadeRate))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_EvadeRate, UAS_Character::GetEvadeRateAttribute());
+		}
+
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value, UAS_Character::GetMetalValueAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level, UAS_Character::GetMetalLevelAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration,
+			       UAS_Character::GetMetalPenetrationAttribute()
+			      );
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration,
+			       UAS_Character::GetMetalPercentPenetrationAttribute()
+			      );
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance,
+			       UAS_Character::GetMetalResistanceAttribute()
+			      );
+		}
+
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Value))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Value, UAS_Character::GetWoodValueAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Level))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Level, UAS_Character::GetWoodLevelAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Penetration))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Wood_Penetration,
+			       UAS_Character::GetWoodPenetrationAttribute()
+			      );
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_PercentPenetration))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Wood_PercentPenetration,
+			       UAS_Character::GetWoodPercentPenetrationAttribute()
+			      );
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Resistance))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Wood_Resistance,
+			       UAS_Character::GetWoodResistanceAttribute()
+			      );
+		}
+
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Value))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Water_Value, UAS_Character::GetWaterValueAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Level))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Water_Level, UAS_Character::GetWaterLevelAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Penetration))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Water_Penetration,
+			       UAS_Character::GetWaterPenetrationAttribute()
+			      );
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_PercentPenetration))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Water_PercentPenetration,
+			       UAS_Character::GetWaterPercentPenetrationAttribute()
+			      );
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Resistance))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Water_Resistance,
+			       UAS_Character::GetWaterResistanceAttribute()
+			      );
+		}
+
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Value))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Value, UAS_Character::GetFireValueAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Level))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Level, UAS_Character::GetFireLevelAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Penetration))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Fire_Penetration,
+			       UAS_Character::GetFirePenetrationAttribute()
+			      );
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_PercentPenetration))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Fire_PercentPenetration,
+			       UAS_Character::GetFirePercentPenetrationAttribute()
+			      );
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Resistance))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Fire_Resistance,
+			       UAS_Character::GetFireResistanceAttribute()
+			      );
+		}
+
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Value))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Value, UAS_Character::GetEarthValueAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Level))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Level, UAS_Character::GetEarthLevelAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Penetration))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Earth_Penetration,
+			       UAS_Character::GetEarthPenetrationAttribute()
+			      );
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_PercentPenetration))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Earth_PercentPenetration,
+			       UAS_Character::GetEarthPercentPenetrationAttribute()
+			      );
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Resistance))
+		{
+			Lambda(
+			       UGameplayTagsLibrary::GEData_ModifyItem_Earth_Resistance,
+			       UAS_Character::GetEarthResistanceAttribute()
+			      );
+		}
+	}
+#pragma endregion
+
+#pragma region 把值写进GE里面
+	for (const auto& Iter : NeedModifySet)
+	{
+		auto Lambda = [this, TargetSet, &Spec, &CustomMagnitudes, &OutExecutionOutput](
+			const FGameplayAttribute& Attribute
+			)
+		{
+			const auto NewValue = GetBaseValueMaps(
+			                                       Spec,
+			                                       Attribute.GetGameplayAttributeData(
+				                                        TargetSet
+				                                       )
+			                                      );
+
+			OutExecutionOutput.AddOutputModifier(
+			                                     FGameplayModifierEvaluatedData(
+			                                                                    Attribute,
+			                                                                    EGameplayModOp::Override,
+			                                                                    NewValue
+			                                                                   )
+			                                    );
+			return NewValue;
+		};
+		if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetHPAttribute());
+			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetStaminaAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetManaAttribute());
+		}
+
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxHP))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMax_HPAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxStamina))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMax_StaminaAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxMana))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMax_ManaAttribute());
+		}
+
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalDamage))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetCriticalDamageAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalHitRate))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetCriticalHitRateAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_HitRate))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetHitRateAttribute());
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_EvadeRate))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetEvadeRateAttribute());
+		}
+
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetShieldAttribute());
+			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMoveSpeedAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetPerformSpeedAttribute());
+		}
+
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMetalValueAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMetalLevelAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMetalPenetrationAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMetalPercentPenetrationAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMetalResistanceAttribute());
+		}
+
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Value))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetWoodValueAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Level))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetWoodLevelAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Penetration))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetWoodPenetrationAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_PercentPenetration))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetWoodPercentPenetrationAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Resistance))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetWoodResistanceAttribute());
+		}
+
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Value))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetWaterValueAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Level))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetWaterLevelAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Penetration))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetWaterPenetrationAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_PercentPenetration))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetWaterPercentPenetrationAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Resistance))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetWaterResistanceAttribute());
+		}
+
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Value))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetFireValueAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Level))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetFireLevelAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Penetration))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetFirePenetrationAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_PercentPenetration))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetFirePercentPenetrationAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Resistance))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetFireResistanceAttribute());
+		}
+
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Value))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetEarthValueAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Level))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetEarthLevelAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Penetration))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetEarthPenetrationAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_PercentPenetration))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetEarthPercentPenetrationAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Resistance))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetEarthResistanceAttribute());
+		}
+
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetHPAttribute());
+			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
+			ReceivedEventModifyDataCallback.ElementalType = EElementalType::kMetal;
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetHPAttribute());
+			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
+			ReceivedEventModifyDataCallback.ElementalType = EElementalType::kWood;
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Water))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetHPAttribute());
+			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
+			ReceivedEventModifyDataCallback.ElementalType = EElementalType::kWater;
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Fire))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetHPAttribute());
+			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
+			ReceivedEventModifyDataCallback.ElementalType = EElementalType::kFire;
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetHPAttribute());
+			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
+			ReceivedEventModifyDataCallback.ElementalType = EElementalType::kEarth;
+		}
+	}
+#pragma endregion
+
+	Instigator->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
+	                                                                         ReceivedEventModifyDataCallback
+	                                                                        );
+
+	if (Instigator != TargetCharacterPtr)
+	{
+		TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnReceivedOhterCharacter(
+			 ReceivedEventModifyDataCallback
+			);
+
+		if (ReceivedEventModifyDataCallback.bIsDeath)
+		{
+		}
+		else if (ReceivedEventModifyDataCallback.bIsEvade)
+		{
+		}
+		else
+		{
+			if (ReceivedEventModifyDataCallback.Damage > 0)
+			{
+				const auto HitResultPtr = Context.GetHitResult();
+				if (HitResultPtr)
+				{
+					TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasbeenAttacked(
+						 Instigator,
+						 HitResultPtr->ImpactNormal
+						);
+				}
+			}
 		}
 	}
 }

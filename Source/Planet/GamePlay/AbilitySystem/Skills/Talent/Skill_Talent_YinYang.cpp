@@ -7,17 +7,17 @@
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
-#include "GenerateType.h"
-#include "GAEvent_Send.h"
+#include "GenerateTypes.h"
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
 #include "CollisionDataStruct.h"
 #include "HumanCharacter.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "SceneActorSubSystem.h"
 #include "CharacterAbilitySystemComponent.h"
+#include "Tools.h"
 
 int32 FTalent_YinYang::GetCurrentValue() const
 {
@@ -88,7 +88,7 @@ void USkill_Talent_YinYang::OnRemoveAbility(
 {
 	if (OnValueChanged)
 	{
-		OnValueChanged->UnBindCallback();
+		OnValueChanged.Reset();
 	}
 
 	if (CharacterPtr)
@@ -238,28 +238,6 @@ void USkill_Talent_YinYang::PerformAction_Yang()
 		CapsuleParams
 	))
 	{
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-		for (auto Iter : OutOverlaps)
-		{
-			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-			if (TargetCharacterPtr)
-			{
-				if (CharacterPtr->IsTeammate(TargetCharacterPtr))
-				{
-					FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-					auto CharacterAttributes = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-
-					GAEventDataPtr->DataAry.Add(GAEventData);
-				}
-			}
-		}
-
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

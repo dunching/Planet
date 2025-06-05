@@ -1,5 +1,7 @@
 .vs/
 *.sln
+/.idea
+/.idea
 
 Binaries/
 Intermediate/
@@ -12,6 +14,9 @@ Intermediate/
 /Script
 /Plugins/*/Binaries
 /Plugins/*/Intermediate
+
+/Planet.sln.DotSettings.user
+/Planet.uproject.DotSettings.user
 
 /Content/BossyEnemy
 /Content/CloseCombatAnimSet
@@ -28,7 +33,6 @@ Intermediate/
 /Content/VoxelExamples
 /Content/VoxelizedMeshes
 /Content/Finisher_Animations
-/Planet.sln.DotSettings.user
-/.idea
-/.idea
-/Planet.uproject.DotSettings.user
+/Content/Effects
+/Content/PhysicsMaterials
+/Content/Maps/TestMaps

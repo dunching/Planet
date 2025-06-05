@@ -1,4 +1,4 @@
-// Copyright 2020 Dan Kestranek.
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "BasicFutures_MoveToAttaclArea.h"
 
@@ -42,20 +42,21 @@ UBasicFutures_MoveToAttaclArea::UBasicFutures_MoveToAttaclArea() :
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 
-	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateNo;
+	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 }
 
-void UBasicFutures_MoveToAttaclArea::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	if (GetWorldImp())
-	{
-		AbilityTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
-		ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
-	}
-}
+// void UBasicFutures_MoveToAttaclArea::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	if (GetWorldImp())
+// 	{
+// 		// // AbilityTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
+// 		
+// 		ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
+// 	}
+// }
 
 void UBasicFutures_MoveToAttaclArea::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
@@ -203,7 +204,7 @@ void UBasicFutures_MoveToAttaclArea::MoveCompletedSignature(FAIRequestID InReque
 
 	if (GameplayAbilityTargetData_MoveToAttaclAreaSPtr)
 	{
-		GameplayAbilityTargetData_MoveToAttaclAreaSPtr->MoveCompletedSignature(Result);
+		std::ignore = GameplayAbilityTargetData_MoveToAttaclAreaSPtr->MoveCompletedSignature(Result);
 		GameplayAbilityTargetData_MoveToAttaclAreaSPtr = nullptr;
 	}
 }
