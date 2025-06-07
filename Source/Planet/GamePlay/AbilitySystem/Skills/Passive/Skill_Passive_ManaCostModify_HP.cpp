@@ -28,10 +28,6 @@ void USkill_Passive_ManaCostModify_HP::OnAvatarSet(
 		                                                           );
 	}
 
-#if UE_EDITOR || UE_SERVER
-	if (
-		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
-	)
 	{
 		CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 		if (CharacterPtr)
@@ -48,7 +44,6 @@ void USkill_Passive_ManaCostModify_HP::OnAvatarSet(
 			CharacterPtr->GetCharacterAbilitySystemComponent()->AddGostModify(ModifySPtr);
 		}
 	}
-#endif
 }
 
 void USkill_Passive_ManaCostModify_HP::OnRemoveAbility(
@@ -56,10 +51,6 @@ void USkill_Passive_ManaCostModify_HP::OnRemoveAbility(
 	const FGameplayAbilitySpec& Spec
 	)
 {
-#if UE_EDITOR || UE_SERVER
-	if (
-		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
-	)
 	{
 		if (CharacterPtr)
 		{
@@ -67,7 +58,6 @@ void USkill_Passive_ManaCostModify_HP::OnRemoveAbility(
 			ModifySPtr = nullptr;
 		}
 	}
-#endif
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }

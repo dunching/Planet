@@ -45,8 +45,10 @@ void UCharacterAbilitySystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-#if UE_EDITOR || UE_SERVER
-	if (GetOwnerRole() == ROLE_Authority)
+	if (
+		(GetOwnerRole() == ROLE_Authority) ||
+		(GetOwnerRole() == ROLE_AutonomousProxy)
+	)
 	{
 		OnGameplayEffectAppliedDelegateToTarget.AddUObject(
 		                                                   this,
@@ -58,17 +60,34 @@ void UCharacterAbilitySystemComponent::BeginPlay()
 		                                                );
 
 
-		AddOutputModify(MakeShared<IOutputData_ProbabilityConfirmation_ModifyInterface>(static_cast<int32>(EOutputModifyOrder::kProbabilityConfirmation)));
+		AddOutputModify(
+		                MakeShared<IOutputData_ProbabilityConfirmation_ModifyInterface>(
+			                 static_cast<int32>(EOutputModifyOrder::kProbabilityConfirmation)
+			                )
+		               );
 
-		AddInputModify(MakeShared<IInputData_ProbabilityConfirmation_ModifyInterface>(static_cast<int32>(EInputModifyOrder::kProbabilityConfirmation)));
-		AddInputModify(MakeShared<IInputData_BasicData_ModifyInterface>(static_cast<int32>(EInputModifyOrder::kBasicData)));
+		AddInputModify(
+		               MakeShared<IInputData_ProbabilityConfirmation_ModifyInterface>(
+			                static_cast<int32>(EInputModifyOrder::kProbabilityConfirmation)
+			               )
+		              );
+		AddInputModify(
+		               MakeShared<IInputData_BasicData_ModifyInterface>(
+		                                                                static_cast<int32>(
+			                                                                EInputModifyOrder::kBasicData)
+		                                                               )
+		              );
 		AddInputModify(MakeShared<IInputData_Shield_ModifyInterface>(static_cast<int32>(EInputModifyOrder::kShield)));
 
-		AddGetValueModify(MakeShared<IGetValueGenericcModifyInterface>(static_cast<int32>(EGetValueModifyOrder::kGenericc)));
+		AddGetValueModify(
+		                  MakeShared<IGetValueGenericcModifyInterface>(
+		                                                               static_cast<int32>(
+			                                                               EGetValueModifyOrder::kGenericc)
+		                                                              )
+		                 );
 
 		AddGostModify(MakeShared<IBasicGostModifyInterface>(static_cast<int32>(EGostModifyOrder::kBasic)));
 	}
-#endif
 }
 
 bool UCharacterAbilitySystemComponent::IsCantBeDamage() const
@@ -865,9 +884,9 @@ void UCharacterAbilitySystemComponent::UpdateMapBaseValue(
 		};
 
 		ValueMap.Add(
-					 GameplayAttributeDataPtr,
-					 DataComposition
-					);
+		             GameplayAttributeDataPtr,
+		             DataComposition
+		            );
 	}
 
 	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive))
@@ -1755,7 +1774,7 @@ bool UCharacterAbilitySystemComponent::CheckCost(
 	for (const auto& Iter : CostMap)
 	{
 		bool bIsOK = true;
-		
+
 		TargetSet->ProcessForAttributeTag(
 		                                  Iter.Key,
 		                                  [&TargetSet, &Iter, &bIsOK, this](
@@ -1768,7 +1787,7 @@ bool UCharacterAbilitySystemComponent::CheckCost(
 					                                    TargetSet
 					                                   )
 				                                  );
-		                                  		bIsOK = Iter.Value <= NewValue;
+			                                  bIsOK = Iter.Value <= NewValue;
 		                                  }
 		                                 );
 
