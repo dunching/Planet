@@ -1,5 +1,7 @@
 #include "DataModifyInterface.h"
 
+#include "Kismet/KismetMathLibrary.h"
+
 #include "AS_Character.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
@@ -95,10 +97,10 @@ bool IInputData_ProbabilityConfirmation_ModifyInterface::Modify(
 	auto TargetCharacterPtr = Cast<FPawnType>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
 
 	const auto InstigatorCharacterAttributesPtr = Instigator->GetCharacterAttributesComponent()->
-															  GetCharacterAttributes();
+	                                                          GetCharacterAttributes();
 
 	const auto TargetCharacterAttributesPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->
-																  GetCharacterAttributes();
+	                                                              GetCharacterAttributes();
 
 	for (auto& Iter : NewDatas)
 	{
@@ -152,10 +154,10 @@ bool IInputData_BasicData_ModifyInterface::Modify(
 	auto TargetCharacterPtr = Cast<FPawnType>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
 
 	const auto InstigatorCharacterAttributesPtr = Instigator->GetCharacterAttributesComponent()->
-															  GetCharacterAttributes();
+	                                                          GetCharacterAttributes();
 
 	const auto TargetCharacterAttributesPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->
-																  GetCharacterAttributes();
+	                                                              GetCharacterAttributes();
 
 	auto Lambda = [this, InstigatorCharacterAttributesPtr, TargetCharacterAttributesPtr](
 		TTuple<FGameplayTag, float>& Iter,
@@ -248,10 +250,10 @@ bool IInputData_Shield_ModifyInterface::Modify(
 	auto TargetCharacterPtr = Cast<FPawnType>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
 
 	const auto InstigatorCharacterAttributesPtr = Instigator->GetCharacterAttributesComponent()->
-															  GetCharacterAttributes();
+	                                                          GetCharacterAttributes();
 
 	const auto TargetCharacterAttributesPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->
-																  GetCharacterAttributes();
+	                                                              GetCharacterAttributes();
 
 	for (auto& Iter : NewDatas)
 	{
@@ -305,6 +307,57 @@ bool IInputData_Shield_ModifyInterface::Modify(
 	return false;
 }
 
+IGetValueGenericcModifyInterface::IGetValueGenericcModifyInterface(
+	int32 InPriority
+	):
+	 IGetValueModifyInterface(InPriority)
+{
+}
+
+int32 IGetValueGenericcModifyInterface::GetValue(
+	const FDataComposition& DataComposition,
+	int32 PreviouValue
+	) const
+{
+	float Result = 0.f;
+
+	auto& GameplayAttributeDataMap = DataComposition;
+
+	// 
+	for (const auto Iter : GameplayAttributeDataMap.DataMap)
+	{
+		Result += Iter.Value;
+	}
+
+	//
+	const auto OriginlResult = Result;
+	for (const auto Iter : GameplayAttributeDataMap.MagnitudeMap)
+	{
+		const auto Percent = Iter.Value / 100;
+		Result += (OriginlResult * Percent);
+	}
+
+	// 去掉小数部分
+	Result = UKismetMathLibrary::Round(Result);
+
+	return Result;
+}
+
+IBasicGostModifyInterface::IBasicGostModifyInterface(
+	int32 InPriority
+	):
+	 IGostModifyInterface(InPriority)
+{
+}
+
+TMap<FGameplayTag, int32> IBasicGostModifyInterface::GetCost(
+	const TMap<FGameplayTag, int32>& Original,
+	const TMap<FGameplayTag, int32>& CurrentOriginal
+	) const
+{
+	return Original;
+}
+
 IOutputData_MultipleDamega_ModifyInterface::IOutputData_MultipleDamega_ModifyInterface(
 	int32 InPriority,
 	int32 InCount,
@@ -347,4 +400,61 @@ bool IOutputData_MultipleDamega_ModifyInterface::Modify(
 	}
 
 	return false;
+}
+
+IGostModify_ReplaceWithOther_Interface::IGostModify_ReplaceWithOther_Interface(
+	int32 InPriority,
+	FGameplayTag InCostAttributeTag,
+	int32 InManaPercent,
+	int32 InNewResourcePercent
+	):
+	 IGostModifyInterface(InPriority)
+	 , CostAttributeTag(InCostAttributeTag)
+	 , ManaPercent(InManaPercent)
+	 , NewResourcePercent(InNewResourcePercent)
+{
+}
+
+TMap<FGameplayTag, int32> IGostModify_ReplaceWithOther_Interface::GetCost(
+	const TMap<FGameplayTag, int32>& Original,
+	const TMap<FGameplayTag, int32>& CurrentOriginal
+	) const
+{
+	TMap<FGameplayTag, int32> Result = CurrentOriginal;
+
+	if (Original.Contains(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
+	{
+		const auto ManeValue = Original[UGameplayTagsLibrary::GEData_ModifyItem_Mana];
+		const auto OffsetValue = ManeValue * (ManaPercent / 100.f);
+		Result.Add(UGameplayTagsLibrary::GEData_ModifyItem_Mana, ManeValue - OffsetValue);
+		Result.Add(CostAttributeTag, OffsetValue * (100 / 100.f));
+	}
+
+	return Result;
+}
+
+IGostModify_Multiple_Interface::IGostModify_Multiple_Interface(
+	int32 InPriority,
+	float InMultiple
+	):
+	 IGostModifyInterface(InPriority)
+	 , Multiple(InMultiple)
+{
+}
+
+TMap<FGameplayTag, int32> IGostModify_Multiple_Interface::GetCost(
+	const TMap<FGameplayTag, int32>& Original,
+	const TMap<FGameplayTag, int32>& CurrentOriginal
+	) const
+{
+	TMap<FGameplayTag, int32> Result = CurrentOriginal;
+
+	if (Original.Contains(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
+	{
+		const auto ManeValue = Original[UGameplayTagsLibrary::GEData_ModifyItem_Mana];
+		const auto NewValue = ManeValue * Multiple;
+		Result.Add(UGameplayTagsLibrary::GEData_ModifyItem_Mana, NewValue);
+	}
+
+	return Result;
 }

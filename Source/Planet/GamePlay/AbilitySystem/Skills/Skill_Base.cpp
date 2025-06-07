@@ -152,6 +152,60 @@ UGameplayEffect* USkill_Base::GetCostGameplayEffect() const
 	return UAssetRefMap::GetInstance()->OnceGEClass.GetDefaultObject();
 }
 
+bool USkill_Base::CheckCooldown(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	FGameplayTagContainer* OptionalRelevantTags
+	) const
+{
+	if (!ensure(ActorInfo))
+	{
+		return true;
+	}
+
+	TArray<FGameplayTag> SourceTags{UGameplayTagsLibrary::GEData_CD};
+
+	const FGameplayTagContainer CooldownTags = FGameplayTagContainer::CreateFromArray(SourceTags);
+
+	if (!CooldownTags.IsEmpty())
+	{
+		if (UAbilitySystemComponent* AbilitySystemComponent = ActorInfo->AbilitySystemComponent.Get())
+		{
+			if (AbilitySystemComponent->HasAnyMatchingGameplayTags(CooldownTags))
+			{
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+const FGameplayTagContainer* USkill_Base::GetCooldownTags() const
+{
+	return nullptr;
+}
+
+bool USkill_Base::CheckCost(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	FGameplayTagContainer* OptionalRelevantTags
+	) const
+{
+	if (!ensure(ActorInfo))
+	{
+		return true;
+	}
+
+	auto AbilitySystemComponentPtr = Cast<UCharacterAbilitySystemComponent>(ActorInfo->AbilitySystemComponent.Get());
+	if (!AbilitySystemComponentPtr )
+	{
+		return false;
+	}
+
+	const auto CostsMap = AbilitySystemComponentPtr->GetCost(GetCostMap());
+	return AbilitySystemComponentPtr->CheckCost(CostsMap);
+}
+
 TArray<FActiveGameplayEffectHandle> USkill_Base::MyApplyGameplayEffectSpecToTarget(
 	const FGameplayAbilitySpecHandle AbilityHandle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -381,20 +435,22 @@ ACharacterBase* USkill_Base::GetTargetInDistance(
 }
 
 TArray<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistanceByNearestCharacter(
-		int32 MaxDistance,int32 UpForwardDistance,int32 DownDistance
-	)const
+	int32 MaxDistance,
+	int32 UpForwardDistance,
+	int32 DownDistance
+	) const
 {
-	TArray<TObjectPtr<ACharacterBase>>  Result;
+	TArray<TObjectPtr<ACharacterBase>> Result;
 
-	const auto TargetsAry= GetTargetsInDistance(MaxDistance, UpForwardDistance, DownDistance);
+	const auto TargetsAry = GetTargetsInDistance(MaxDistance, UpForwardDistance, DownDistance);
 
 	const auto CharacterLocation = CharacterPtr->GetActorLocation();
 
-	std::map<float, TObjectPtr<ACharacterBase>>  Map;
-	
+	std::map<float, TObjectPtr<ACharacterBase>> Map;
+
 	for (const auto& Iter : TargetsAry)
 	{
-		const auto Distance = FVector::Distance(Iter->GetActorLocation() , CharacterLocation);
+		const auto Distance = FVector::Distance(Iter->GetActorLocation(), CharacterLocation);
 		Map.emplace(Distance, Iter);
 	}
 
@@ -407,25 +463,27 @@ TArray<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistanceByNearestCha
 }
 
 TArray<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistanceByNearestCharacterViewDirection(
-		int32 MaxDistance,int32 UpForwardDistance,int32 DownDistance
-	)const
+	int32 MaxDistance,
+	int32 UpForwardDistance,
+	int32 DownDistance
+	) const
 {
-	TArray<TObjectPtr<ACharacterBase>>  Result;
+	TArray<TObjectPtr<ACharacterBase>> Result;
 
-	const auto TargetsAry= GetTargetsInDistance(MaxDistance, UpForwardDistance, DownDistance);
+	const auto TargetsAry = GetTargetsInDistance(MaxDistance, UpForwardDistance, DownDistance);
 
 	const auto CharacterLocation = CharacterPtr->GetActorLocation();
 
 	// 初始角度
 	const auto OriginRot = UKismetMathLibrary::MakeRotFromZX(
-															 -UKismetGravityLibrary::GetGravity(),
-															 CharacterPtr->GetActorForwardVector()
-															);
+	                                                         -UKismetGravityLibrary::GetGravity(),
+	                                                         CharacterPtr->GetActorForwardVector()
+	                                                        );
 
 	const auto Dir = OriginRot.Vector();
 
-	std::map<float, TObjectPtr<ACharacterBase>, std::greater<>>  Map;
-	
+	std::map<float, TObjectPtr<ACharacterBase>, std::greater<>> Map;
+
 	for (const auto& Iter : TargetsAry)
 	{
 		const auto TargetDir = (Iter->GetActorLocation() - CharacterLocation).
@@ -438,7 +496,7 @@ TArray<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistanceByNearestCha
 	{
 		Result.Add(Iter.second);
 	}
-	
+
 	return Result;
 }
 
@@ -446,7 +504,7 @@ FGameplayEffectSpecHandle USkill_Base::MakeDamageToTargetSpecHandle(
 	EElementalType ElementalType,
 	int32 Elemental_Damage,
 	float Elemental_Damage_Magnification
-	)const
+	) const
 {
 	const auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
@@ -513,13 +571,51 @@ FGameplayEffectSpecHandle USkill_Base::MakeDamageToTargetSpecHandle(
 	return SpecHandle;
 }
 
+void USkill_Base::ApplyCostImp(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const TMap<FGameplayTag, int32>& CostMap
+	) const
+{
+	auto AbilitySystemComponentPtr = Cast<UCharacterAbilitySystemComponent>(ActorInfo->AbilitySystemComponent.Get());
+	if (!AbilitySystemComponentPtr)
+	{
+		return;
+	}
+
+	UGameplayEffect* CostGE = GetCostGameplayEffect();
+	if (CostGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(CostGE->GetClass(), GetAbilityLevel());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+
+		const auto CostsMap = AbilitySystemComponentPtr->GetCost(CostMap);
+		for (const auto& Iter : CostsMap)
+		{
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			                                               Iter.Key,
+			                                               -Iter.Value
+			                                              );
+		}
+		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
+}
+
+TMap<FGameplayTag, int32> USkill_Base::GetCostMap() const
+{
+	return {};
+}
+
 TSet<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistance(
 	int32 MaxDistance,
 	int32 UpForwardDistance,
 	int32 DownDistance
 	) const
 {
-	TSet<TObjectPtr<ACharacterBase>>  Result;
+	TSet<TObjectPtr<ACharacterBase>> Result;
 
 	if (auto FocusCharacterPtr = HasFocusActor())
 	{
@@ -562,14 +658,14 @@ TSet<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistance(
 	Params.AddIgnoredActor(CharacterPtr);
 
 	if (GetWorld()->SweepMultiByObjectType(
-	                                         OutOverlaps,
-	                                         CharacterPtr->GetActorLocation() + (FVector::UpVector *UpForwardDistance ),
-	                                         CharacterPtr->GetActorLocation() + (FVector::DownVector *DownDistance ),
-	                                         FQuat::Identity,
-	                                         ObjectQueryParams,
-	                                         FCollisionShape::MakeSphere(MaxDistance),
-	                                         Params
-	                                        ))
+	                                       OutOverlaps,
+	                                       CharacterPtr->GetActorLocation() + (FVector::UpVector * UpForwardDistance),
+	                                       CharacterPtr->GetActorLocation() + (FVector::DownVector * DownDistance),
+	                                       FQuat::Identity,
+	                                       ObjectQueryParams,
+	                                       FCollisionShape::MakeSphere(MaxDistance),
+	                                       Params
+	                                      ))
 	{
 		for (const auto& Iter : OutOverlaps)
 		{
@@ -596,6 +692,6 @@ TSet<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistance(
 			Result.Add(TargetCharacterPtr);
 		}
 	}
-	
+
 	return Result;
 }

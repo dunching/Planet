@@ -85,7 +85,7 @@ void UMainMenuLayout::SwitchViewer(
 				if (MenuInterfacePtr->GetMenuType() == MenuType)
 				{
 					// 这里不太对啊？
-					MenuInterfacePtr->EnableMenu();
+					// MenuInterfacePtr->EnableMenu();
 					return;
 				}
 

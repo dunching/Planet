@@ -19,6 +19,8 @@ class UPlanetAbilitySystemComponent;
 
 class IInputDataModifyInterface;
 class IOutputDataModifyInterface;
+class IGetValueModifyInterface;
+class IGostModifyInterface;
 
 struct FGameplayEffectCustomExecutionParameters;
 struct FGameplayEffectCustomExecutionOutput;
@@ -64,6 +66,15 @@ public:
 
 #pragma region 输入和输出得修正
 
+	/**
+	 * 输出修正
+	 * @param AllAssetTags 
+	 * @param NeedModifySet 
+	 * @param NewDatas 
+	 * @param AdditionalModifyAry 
+	 * @param ExecutionParams 
+	 * @param OutExecutionOutput 
+	 */
 	virtual  void ModifyOutputData(
 		const FGameplayTagContainer & AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
@@ -73,6 +84,15 @@ public:
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 		);
 
+	/**
+	 * 输入修正
+	 * @param AllAssetTags 
+	 * @param NeedModifySet 
+	 * @param NewDatas 
+	 * @param AdditionalModifyAry 
+	 * @param ExecutionParams 
+	 * @param OutExecutionOutput 
+	 */
 	virtual void ModifyInputData(
 		const FGameplayTagContainer & AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
@@ -82,6 +102,25 @@ public:
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 		);
 
+	/**
+	 * 获取基础数据
+	 * @param Spec 
+	 * @param GameplayAttributeDataPtr 
+	 * @return 
+	 */
+	float GetBaseValueMaps(
+		const FGameplayAttributeData* GameplayAttributeDataPtr
+		) const;
+
+	/**
+	 * 应用数据
+	 * @param AllAssetTags 
+	 * @param NeedModifySet 
+	 * @param CustomMagnitudes 
+	 * @param AdditionalModifyAry 
+	 * @param ExecutionParams 
+	 * @param OutExecutionOutput 
+	 */
 	virtual void ApplyInputData(
 		const FGameplayTagContainer & AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
@@ -91,6 +130,21 @@ public:
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 		);
 
+	/**
+	 * 获取最终的消耗
+	 * 如我们需要将将消耗降低30%
+	 * @param CostMap 
+	 * @return 
+	 */
+	TMap<FGameplayTag, int32>GetCost(const TMap<FGameplayTag, int32>&CostMap);
+
+	/**
+	 * 确认折算之后的消耗是否满足释放条件
+	 * @param CostMap 
+	 * @return 
+	 */
+	virtual bool CheckCost(const TMap<FGameplayTag, int32>&CostMap)const;	
+	
 	void AddOutputModify(
 		const TSharedPtr<IOutputDataModifyInterface>& GAEventModifySPtr
 		);
@@ -106,26 +160,47 @@ public:
 	void RemoveInputModify(
 		const TSharedPtr<IInputDataModifyInterface>& GAEventModifySPtr
 		);
+
+	void AddGetValueModify(
+		const TSharedPtr<IGetValueModifyInterface>& GAEventModifySPtr
+		);
+
+	void RemoveGetValueModify(
+		const TSharedPtr<IGetValueModifyInterface>& GAEventModifySPtr
+		);
+
+	void AddGostModify(
+		const TSharedPtr<IGostModifyInterface>& GAEventModifySPtr
+		);
+
+	void RemoveGostModify(
+		const TSharedPtr<IGostModifyInterface>& GAEventModifySPtr
+		);
 #pragma endregion
 
 protected:
-	/**
-	 * 获取基础数据
-	 * @param Spec 
-	 * @param GameplayAttributeDataPtr 
-	 * @return 
-	 */
-	float GetBaseValueMaps(
-		const FGameplayEffectSpec& Spec,
-		const FGameplayAttributeData* GameplayAttributeDataPtr
-		) const;
-
 	void UpdateValueMap();
 
-	// 从小到大
+	/**
+	 * 从小到大
+	 * 输出修正
+	 */
 	std::multiset<TSharedPtr<IOutputDataModifyInterface>, FDataModify_key_compare> OutputDataModifysMap;
 
+	/**
+	 * 输入修正
+	 */
 	std::multiset<TSharedPtr<IInputDataModifyInterface>, FDataModify_key_compare> InputDataModifysMap;
+
+	/**
+	 * 对于某类数值的获取修正
+	 */
+	std::multiset<TSharedPtr<IGetValueModifyInterface>, FDataModify_key_compare> GetValueModifysMap;
+
+	/**
+	 * "战斗资源"消耗的折算
+	 */
+	std::multiset<TSharedPtr<IGostModifyInterface>, FDataModify_key_compare> CostModifysMap;
 
 	/**
 	 * GameplayAttributeData的组成

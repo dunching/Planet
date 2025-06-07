@@ -248,10 +248,6 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
 				CharacterMovementPtr->bSkip_PlayerInput = Lambda();
-				if (CharacterMovementPtr->bSkip_PlayerInput && CharacterPtr->IsA(AHumanCharacter_Player::StaticClass()))
-				{
-					checkNoEntry();
-				}
 			}
 		}
 		else if (Tag.MatchesTagExact(UGameplayTagsLibrary::MovementStateAble_CantRootMotion))

@@ -104,8 +104,9 @@ void UInputProcessorSubSystemBase::ResetProcessor()
 {
 	if (CurrentProcessorSPtr)
 	{
-		CurrentProcessorSPtr->QuitAction();
+		// CurrentProcessorSPtr->QuitAction();
 	}
+	CurrentProcessorSPtr = nullptr;
 }
 
 FDelegateHandle UInputProcessorSubSystemBase::AddKeyEvent(

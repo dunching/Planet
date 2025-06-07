@@ -103,6 +103,8 @@ public:
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 		) override;
 
+	virtual bool CheckCost(const TMap<FGameplayTag, int32>&CostMap)const override;	
+	
 #pragma endregion
 
 #pragma region 基础GA

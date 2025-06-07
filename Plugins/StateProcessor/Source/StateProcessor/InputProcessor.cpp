@@ -90,6 +90,11 @@ void FInputProcessor::BeginDestroy()
 {
 }
 
+void FInputProcessor::GameDown()
+{
+	UnRegisterTicker();
+}
+
 bool FInputProcessor::InputKey(
 	const FInputKeyEventArgs& EventArgs
 	)

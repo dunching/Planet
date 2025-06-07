@@ -108,6 +108,20 @@ public:
 
 	virtual UGameplayEffect* GetCostGameplayEffect() const override;
 
+	virtual bool CheckCooldown(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
+		) const override;
+
+	virtual const FGameplayTagContainer* GetCooldownTags() const override;
+
+	virtual bool CheckCost(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
+		) const override;
+
 	/**
 	 * 
 	 * @param AbilityHandle 
@@ -129,7 +143,7 @@ public:
 
 	virtual void UpdateRegisterParam(
 		const FGameplayEventData& GameplayEventData
-		);
+		) override;
 
 	/**
 	 * 获取持续性或具备下一段输入的，不立即进入CD的GA的剩余持续时间
@@ -184,8 +198,17 @@ protected:
 		EElementalType ElementalType,
 		int32 Elemental_Damage,
 		float Elemental_Damage_Magnification
-		)const;
+		) const;
 
+	void ApplyCostImp(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const TMap<FGameplayTag, int32>& CostMap
+		) const;
+
+	virtual TMap<FGameplayTag, int32>GetCostMap()const;
+	
 	TObjectPtr<ACharacterBase> CharacterPtr = nullptr;
 
 	TSharedPtr<FSkillProxy> SkillProxyPtr = nullptr;

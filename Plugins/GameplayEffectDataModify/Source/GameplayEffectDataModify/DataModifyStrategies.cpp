@@ -27,8 +27,8 @@ IOutputDataModifyInterface::IOutputDataModifyInterface(
 }
 
 bool IOutputDataModifyInterface::Modify(
-		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-		FGameplayEffectCustomExecutionOutput& OutExecutionOutput,
+	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+	FGameplayEffectCustomExecutionOutput& OutExecutionOutput,
 	TSet<FGameplayTag>& NeedModifySet,
 	TMap<FGameplayTag, float>& NewDatas,
 	TSet<EAdditionalModify>& AdditionalModifyAry
@@ -45,12 +45,42 @@ IInputDataModifyInterface::IInputDataModifyInterface(
 }
 
 bool IInputDataModifyInterface::Modify(
-		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-		FGameplayEffectCustomExecutionOutput& OutExecutionOutput,
+	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+	FGameplayEffectCustomExecutionOutput& OutExecutionOutput,
 	TSet<FGameplayTag>& NeedModifySet,
 	TMap<FGameplayTag, float>& NewDatas,
 	TSet<EAdditionalModify>& AdditionalModifyAry
 	)
 {
 	return true;
+}
+
+IGetValueModifyInterface::IGetValueModifyInterface(
+	int32 InPriority
+	):
+	 IDataModifyInterface(InPriority)
+{
+}
+
+int32 IGetValueModifyInterface::GetValue(
+	const FDataComposition& DataComposition,
+	int32 PreviouValue
+	) const
+{
+	return PreviouValue;
+}
+
+IGostModifyInterface::IGostModifyInterface(
+	int32 InPriority
+	):
+	 IDataModifyInterface(InPriority)
+{
+}
+
+TMap<FGameplayTag, int32> IGostModifyInterface::GetCost(
+	const TMap<FGameplayTag, int32>& Original,
+	const TMap<FGameplayTag, int32>& CurrentOriginal
+	) const
+{
+	return {};
 }

@@ -85,7 +85,7 @@ void USkill_Passive_MultipleDamega::MakedDamageDelegate(
 				{
 					return;
 				}
-				
+
 				auto GameplayTagContainer = FGameplayTagContainer::EmptyContainer;
 				GameplayTagContainer.AddTag(UGameplayTagsLibrary::GEData_Info);
 				GameplayTagContainer.AddTag(SkillProxyPtr->GetProxyType());
@@ -136,7 +136,8 @@ void USkill_Passive_MultipleDamega::MakedDamageDelegate(
 				}
 				OutputDataModifySPtr = MakeShared<
 					IOutputData_MultipleDamega_ModifyInterface>(
-					                                            101,
+					                                            static_cast<int32>(
+						                                            EOutputModifyOrder::kSkill_Passive_MultipleDamega),
 					                                            ItemProxy_DescriptionPtr->Count,
 					                                            ItemProxy_DescriptionPtr->Multiple
 					                                           );
@@ -169,17 +170,17 @@ void USkill_Passive_MultipleDamega::OnGameplayEffectRemoved(
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_CD);
 				SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
 				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-															   UGameplayTagsLibrary::GEData_Duration,
-															   ItemProxy_DescriptionPtr->CD.
-															   PerLevelValue[0]
-															  );
+				                                               UGameplayTagsLibrary::GEData_Duration,
+				                                               ItemProxy_DescriptionPtr->CD.
+				                                               PerLevelValue[0]
+				                                              );
 
 				CDHandle = ApplyGameplayEffectSpecToOwner(
-														  GetCurrentAbilitySpecHandle(),
-														  GetCurrentActorInfo(),
-														  GetCurrentActivationInfo(),
-														  SpecHandle
-														 );
+				                                          GetCurrentAbilitySpecHandle(),
+				                                          GetCurrentActorInfo(),
+				                                          GetCurrentActivationInfo(),
+				                                          SpecHandle
+				                                         );
 			}
 		}
 	}

@@ -55,6 +55,8 @@ public:
 	// 
 	virtual void BeginDestroy();
 
+	void GameDown();
+	
 	virtual bool InputKey(
 		const FInputKeyEventArgs& EventArgs
 	) ;

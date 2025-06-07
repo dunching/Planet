@@ -132,6 +132,8 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	) override;
 
+	virtual TMap<FGameplayTag, int32>GetCostMap()const override;
+	
 	// 继续下一段技能
 	void ContinueActive();
 

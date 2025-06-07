@@ -18,7 +18,7 @@ class PLANET_API IOutputData_ModifyInterface_Base : public IOutputDataModifyInte
 {
 public:
 	using FPawnType = ACharacterBase;
-	
+
 	IOutputData_ModifyInterface_Base(
 		int32 InPriority
 		);
@@ -28,7 +28,7 @@ class PLANET_API IInputData_ModifyInterface_Base : public IInputDataModifyInterf
 {
 public:
 	using FPawnType = ACharacterBase;
-	
+
 	IInputData_ModifyInterface_Base(
 		int32 InPriority
 		);
@@ -113,6 +113,38 @@ public:
 		) override;
 };
 
+/**
+ * 
+ */
+class PLANET_API IGetValueGenericcModifyInterface : public IGetValueModifyInterface
+{
+public:
+	IGetValueGenericcModifyInterface(
+		int32 InPriority
+		);
+
+	virtual int32 GetValue(
+		const FDataComposition& DataComposition,
+		int32 PreviouValue
+		) const override;
+};
+
+/**
+ * 
+ */
+class PLANET_API IBasicGostModifyInterface : public IGostModifyInterface
+{
+public:
+	IBasicGostModifyInterface(
+		int32 InPriority
+		);
+
+	virtual TMap<FGameplayTag, int32> GetCost(
+		const TMap<FGameplayTag, int32>& Original,
+		const TMap<FGameplayTag, int32>& CurrentOriginal
+		) const override;
+};
+
 #pragma endregion
 
 #pragma region 通用的修正
@@ -140,11 +172,80 @@ public:
 		) override;
 
 	float Multiple = 1.f;
-	
+
 	int32 Count = 1;
-	
+
 	int32 CurrentCount = 0;
 };
 
+/**
+ * 将消耗的Mana部分替换为其他资源
+ */
+class PLANET_API IGostModify_ReplaceWithOther_Interface : public IGostModifyInterface
+{
+public:
+	IGostModify_ReplaceWithOther_Interface(
+		int32 InPriority,
+		FGameplayTag InCostAttributeTag,
+		int32 InManaPercent,
+		int32 InNewResourcePercent
+		);
+
+	virtual TMap<FGameplayTag, int32> GetCost(
+		const TMap<FGameplayTag, int32>& Original,
+		const TMap<FGameplayTag, int32>& CurrentOriginal
+		) const override;
+
+	FGameplayTag CostAttributeTag;
+
+	int32 ManaPercent = 30;
+
+	int32 NewResourcePercent = 100;
+};
+
+/**
+ * 将消耗的Mana按倍率进行乘积
+ */
+class PLANET_API IGostModify_Multiple_Interface : public IGostModifyInterface
+{
+public:
+	IGostModify_Multiple_Interface(
+		int32 InPriority,
+		float InMultiple
+		);
+
+	virtual TMap<FGameplayTag, int32> GetCost(
+		const TMap<FGameplayTag, int32>& Original,
+		const TMap<FGameplayTag, int32>& CurrentOriginal
+		) const override;
+
+	float Multiple = 1.f;
+};
 
 #pragma endregion
+
+enum class EOutputModifyOrder : uint16
+{
+	kProbabilityConfirmation = 150,
+	
+	kSkill_Passive_MultipleDamega = 151,
+};
+
+enum class EInputModifyOrder: uint16
+{
+	kProbabilityConfirmation = 150,
+	kBasicData = 151,
+	kShield = 152,
+};
+
+enum class EGetValueModifyOrder: uint16
+{
+	kGenericc = 150,
+};
+
+enum class EGostModifyOrder: uint16
+{
+	kBasic = 150,
+	
+	kSkill_Passive_ManaCostModify_HP = 151,
+};

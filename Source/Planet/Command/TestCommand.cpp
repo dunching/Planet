@@ -268,3 +268,21 @@ void TestCommand::AddExperience(
 	}
 #endif
 }
+
+void TestCommand::SetCharacterAttributeValue(
+	const TArray<FString>& Args
+	)
+{
+#if WITH_EDITOR
+	if (!Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (PCPtr)
+	{
+		PCPtr->SetCharacterAttributeValue(Args);
+	}
+#endif
+}

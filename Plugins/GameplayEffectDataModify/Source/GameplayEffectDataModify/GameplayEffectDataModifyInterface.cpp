@@ -4,35 +4,31 @@
 #include "GameplayTagContainer.h"
 
 float IGameplayEffectDataModifyInterface::GetBaseValueMaps(
-	const FGameplayEffectSpec& Spec,
 	const FGameplayAttributeData* GameplayAttributeDataPtr
-	) const
+	)const
 {
 	float Result = 0.f;
 
-	if (!ValueMap.Contains(GameplayAttributeDataPtr))
+	if (ValueMap.Contains(GameplayAttributeDataPtr))
 	{
-		return Result;
+		const auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+
+		auto& ModifyStrategiesRef = GetValueModifysMap;
+
+		int32 Value = 0;
+		for (auto Iter = ModifyStrategiesRef.begin(); Iter != ModifyStrategiesRef.end(); Iter++)
+		{
+			Value = (*Iter)->GetValue(GameplayAttributeDataMap, Value);
+		}
+		
+		Result = Value;
+	}
+	else
+	{
+		Result = GameplayAttributeDataPtr->GetCurrentValue();
 	}
 
-	auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-
-	// 
-	for (const auto Iter : GameplayAttributeDataMap.DataMap)
-	{
-		Result += Iter.Value;
-	}
-
-	//
-	const auto OriginlResult = Result;
-	for (const auto Iter : GameplayAttributeDataMap.MagnitudeMap)
-	{
-		const auto Percent = Iter.Value / 100;
-		Result += (OriginlResult * Percent);
-	}
-
-	// 去掉小数部分
-	return UKismetMathLibrary::Round(Result);
+	return Result;
 }
 
 void IGameplayEffectDataModifyInterface::UpdateValueMap()
@@ -71,6 +67,30 @@ void IGameplayEffectDataModifyInterface::ApplyInputData(
 {
 }
 
+TMap<FGameplayTag, int32> IGameplayEffectDataModifyInterface::GetCost(
+	const TMap<FGameplayTag, int32>& CostMap
+	)
+{
+	TMap<FGameplayTag, int32>Result = CostMap;
+	
+	auto& ModifyStrategiesRef = CostModifysMap;
+
+	int32 Value = 0;
+	for (auto Iter = ModifyStrategiesRef.begin(); Iter != ModifyStrategiesRef.end(); Iter++)
+	{
+		Result = (*Iter)->GetCost(CostMap,Result);
+	}
+
+	return Result;
+}
+
+bool IGameplayEffectDataModifyInterface::CheckCost(
+	const TMap<FGameplayTag, int32>& CostMap
+	) const
+{
+	return false;
+}
+
 void IGameplayEffectDataModifyInterface::ModifyInputData(
 	const FGameplayTagContainer& AllAssetTags,
 	TSet<FGameplayTag>& NeedModifySet,
@@ -106,7 +126,7 @@ void IGameplayEffectDataModifyInterface::ModifyInputData(
 void FDataComposition::Empty()
 {
 	DataMap.Empty();
-	
+
 	MagnitudeMap.Empty();
 }
 
@@ -205,6 +225,74 @@ void IGameplayEffectDataModifyInterface::RemoveInputModify(
 		if ((*Iter)->ID == GAEventModifySPtr->ID)
 		{
 			InputDataModifysMap.erase(Iter);
+			break;
+		}
+	}
+}
+
+void IGameplayEffectDataModifyInterface::AddGetValueModify(
+	const TSharedPtr<IGetValueModifyInterface>& GAEventModifySPtr
+	)
+{
+	for (bool bIsContinue = true; bIsContinue;)
+	{
+		bIsContinue = false;
+		GAEventModifySPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
+		for (const auto& Iter : GetValueModifysMap)
+		{
+			if (Iter->ID == GAEventModifySPtr->ID)
+			{
+				bIsContinue = true;
+				break;
+			}
+		}
+	}
+	GetValueModifysMap.emplace(GAEventModifySPtr);
+}
+
+void IGameplayEffectDataModifyInterface::RemoveGetValueModify(
+	const TSharedPtr<IGetValueModifyInterface>& GAEventModifySPtr
+	)
+{
+	for (auto Iter = GetValueModifysMap.begin(); Iter != GetValueModifysMap.end(); Iter++)
+	{
+		if ((*Iter)->ID == GAEventModifySPtr->ID)
+		{
+			GetValueModifysMap.erase(Iter);
+			break;
+		}
+	}
+}
+
+void IGameplayEffectDataModifyInterface::AddGostModify(
+	const TSharedPtr<IGostModifyInterface>& GAEventModifySPtr
+	)
+{
+	for (bool bIsContinue = true; bIsContinue;)
+	{
+		bIsContinue = false;
+		GAEventModifySPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
+		for (const auto& Iter : CostModifysMap)
+		{
+			if (Iter->ID == GAEventModifySPtr->ID)
+			{
+				bIsContinue = true;
+				break;
+			}
+		}
+	}
+	CostModifysMap.emplace(GAEventModifySPtr);
+}
+
+void IGameplayEffectDataModifyInterface::RemoveGostModify(
+	const TSharedPtr<IGostModifyInterface>& GAEventModifySPtr
+	)
+{
+	for (auto Iter = CostModifysMap.begin(); Iter != CostModifysMap.end(); Iter++)
+	{
+		if ((*Iter)->ID == GAEventModifySPtr->ID)
+		{
+			CostModifysMap.erase(Iter);
 			break;
 		}
 	}

@@ -110,6 +110,177 @@ void UAS_Character::GetLifetimeReplicatedProps(
 	DOREPLIFETIME_CONDITION(ThisClass, Shield, COND_None);
 }
 
+void UAS_Character::ProcessForAttributeTag(
+	const FGameplayTag& AttributeTag,
+	const std::function<void(
+		const FGameplayAttribute&,
+		float 
+		)>& Func
+	)const
+{
+	if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
+	{
+		Func(GetHPAttribute(), GetHP());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina))
+	{
+		Func(GetStaminaAttribute(), GetStamina());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
+	{
+		Func(GetManaAttribute(), GetMana());
+	}
+
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxHP))
+	{
+		Func(GetMax_HPAttribute(), GetMax_HP());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxStamina))
+	{
+		Func(GetMax_StaminaAttribute(), GetMax_Stamina());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxMana))
+	{
+		Func(GetMax_ManaAttribute(), GetMax_Mana());
+	}
+	
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
+	{
+		Func(GetMoveSpeedAttribute(), GetMoveSpeed());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
+	{
+		Func(GetPerformSpeedAttribute(), GetPerformSpeed());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalDamage))
+	{
+		Func(GetCriticalDamageAttribute(), GetCriticalDamage());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalHitRate))
+	{
+		Func(GetCriticalHitRateAttribute(), GetCriticalHitRate());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HitRate))
+	{
+		Func(GetHitRateAttribute(), GetHitRate());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_EvadeRate))
+	{
+		Func(GetEvadeRateAttribute(), GetEvadeRate());
+	}
+	
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield))
+	{
+		Func(GetShieldAttribute(), GetShield());
+	}
+
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value))
+	{
+		Func(GetMetalValueAttribute(), GetMetalValue());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level))
+	{
+		Func(GetMetalLevelAttribute(), GetMetalLevel());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration))
+	{
+		Func(GetMetalPenetrationAttribute(), GetMetalPenetration());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration))
+	{
+		Func(GetMetalPercentPenetrationAttribute(), GetMetalPercentPenetration());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance))
+	{
+		Func(GetMetalResistanceAttribute(), GetMetalResistance());
+	}
+
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Value))
+	{
+		Func(GetWoodValueAttribute(), GetWoodValue());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Level))
+	{
+		Func(GetWoodLevelAttribute(), GetWoodLevel());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Penetration))
+	{
+		Func(GetWoodPenetrationAttribute(), GetWoodPenetration());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_PercentPenetration))
+	{
+		Func(GetWoodPercentPenetrationAttribute(), GetWoodPercentPenetration());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Resistance))
+	{
+		Func(GetWoodResistanceAttribute(), GetWoodResistance());
+	}
+
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Value))
+	{
+		Func(GetWaterValueAttribute(), GetWaterValue());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Level))
+	{
+		Func(GetWaterLevelAttribute(), GetWaterLevel());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Penetration))
+	{
+		Func(GetWaterPenetrationAttribute(), GetWaterPenetration());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_PercentPenetration))
+	{
+		Func(GetWaterPercentPenetrationAttribute(), GetWaterPercentPenetration());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Resistance))
+	{
+		Func(GetWaterResistanceAttribute(), GetWaterResistance());
+	}
+
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Value))
+	{
+		Func(GetFireValueAttribute(), GetFireValue());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Level))
+	{
+		Func(GetFireLevelAttribute(), GetFireLevel());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Penetration))
+	{
+		Func(GetFirePenetrationAttribute(), GetFirePenetration());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_PercentPenetration))
+	{
+		Func(GetFirePercentPenetrationAttribute(), GetFirePercentPenetration());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Resistance))
+	{
+		Func(GetFireResistanceAttribute(), GetFireResistance());
+	}
+
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Value))
+	{
+		Func(GetEarthValueAttribute(), GetEarthValue());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Level))
+	{
+		Func(GetEarthLevelAttribute(), GetEarthLevel());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Penetration))
+	{
+		Func(GetEarthPenetrationAttribute(), GetEarthPenetration());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_PercentPenetration))
+	{
+		Func(GetEarthPercentPenetrationAttribute(), GetEarthPercentPenetration());
+	}
+	else if (AttributeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Resistance))
+	{
+		Func(GetEarthResistanceAttribute(), GetEarthResistance());
+	}
+
+}
+
 void UAS_Character::OnRep_Max_HP(
 	const FMyGameplayAttributeData& OldHealth
 	)

@@ -243,20 +243,7 @@ void USkill_Active_XYFH::ApplyCost(
 	const FGameplayAbilityActivationInfo ActivationInfo
 	) const
 {
-	UGameplayEffect* CostGE = GetCostGameplayEffect();
-	if (CostGE)
-	{
-		FGameplayEffectSpecHandle SpecHandle =
-			MakeOutgoingGameplayEffectSpec(CostGE->GetClass(), GetAbilityLevel());
-		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
-		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-		                                               UGameplayTagsLibrary::GEData_ModifyItem_Mana,
-		                                               -ItemProxy_DescriptionPtr->Cost.PerLevelValue[0]
-		                                              );
-
-		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
-	}
+	ApplyCostImp(Handle, ActorInfo, ActivationInfo,GetCostMap());
 }
 
 void USkill_Active_XYFH::PerformAction(

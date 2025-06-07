@@ -17,6 +17,7 @@ struct FDataModify_key_compare;
 
 struct FGameplayEffectCustomExecutionParameters;
 struct FGameplayEffectCustomExecutionOutput;
+struct FDataComposition;
 
 class GAMEPLAYEFFECTDATAMODIFY_API IDataModifyInterface
 {
@@ -42,11 +43,22 @@ private:
 	int32 ID = -1;
 };
 
+struct FDataModify_key_compare
+{
+	bool operator()(
+		const TSharedPtr<IDataModifyInterface>& lhs,
+		const TSharedPtr<IDataModifyInterface>& rhs
+		) const
+	{
+		return lhs->Priority < rhs->Priority;
+	}
+};
+
 class GAMEPLAYEFFECTDATAMODIFY_API IOutputDataModifyInterface : public IDataModifyInterface
 {
 public:
 	using FPawnType = ACharacter;
-	
+
 	IOutputDataModifyInterface(
 		int32 InPriority = 1
 		);
@@ -74,7 +86,7 @@ class GAMEPLAYEFFECTDATAMODIFY_API IInputDataModifyInterface : public IDataModif
 {
 public:
 	using FPawnType = ACharacter;
-	
+
 	IInputDataModifyInterface(
 		int32 InPriority = 1
 		);
@@ -88,13 +100,32 @@ public:
 		);
 };
 
-struct FDataModify_key_compare
+class GAMEPLAYEFFECTDATAMODIFY_API IGetValueModifyInterface : public IDataModifyInterface
 {
-	bool operator()(
-		const TSharedPtr<IDataModifyInterface>& lhs,
-		const TSharedPtr<IDataModifyInterface>& rhs
-		) const
-	{
-		return lhs->Priority < rhs->Priority;
-	}
+public:
+	using FPawnType = ACharacter;
+
+	IGetValueModifyInterface(
+		int32 InPriority = 1
+		);
+
+	virtual int32 GetValue(
+		const FDataComposition& DataComposition,
+		int32 PreviouValue
+		) const;
+};
+
+class GAMEPLAYEFFECTDATAMODIFY_API IGostModifyInterface : public IDataModifyInterface
+{
+public:
+	using FPawnType = ACharacter;
+
+	IGostModifyInterface(
+		int32 InPriority = 1
+		);
+
+	virtual TMap<FGameplayTag, int32> GetCost(
+		const TMap<FGameplayTag, int32>& Original,
+		const TMap<FGameplayTag, int32>& CurrentOriginal
+		) const;
 };
