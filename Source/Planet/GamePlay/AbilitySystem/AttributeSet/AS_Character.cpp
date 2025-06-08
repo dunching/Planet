@@ -282,345 +282,353 @@ void UAS_Character::ProcessForAttributeTag(
 }
 
 void UAS_Character::OnRep_Max_HP(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Max_HP, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Max_HP, OldValue);
 }
 
 void UAS_Character::OnRep_HP(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, HP, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, HP, OldValue);
 }
 
 void UAS_Character::OnRep_HP_Replay(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, HP_Replay, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, HP_Replay, OldValue);
 }
 
 void UAS_Character::OnRep_Max_Stamina(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Max_Stamina, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Max_Stamina, OldValue);
 }
 
 void UAS_Character::OnRep_Stamina(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Stamina, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Stamina, OldValue);
 }
 
 void UAS_Character::OnRep_Stamina_Replay(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Stamina_Replay, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Stamina_Replay, OldValue);
 }
 
 void UAS_Character::OnRep_Mana(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Mana, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Mana, OldValue);
 }
 
 void UAS_Character::OnRep_Max_Mana(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Max_Mana, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Max_Mana, OldValue);
 }
 
 void UAS_Character::OnRep_Mana_Replay(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Mana_Replay, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Mana_Replay, OldValue);
 }
 
 void UAS_Character::OnRep_Experience(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Experience, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Experience, OldValue);
 }
 
 void UAS_Character::OnRep_LevelExperience(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, LevelExperience, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, LevelExperience, OldValue);
 }
 
 void UAS_Character::OnRep_MetalValue(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalValue, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalValue, OldValue);
 }
 
 void UAS_Character::OnRep_MetalLevel(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalLevel, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalLevel, OldValue);
 }
 
 void UAS_Character::OnRep_MetalPenetration(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalPenetration, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalPenetration, OldValue);
 }
 
 void UAS_Character::OnRep_MetalPercentPenetration(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalPercentPenetration, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalPercentPenetration, OldValue);
 }
 
 void UAS_Character::OnRep_MetalResistance(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalResistance, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalResistance, OldValue);
 }
 
 void UAS_Character::OnRep_WoodValue(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WoodValue, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WoodValue, OldValue);
 }
 
 void UAS_Character::OnRep_WoodLevel(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WoodLevel, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WoodLevel, OldValue);
 }
 
 void UAS_Character::OnRep_WoodPenetration(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WoodPenetration, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WoodPenetration, OldValue);
 }
 
 void UAS_Character::OnRep_WoodPercentPenetration(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WoodPercentPenetration, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WoodPercentPenetration, OldValue);
 }
 
 void UAS_Character::OnRep_WoodResistance(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WoodResistance, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WoodResistance, OldValue);
 }
 
 void UAS_Character::OnRep_EarthValue(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, EarthValue, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, EarthValue, OldValue);
 }
 
 void UAS_Character::OnRep_EarthLevel(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, EarthLevel, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, EarthLevel, OldValue);
 }
 
 void UAS_Character::OnRep_EarthPenetration(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, EarthPenetration, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, EarthPenetration, OldValue);
 }
 
 void UAS_Character::OnRep_EarthPercentPenetration(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, EarthPercentPenetration, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, EarthPercentPenetration, OldValue);
 }
 
 void UAS_Character::OnRep_EarthResistance(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, EarthResistance, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, EarthResistance, OldValue);
 }
 
 void UAS_Character::OnRep_WaterValue(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WaterValue, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WaterValue, OldValue);
 }
 
 void UAS_Character::OnRep_WaterLevel(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WaterLevel, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WaterLevel, OldValue);
 }
 
 void UAS_Character::OnRep_WaterPenetration(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WaterPenetration, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WaterPenetration, OldValue);
 }
 
 void UAS_Character::OnRep_WaterPercentPenetration(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WaterPercentPenetration, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WaterPercentPenetration, OldValue);
 }
 
 void UAS_Character::OnRep_WaterResistance(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WaterResistance, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, WaterResistance, OldValue);
 }
 
 void UAS_Character::OnRep_FireValue(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, FireValue, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, FireValue, OldValue);
 }
 
 void UAS_Character::OnRep_FireLevel(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, FireLevel, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, FireLevel, OldValue);
 }
 
 void UAS_Character::OnRep_FirePenetration(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, FirePenetration, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, FirePenetration, OldValue);
 }
 
 void UAS_Character::OnRep_FirePercentPenetration(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, FirePercentPenetration, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, FirePercentPenetration, OldValue);
 }
 
 void UAS_Character::OnRep_FireResistance(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, FireResistance, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, FireResistance, OldValue);
 }
 
 void UAS_Character::OnRep_MoveSpeed(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MoveSpeed, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MoveSpeed, OldValue);
 }
 
 void UAS_Character::OnRep_CriticalDamage(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, CriticalDamage, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, CriticalDamage, OldValue);
 }
 
 void UAS_Character::OnRep_CriticalHitRate(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, CriticalHitRate, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, CriticalHitRate, OldValue);
 }
 
 void UAS_Character::OnRep_HitRate(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, HitRate, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, HitRate, OldValue);
 }
 
 void UAS_Character::OnRep_EvadeRate(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, EvadeRate, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, EvadeRate, OldValue);
 }
 
 void UAS_Character::OnRep_PerformSpeed(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, PerformSpeed, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, PerformSpeed, OldValue);
 }
 
 inline void UAS_Character::OnRep_Shield(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Shield, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Shield, OldValue);
+}
+
+void UAS_Character::OnRep_Haste(
+	const FMyGameplayAttributeData& OldValue
+	)
+{
+	// 使用默认的游戏玩法属性系统更新通知行为。
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Haste, OldValue);
 }
 
 void UAS_Character::OnRep_Level(
-	const FMyGameplayAttributeData& OldHealth
+	const FMyGameplayAttributeData& OldValue
 	)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Level, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Level, OldValue);
 }

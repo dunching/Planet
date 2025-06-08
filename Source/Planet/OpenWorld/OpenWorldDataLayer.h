@@ -27,7 +27,8 @@ enum class ETeleport : uint8
 	/**
 	 * 开放世界中的传送点
 	 */
-	kTeleport_1,
+	kTeleport_NoviceVillage,	// 新手村
+	kTeleport_2,				
 	
 	kTest1,
 	kTest2,

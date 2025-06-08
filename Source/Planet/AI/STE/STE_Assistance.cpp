@@ -175,6 +175,8 @@ TWeakObjectPtr<ACharacterBase> USTE_Assistance::UpdateTargetCharacter()
 
 				return GetTargetCharacter(Location, MaxDistance,KnowCharatersSet);
 			}
+			
+			return GetNewTargetCharacter(KnowCharatersSet);
 		}
 		else if (CharacterActorPtr->IsA(AHumanCharacter_Player::StaticClass()))
 		{

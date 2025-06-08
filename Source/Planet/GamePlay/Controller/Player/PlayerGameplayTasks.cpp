@@ -10,6 +10,7 @@
 #include "Teleport.h"
 #include "HumanCharacter_Player.h"
 #include "InputProcessorSubSystem_Imp.h"
+#include "LogWriter.h"
 #include "TransitionProcessor.h"
 #include "WeatherSystem.h"
 
@@ -210,6 +211,12 @@ void UGameplayTask_TeleportPlayer::TickTask(
 	{
 		if (bIsSuccessful)
 		{
+			if (CurrentWaitTime < MinWaitTime)
+			{
+				PRINTINVOKEWITHSTR(FString(TEXT("Not Yet")));
+				return;	
+			}
+			
 			if ((CurrentWaitTime >= MinWaitTime) && bIsOnLanded)
 			{
 #if UE_EDITOR || UE_CLIENT

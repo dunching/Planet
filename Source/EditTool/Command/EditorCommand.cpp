@@ -3,6 +3,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/SplineComponent.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "WorldPartition/WorldPartitionMiniMap.h"
+#include "IImageWrapper.h"
+#include "IImageWrapperModule.h"
+#include "ImageUtils.h"
 
 #include "HumanCharacter.h"
 #include "AssetRefMap.h"
@@ -676,4 +680,59 @@ void EditorCommand::ModifyElementalDataToTarget(
 	}
 
 	PCPtr->ModifyElementalDataToTarget(Args);
+}
+
+void EditorCommand::ExportMinimapTexture()
+{
+	auto World = GEditor->GetEditorWorldContext().World();
+	auto ActorPtr = Cast<AWorldPartitionMiniMap>(UGameplayStatics::GetActorOfClass(World, AWorldPartitionMiniMap::StaticClass()));
+	if (!ActorPtr)
+	{
+		return;
+	}
+	FString PicturePath = FPaths::ProjectSavedDir() + TEXT("Minimap.png");
+
+	auto Texture = ActorPtr->MiniMapTexture;
+	
+	// record old settings
+	TextureCompressionSettings OldCompressionSettings = Texture->CompressionSettings;
+	TextureMipGenSettings OldMipGenSettings = Texture->MipGenSettings;
+	bool OldSRGB = Texture->SRGB;
+
+	// modified to exportable settings
+	Texture->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
+	Texture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
+	Texture->SRGB = false;
+	Texture->UpdateResource();
+
+	// export texture to image
+	FTexture2DMipMap& Mip = Texture->GetPlatformData()->Mips[0];
+	uint8* TextureData = (uint8*) Mip.BulkData.Lock(LOCK_READ_WRITE);
+	Mip.BulkData.Unlock();
+
+	int32 SizeX = Texture->GetPlatformData()->SizeX;
+	int32 SizeY = Texture->GetPlatformData()->SizeY;
+	TArray<FColor> ColorData;
+	for (int32 IndexY = 0; IndexY < SizeY; IndexY++)
+	{
+		for (int32 IndexX = 0; IndexX < SizeX; IndexX++)
+		{
+			FColor PixelColor;
+			PixelColor.B = TextureData[(IndexY * SizeX + IndexX) * 4 + 0];
+			PixelColor.G = TextureData[(IndexY * SizeX + IndexX) * 4 + 1];
+			PixelColor.R = TextureData[(IndexY * SizeX + IndexX) * 4 + 2];
+			PixelColor.A = TextureData[(IndexY * SizeX + IndexX) * 4 + 3];
+			ColorData.Add(PixelColor);
+		}
+	}
+
+	TArray64<uint8> ImageData;
+	FImageUtils::PNGCompressImageArray(SizeX, SizeY, ColorData, ImageData);
+	FFileHelper::SaveArrayToFile(ImageData, *PicturePath);
+
+	// return to old settings
+	Texture->CompressionSettings = OldCompressionSettings;
+	Texture->MipGenSettings = OldMipGenSettings;
+	Texture->SRGB = OldSRGB;
+	Texture->UpdateResource();
 }

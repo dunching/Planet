@@ -58,7 +58,7 @@ void GameplayCommand::EntryChallengeLevel(
 			}
 			else if (Args[0] == TEXT("Teleport"))
 			{
-				PCPtr->EntryChallengeLevel(ETeleport::kTeleport_1);
+				PCPtr->EntryChallengeLevel(ETeleport::kTeleport_NoviceVillage);
 			}
 			else if (Args[0] == TEXT("Test1"))
 			{

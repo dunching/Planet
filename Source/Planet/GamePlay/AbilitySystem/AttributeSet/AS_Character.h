@@ -64,226 +64,224 @@ public:
 			const FGameplayAttribute&,
 			float
 			)>& Func
-		)const;
+		) const;
 
 	const int32 Max_Max_HP = 10000;
 
 	// 最大生命值
 	UPROPERTY(ReplicatedUsing = OnRep_Max_HP, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData Max_HP;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Max_HP);
 
 	UFUNCTION()
 	virtual void OnRep_Max_HP(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	// 生命值
 	UPROPERTY(ReplicatedUsing = OnRep_HP, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData HP;
 	ATTRIBUTE_ACCESSORS(UAS_Character, HP);
 
 	UFUNCTION()
 	virtual void OnRep_HP(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	// 生命值回复速率
 	UPROPERTY(ReplicatedUsing = OnRep_HP_Replay, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData HP_Replay;
 	ATTRIBUTE_ACCESSORS(UAS_Character, HP_Replay);
 
 	UFUNCTION()
 	virtual void OnRep_HP_Replay(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	const int32 Max_Max_Stamina = 10000;
 
 	UPROPERTY(ReplicatedUsing = OnRep_Max_Stamina, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData Max_Stamina;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Max_Stamina);
 
 	UFUNCTION()
 	virtual void OnRep_Max_Stamina(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	// 体力,用于冲刺、奔跑
 	UPROPERTY(ReplicatedUsing = OnRep_Stamina, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData Stamina;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Stamina);
 
 	UFUNCTION()
 	virtual void OnRep_Stamina(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	// 体力回复速率
 	UPROPERTY(ReplicatedUsing = OnRep_Stamina_Replay, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData Stamina_Replay;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Stamina_Replay);
 
 	UFUNCTION()
 	virtual void OnRep_Stamina_Replay(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	// 战斗资源，用于释放技能
 	UPROPERTY(ReplicatedUsing = OnRep_Mana, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData Mana;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Mana);
 
 	UFUNCTION()
 	virtual void OnRep_Mana(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	const int32 Max_Max_Mana = 10000;
 
 	UPROPERTY(ReplicatedUsing = OnRep_Max_Mana, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData Max_Mana;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Max_Mana);
 
 	UFUNCTION()
 	virtual void OnRep_Max_Mana(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	// 战斗资源回复速率
 	UPROPERTY(ReplicatedUsing = OnRep_Mana_Replay, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData Mana_Replay;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Mana_Replay);
 
 	UFUNCTION()
 	virtual void OnRep_Mana_Replay(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_MoveSpeed, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData MoveSpeed;
 	ATTRIBUTE_ACCESSORS(UAS_Character, MoveSpeed);
 
 	UFUNCTION()
 	virtual void OnRep_MoveSpeed(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	/**
 	 * 会心伤害 0 ~ 10000
 	 */
 	UPROPERTY(ReplicatedUsing = OnRep_CriticalDamage, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData CriticalDamage;
 	ATTRIBUTE_ACCESSORS(UAS_Character, CriticalDamage);
 
 	UFUNCTION()
 	virtual void OnRep_CriticalDamage(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	/**
 	 * 会心率 0 ~ 100
 	 */
 	UPROPERTY(ReplicatedUsing = OnRep_CriticalHitRate, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData CriticalHitRate;
 	ATTRIBUTE_ACCESSORS(UAS_Character, CriticalHitRate);
 
 	UFUNCTION()
 	virtual void OnRep_CriticalHitRate(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	/**
 	 * 命中率 0 ~ 1000
 	 */
 	UPROPERTY(ReplicatedUsing = OnRep_HitRate, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData HitRate;
 	ATTRIBUTE_ACCESSORS(UAS_Character, HitRate);
 
 	UFUNCTION()
 	virtual void OnRep_HitRate(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	/**
 	 * 闪避几率 0 ~ 1000
 	 */
 	UPROPERTY(ReplicatedUsing = OnRep_EvadeRate, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData EvadeRate;
 	ATTRIBUTE_ACCESSORS(UAS_Character, EvadeRate);
 
 	UFUNCTION()
 	virtual void OnRep_EvadeRate(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	// 攻击速度、技能释放速度
 	UPROPERTY(ReplicatedUsing = OnRep_PerformSpeed, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData PerformSpeed;
 	ATTRIBUTE_ACCESSORS(UAS_Character, PerformSpeed);
 
 	UFUNCTION()
 	virtual void OnRep_PerformSpeed(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	// 当前护盾值
 	UPROPERTY(ReplicatedUsing = OnRep_Shield, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData Shield;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Shield);
 
 	UFUNCTION()
 	virtual void OnRep_Shield(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
+		);
+
+	/**
+	* 技能急速
+	* 冷却时间 = 基础冷却时间 ÷(1 + 技能急速 / 100)。
+	* 例如，某个英雄的技能冷却时间是 10 秒，若拥有 20 的技能急速，
+	* 则实际冷却时间会缩短为 10÷(1+20/100)=8.33 秒。
+	* 技能急速与冷却缩减的转换公式为：冷却缩减 = 技能急速 ÷(100 + 技能急速)。
+	* 例如，100 技能急速相当于 100÷(100+100)=50% 的冷却缩减。
+	*/
+	UPROPERTY(ReplicatedUsing = OnRep_Haste, VisibleAnywhere, BlueprintReadWrite)
+	FMyGameplayAttributeData Haste;
+	ATTRIBUTE_ACCESSORS(UAS_Character, Haste);
+
+	UFUNCTION()
+	virtual void OnRep_Haste(
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	// 当前等级
 	UPROPERTY(ReplicatedUsing = OnRep_Level, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData Level;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Level);
 
 	UFUNCTION()
 	virtual void OnRep_Level(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	// 当前经验
 	UPROPERTY(ReplicatedUsing = OnRep_Experience, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData Experience;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Experience);
 
 	UFUNCTION()
 	virtual void OnRep_Experience(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	// 当前等级升级所需经验
 	UPROPERTY(ReplicatedUsing = OnRep_LevelExperience, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData LevelExperience;
 	ATTRIBUTE_ACCESSORS(UAS_Character, LevelExperience);
 
 	UFUNCTION()
 	virtual void OnRep_LevelExperience(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 #pragma region 基础 属性：五行元素
@@ -307,13 +305,12 @@ public:
 	 */
 
 	UPROPERTY(ReplicatedUsing = OnRep_MetalValue, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData MetalValue;
 	ATTRIBUTE_ACCESSORS(UAS_Character, MetalValue);
 
 	UFUNCTION()
 	virtual void OnRep_MetalValue(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	/**
@@ -322,53 +319,48 @@ public:
 	 * 7-9 每级增加 1.5%会心率、2.5%会心伤害、1.5%穿透
 	 */
 	UPROPERTY(ReplicatedUsing = OnRep_MetalLevel, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData MetalLevel;
 	ATTRIBUTE_ACCESSORS(UAS_Character, MetalLevel);
 
 	UFUNCTION()
 	virtual void OnRep_MetalLevel(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_MetalPenetration, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData MetalPenetration;
 	ATTRIBUTE_ACCESSORS(UAS_Character, MetalPenetration);
 
 	UFUNCTION()
 	virtual void OnRep_MetalPenetration(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_MetalPercentPenetration, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData MetalPercentPenetration;
 	ATTRIBUTE_ACCESSORS(UAS_Character, MetalPercentPenetration);
 
 	UFUNCTION()
 	virtual void OnRep_MetalPercentPenetration(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_MetalResistance, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData MetalResistance;
 	ATTRIBUTE_ACCESSORS(UAS_Character, MetalResistance);
 
 	UFUNCTION()
 	virtual void OnRep_MetalResistance(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_WoodValue, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData WoodValue;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WoodValue);
 
 	UFUNCTION()
 	virtual void OnRep_WoodValue(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	/**
@@ -377,53 +369,48 @@ public:
 	 * 7-9 每级增加 15体力上限、20战斗资源上限、2.0%冷却
 	 */
 	UPROPERTY(ReplicatedUsing = OnRep_WoodLevel, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData WoodLevel;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WoodLevel);
 
 	UFUNCTION()
 	virtual void OnRep_WoodLevel(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_WoodPenetration, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData WoodPenetration;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WoodPenetration);
 
 	UFUNCTION()
 	virtual void OnRep_WoodPenetration(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_WoodPercentPenetration, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData WoodPercentPenetration;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WoodPercentPenetration);
 
 	UFUNCTION()
 	virtual void OnRep_WoodPercentPenetration(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_WoodResistance, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData WoodResistance;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WoodResistance);
 
 	UFUNCTION()
 	virtual void OnRep_WoodResistance(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_WaterValue, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData WaterValue;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WaterValue);
 
 	UFUNCTION()
 	virtual void OnRep_WaterValue(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	/**
@@ -432,57 +419,51 @@ public:
 	 * 7-9 每级增加 1MaxHP、1MaxStamina、1MaxMana回复速率、3%治疗增强
 	 */
 	UPROPERTY(ReplicatedUsing = OnRep_WaterLevel, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData WaterLevel;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WaterLevel);
 
 	UFUNCTION()
 	virtual void OnRep_WaterLevel(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_WaterPenetration, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData WaterPenetration;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WaterPenetration);
 
 	UFUNCTION()
 	virtual void OnRep_WaterPenetration(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_WaterPercentPenetration, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData WaterPercentPenetration;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WaterPercentPenetration);
 
 	UFUNCTION()
 	virtual void OnRep_WaterPercentPenetration(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_WaterResistance, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData WaterResistance;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WaterResistance);
 
 	UFUNCTION()
 	virtual void OnRep_WaterResistance(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_FireValue, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData FireValue;
 	ATTRIBUTE_ACCESSORS(UAS_Character, FireValue);
 
 	UFUNCTION()
 	virtual void OnRep_FireValue(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_FireLevel, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData FireLevel;
 	ATTRIBUTE_ACCESSORS(UAS_Character, FireLevel);
 
@@ -493,47 +474,46 @@ public:
 	 */
 	UFUNCTION()
 	virtual void OnRep_FireLevel(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_FirePenetration, VisibleAnywhere, BlueprintReadWrite)
-	;
 	FMyGameplayAttributeData FirePenetration;
 	ATTRIBUTE_ACCESSORS(UAS_Character, FirePenetration);
 
 	UFUNCTION()
 	virtual void OnRep_FirePenetration(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_FirePercentPenetration, VisibleAnywhere, BlueprintReadWrite)
-	;
+
 	FMyGameplayAttributeData FirePercentPenetration;
 	ATTRIBUTE_ACCESSORS(UAS_Character, FirePercentPenetration);
 
 	UFUNCTION()
 	virtual void OnRep_FirePercentPenetration(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_FireResistance, VisibleAnywhere, BlueprintReadWrite)
-	;
+
 	FMyGameplayAttributeData FireResistance;
 	ATTRIBUTE_ACCESSORS(UAS_Character, FireResistance);
 
 	UFUNCTION()
 	virtual void OnRep_FireResistance(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_EarthValue, VisibleAnywhere, BlueprintReadWrite)
-	;
+
 	FMyGameplayAttributeData EarthValue;
 	ATTRIBUTE_ACCESSORS(UAS_Character, EarthValue);
 
 	UFUNCTION()
 	virtual void OnRep_EarthValue(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	/**
@@ -542,43 +522,43 @@ public:
 	 * 7-9 每级增加 40的MaxHP、3%的免伤、每8秒刷新一个10%MaxHP的盾
 	 */
 	UPROPERTY(ReplicatedUsing = OnRep_EarthLevel, VisibleAnywhere, BlueprintReadWrite)
-	;
+
 	FMyGameplayAttributeData EarthLevel;
 	ATTRIBUTE_ACCESSORS(UAS_Character, EarthLevel);
 
 	UFUNCTION()
 	virtual void OnRep_EarthLevel(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_EarthPenetration, VisibleAnywhere, BlueprintReadWrite)
-	;
+
 	FMyGameplayAttributeData EarthPenetration;
 	ATTRIBUTE_ACCESSORS(UAS_Character, EarthPenetration);
 
 	UFUNCTION()
 	virtual void OnRep_EarthPenetration(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_EarthPercentPenetration, VisibleAnywhere, BlueprintReadWrite)
-	;
+
 	FMyGameplayAttributeData EarthPercentPenetration;
 	ATTRIBUTE_ACCESSORS(UAS_Character, EarthPercentPenetration);
 
 	UFUNCTION()
 	virtual void OnRep_EarthPercentPenetration(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_EarthResistance, VisibleAnywhere, BlueprintReadWrite)
-	;
+
 	FMyGameplayAttributeData EarthResistance;
 	ATTRIBUTE_ACCESSORS(UAS_Character, EarthResistance);
 
 	UFUNCTION()
 	virtual void OnRep_EarthResistance(
-		const FMyGameplayAttributeData& OldHealth
+		const FMyGameplayAttributeData& OldValue
 		);
 #pragma endregion
 };

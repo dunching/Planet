@@ -1,7 +1,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+
+#include "UserWidget_Override.h"
+
 #include "ScaleableWidget.generated.h"
 
 class UImage;
@@ -14,7 +16,7 @@ class UCanvasPanel;
  * https://forums.unrealengine.com/t/how-to-scale-zoom-a-widget-with-blueprints/430983/36
  */
 UCLASS()
-class COMMON_UMG_API UScaleableWidget : public UUserWidget
+class COMMON_UMG_API UScaleableWidget : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

@@ -30,6 +30,12 @@ public:
 
 	FTransform GetLandTransform() const;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FString Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FString Description;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Display)
 	TObjectPtr<UStaticMeshComponent> StaticComponentPtr = nullptr;

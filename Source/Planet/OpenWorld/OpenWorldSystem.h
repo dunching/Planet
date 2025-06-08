@@ -75,6 +75,8 @@ public:
 
 	TSoftObjectPtr<ATeleport> GetTeleport(ETeleport ChallengeLevelType)const;
 
+	ETeleport GetTeleportType(const TObjectPtr<ATeleport>&TeleportPtr)const;
+
 	FTableRow_Teleport* GetTeleportDT(ETeleport ChallengeLevelType)const;
 
 	FGameplayTag GetTeleportWeather(ETeleport ChallengeLevelType)const;

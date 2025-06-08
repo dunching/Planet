@@ -104,7 +104,7 @@ void UInputProcessorSubSystemBase::ResetProcessor()
 {
 	if (CurrentProcessorSPtr)
 	{
-		// CurrentProcessorSPtr->QuitAction();
+		CurrentProcessorSPtr->GameDown();
 	}
 	CurrentProcessorSPtr = nullptr;
 }

@@ -310,7 +310,8 @@ bool UOpenWorldSubSystem::CheckSwitchDataLayerComplete(
 			switch (RowIter->ChallengeLevelType)
 			{
 			case ETeleport::kReturnOpenWorld:
-			case ETeleport::kTeleport_1:
+			case ETeleport::kTeleport_NoviceVillage:
+			case ETeleport::kTeleport_2:
 			case ETeleport::kTest1:
 			case ETeleport::kTest2:
 				{
@@ -328,6 +329,11 @@ bool UOpenWorldSubSystem::CheckSwitchDataLayerComplete(
 				}
 				break;
 			case ETeleport::kChallenge_LevelType_Special_1:
+				{
+					return true;
+				}
+				break;
+			default:
 				{
 					return true;
 				}
@@ -359,6 +365,26 @@ TSoftObjectPtr<ATeleport> UOpenWorldSubSystem::GetTeleport(
 	return nullptr;
 }
 
+ETeleport UOpenWorldSubSystem::GetTeleportType(
+	const TObjectPtr<ATeleport>& TeleportPtr
+	) const
+{
+	auto DT_TeleportPtr = UDataTableCollection::GetInstance()->DataTable_Teleport.LoadSynchronous();
+
+	TArray<FTableRow_Teleport*> TeleportResult;
+	DT_TeleportPtr->GetAllRows<>(TEXT("GetChallenge"), TeleportResult);
+
+	for (const auto& RowIter : TeleportResult)
+	{
+		if (RowIter->TeleportRef == TeleportPtr)
+		{
+			return RowIter->ChallengeLevelType;
+		}
+	}
+
+	return ETeleport::kNone;
+}
+
 FTableRow_Teleport* UOpenWorldSubSystem::GetTeleportDT(
 	ETeleport ChallengeLevelType
 	) const
@@ -385,6 +411,11 @@ FGameplayTag UOpenWorldSubSystem::GetTeleportWeather(
 {
 	FGameplayTag NewWeather;
 	auto TeleportDTPtr = UOpenWorldSubSystem::GetInstance()->GetTeleportDT(ChallengeLevelType);
+	if (!TeleportDTPtr)
+	{
+		return FGameplayTag::EmptyTag;
+	}
+	
 	if (TeleportDTPtr->WeatherTagMap.IsEmpty())
 	{
 		
