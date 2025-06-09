@@ -172,7 +172,7 @@ void ACharacterBase::BeginPlay()
 	// 这里是用于传送时或流送时重新生成这个Character，绑定之前的GroupManager数据
 	if (GroupManaggerPtr)
 	{
-		OnRep_GroupSharedInfoChanged();
+		OnRep_GroupManagger();
 	}
 }
 
@@ -512,7 +512,7 @@ void ACharacterBase::OnHPChanged(
 #endif
 }
 
-void ACharacterBase::OnRep_GroupSharedInfoChanged()
+void ACharacterBase::OnRep_GroupManagger()
 {
 	if (!GroupManaggerPtr)
 	{

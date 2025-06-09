@@ -38,6 +38,7 @@ public class EditTool : ModuleRules
 			"CoreUObject",
 			"Engine",
 			"GameplayTags",
+			"Json",
 
 			// 引擎插件
 			"NavigationSystem",

@@ -57,6 +57,10 @@ public:
 		ECameraType NewCameraType
 		);
 
+	void OnPlayerDataIsOk();
+	
+	void OnLocalPlayerDataIsOk();
+	
 protected:
 	virtual void MoveForward(
 		const FInputActionValue& InputActionValue

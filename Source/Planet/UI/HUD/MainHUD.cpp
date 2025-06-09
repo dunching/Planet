@@ -1,5 +1,6 @@
 #include "MainHUD.h"
 
+#include "AssetRefMap.h"
 #include "AS_Character.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "Components/Border.h"
@@ -15,6 +16,8 @@
 #include "GameOptions.h"
 #include "RegularActionLayout.h"
 #include "EndangeredStateLayout.h"
+#include "MinimapSceneCapture2D.h"
+#include "Kismet/GameplayStatics.h"
 
 struct FMainHUD : public TStructVariable<FMainHUD>
 {
@@ -45,6 +48,20 @@ void AMainHUD::InitalHUD()
 {
 	InitMainHUDLayout();
 	SwitchLayout(ELayoutCommon::kActionLayout, nullptr);
+
+	if (PlayerOwner && PlayerOwner->GetPawn())
+	{
+		auto MinimapSceneCapture2DPtr = UGameplayStatics::GetActorOfClass(this, AMinimapSceneCapture2D::StaticClass());
+		if (MinimapSceneCapture2DPtr)
+		{
+			MinimapSceneCapture2DPtr->AttachToActor(
+													PlayerOwner->GetPawn(),
+													FAttachmentTransformRules::KeepRelativeTransform
+												   );
+			MinimapSceneCapture2DPtr->SetActorRelativeLocation(FVector::ZeroVector);
+			MinimapSceneCapture2DPtr->SetActorRotation(FRotator::ZeroRotator);
+		}
+	}
 }
 
 void AMainHUD::SwitchLayout(
@@ -62,6 +79,8 @@ UMainHUDLayout* AMainHUD::GetMainHUDLayout() const
 
 void AMainHUD::OnHPChanged(
 	const FOnAttributeChangeData&
+
+
 	
 	)
 {

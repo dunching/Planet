@@ -62,14 +62,38 @@ FReply UScaleableWidget::NativeOnMouseWheel(
 	{
 		const auto CurZoomFactor = WheelDelta > 0 ? 1 / ZoomFactor : ZoomFactor;
 
-		const auto NewScale = InnerCanvas->GetRenderTransform().Scale * (CurZoomFactor);
+		if (WheelDelta < 0)
+		{
+			const auto InnerCanvas_DesiredSize = InnerCanvas->GetDesiredSize();
+			const auto OuterCanvas_DesiredSize = InGeometry.GetLocalSize();
 
-		InnerCanvas->SetRenderScale(NewScale);
+			const auto NewScale = InnerCanvas->GetRenderTransform().Scale * (CurZoomFactor);
+
+			const auto NewSize = InnerCanvas_DesiredSize * NewScale;
+			if (NewSize.X < OuterCanvas_DesiredSize.X)
+			{
+				InnerCanvas->SetRenderScale(FVector2D(OuterCanvas_DesiredSize.X / InnerCanvas_DesiredSize.X));
+			}
+			else if (NewSize.Y < OuterCanvas_DesiredSize.Y)
+			{
+				InnerCanvas->SetRenderScale(FVector2D(OuterCanvas_DesiredSize.Y / InnerCanvas_DesiredSize.Y));
+			}
+			else
+			{
+				InnerCanvas->SetRenderScale(NewScale);
+			}
+		}
+		else
+		{
+			const auto NewScale = InnerCanvas->GetRenderTransform().Scale * (CurZoomFactor);
+
+			InnerCanvas->SetRenderScale(NewScale);
+		}
 
 		const auto InnerCanvasTranslation = InnerCanvas->GetRenderTransform().Translation;
-		
+
 		const auto OffsetTranslation1 = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition()) - (
-			                         InGeometry.GetLocalSize() / 2);
+			                                InGeometry.GetLocalSize() / 2);
 
 		const auto OffsetTranslation2 = OffsetTranslation1 - InnerCanvasTranslation;
 
@@ -111,7 +135,7 @@ void UScaleableWidget::NativeOnMouseLeave(
 	)
 {
 	Super::NativeOnMouseLeave(InMouseEvent);
-	
+
 	bIsDraggingMap = false;
 }
 

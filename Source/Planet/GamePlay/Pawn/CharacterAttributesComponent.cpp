@@ -235,7 +235,7 @@ void UCharacterAttributesComponent::OnRep_GetCharacterProxyID()
 		return;
 	}
 
-	CharacterPtr->OnRep_GroupSharedInfoChanged();
+	CharacterPtr->OnRep_GroupManagger();
 }
 
 void UCharacterAttributesComponent::OnRep_CharacterID()

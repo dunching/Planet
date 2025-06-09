@@ -19,6 +19,7 @@
 #include "HumanViewAlloctionSkillsProcessor.h"
 #include "ViewGroupsProcessor.h"
 #include "TeamMatesHelperComponentBase.h"
+#include "HumanViewMapProcessor.h"
 
 #include "GameplayTagsLibrary.h"
 #include "ChallengeEntry.h"
@@ -26,6 +27,7 @@
 #include "GroupManagger.h"
 #include "HumanCharacter_AI.h"
 #include "HumanViewSetting.h"
+#include "HumanViewTalentAllocation.h"
 #include "InputProcessorSubSystem_Imp.h"
 #include "ItemProxy_Character.h"
 #include "TeamMatesHelperComponent.h"
@@ -224,6 +226,18 @@ namespace HumanProcessor
 				if (EventArgs.Key == GameOptionsPtr->ViewAllocationMenu)
 				{
 					UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
+					return true;
+				}
+
+				if (EventArgs.Key == GameOptionsPtr->ViewMap)
+				{
+					UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<FHumanViewMapProcessor>();
+					return true;
+				}
+
+				if (EventArgs.Key == GameOptionsPtr->ViewTalentAllocation)
+				{
+					UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<FHumanViewTalentAllocation>();
 					return true;
 				}
 

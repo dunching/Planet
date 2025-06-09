@@ -171,7 +171,7 @@ void APlanetAIController::OnGroupManaggerReady(
 	                );
 }
 
-void APlanetAIController::OnRep_GroupSharedInfoChanged()
+void APlanetAIController::OnRep_GroupManagger()
 {
 	OnGroupManaggerReady(GroupManaggerPtr);
 }

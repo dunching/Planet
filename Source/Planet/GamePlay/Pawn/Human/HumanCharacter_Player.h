@@ -183,7 +183,7 @@ protected:
 		UInputComponent* PlayerInputComponent
 	) override;
 
-	virtual void OnRep_GroupSharedInfoChanged() override;
+	virtual void OnRep_GroupManagger() override;
 
 	virtual void OnGroupManaggerReady(
 		AGroupManagger* NewGroupSharedInfoPtr

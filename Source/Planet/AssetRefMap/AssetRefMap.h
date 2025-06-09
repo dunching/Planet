@@ -48,6 +48,7 @@ class UMainMenuLayout;
 class UGE_Damage;
 class UGE_Duration;
 class UGE_Damage_Callback;
+class AMinimapSceneCapture2D;
 class ATargetPoint_Runtime;
 class AGuideThread_Branch;
 class AGuideThread_Challenge;
@@ -73,6 +74,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GroupSharedInfoClass")
 	TSubclassOf<AGroupManagger>GroupSharedInfoClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Minimap")
+	TSubclassOf<AMinimapSceneCapture2D>MinimapSceneCapture2DClass;
 
 #pragma region MenusUI
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")

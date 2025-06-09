@@ -6,6 +6,7 @@
 #include <functional>
 
 #include "CoreMinimal.h"
+#include "TemplateHelper.h"
 
 #include "Dynamic_Sky.generated.h"
 
@@ -20,6 +21,9 @@ class WEATHER_API ADynamic_Sky : public AActor
 	GENERATED_BODY()
 
 public:
+
+	using FOnHourChanged =
+	TCallbackHandleContainer<void(int32)>;
 
 	ADynamic_Sky(const FObjectInitializer& ObjectInitializer);
 
@@ -47,6 +51,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetTimeSpeed(float Speed);
 
+	FOnHourChanged OnHourChanged;
+	
 protected:
 
 	UFUNCTION(BlueprintCallable)

@@ -62,6 +62,8 @@ void ADynamic_Sky::OnHoury(int32 Hour)
 			Iter.second(Hour);
 		}
 	}
+	
+	OnHourChanged(Hour);
 	// 	{
 	// 		const FLatentActionInfo LatentInfo(0, FMath::Rand(), TEXT("FirstCall"), this);
 	// 		UKismetSystemLibrary::Delay(this, 2.f, LatentInfo);

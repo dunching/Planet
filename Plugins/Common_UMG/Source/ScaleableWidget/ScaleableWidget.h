@@ -47,29 +47,30 @@ protected:
 		const FPointerEvent& InMouseEvent
 		) override;
 
-private:
+protected:
 	UPROPERTY(meta = (BindWidget))
 	UCanvasPanel* OuterCanvas = nullptr;
 
 	UPROPERTY(meta = (BindWidget))
 	UCanvasPanel* InnerCanvas = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = "Map")
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Map")
 	bool bIsDraggingMap = false;
 
-	UPROPERTY(EditAnywhere, Category = "Map")
+	UPROPERTY(EditDefaultsOnly, Category = "Map")
 	int32 CurrentZoomStep = 0;
 
-	UPROPERTY(EditAnywhere, Category = "Map")
+	UPROPERTY(EditDefaultsOnly, Category = "Map")
 	float ZoomFactor = .8f;
 
-	UPROPERTY(EditAnywhere, Category = "Map")
+	UPROPERTY(EditDefaultsOnly, Category = "Map")
 	float PanSpeed = 1.f;
 
-	UPROPERTY(EditAnywhere, Category = "Map")
+	UPROPERTY(EditDefaultsOnly, Category = "Map")
 	int32 MinZoom = -4;
 
-	UPROPERTY(EditAnywhere, Category = "Map")
+	UPROPERTY(EditDefaultsOnly, Category = "Map")
 	int32 MaxZoom = 5;
 
 	FVector2D ClampSides(

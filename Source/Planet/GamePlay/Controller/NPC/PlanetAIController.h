@@ -88,7 +88,7 @@ protected:
 	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
 	UFUNCTION()
-	void OnRep_GroupSharedInfoChanged();
+	void OnRep_GroupManagger();
 
 	UFUNCTION()
 	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
@@ -96,7 +96,7 @@ protected:
 	UFUNCTION()
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
-	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
+	UPROPERTY(ReplicatedUsing = OnRep_GroupManagger)
 	TObjectPtr<AGroupManagger> GroupManaggerPtr = nullptr;
 
 private:

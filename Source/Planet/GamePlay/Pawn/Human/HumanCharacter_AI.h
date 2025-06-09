@@ -135,7 +135,7 @@ protected:
 		TArray<FLifetimeProperty>& OutLifetimeProps
 	) const override;
 
-	virtual void OnRep_GroupSharedInfoChanged() override;
+	virtual void OnRep_GroupManagger() override;
 
 	// virtual TSharedPtr<FCharacterProxy> GetCharacterProxy()const override;
 

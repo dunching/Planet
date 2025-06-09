@@ -40,7 +40,9 @@ public class Weather : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
-                "GameplayTags",
+                "GameplayTags", 
+                
+                "Utils",
             }
 			);
 

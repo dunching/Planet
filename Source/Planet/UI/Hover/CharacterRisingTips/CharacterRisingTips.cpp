@@ -7,6 +7,8 @@
 #include <Components/TextBlock.h>
 #include <Components/Image.h>
 #include "Components/WidgetSwitcher.h"
+#include "Components/Button.h"
+#include "Kismet/KismetStringLibrary.h"
 
 #include "CharacterBase.h"
 #include "PlanetModule.h"
@@ -18,8 +20,6 @@
 #include "TextSubSystem.h"
 #include "TextCollect.h"
 #include "WidgetScreenLayer.h"
-#include "Components/Button.h"
-#include "Kismet/KismetStringLibrary.h"
 
 struct FCharacterRisingTips : public TStructVariable<FCharacterRisingTips>
 {

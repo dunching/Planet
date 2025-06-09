@@ -333,9 +333,9 @@ void AHumanCharacter_AI::GetLifetimeReplicatedProps(
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
-void AHumanCharacter_AI::OnRep_GroupSharedInfoChanged()
+void AHumanCharacter_AI::OnRep_GroupManagger()
 {
-	Super::OnRep_GroupSharedInfoChanged();
+	Super::OnRep_GroupManagger();
 }
 
 // TSharedPtr<FCharacterProxy> AHumanCharacter_AI::GetCharacterProxy() const

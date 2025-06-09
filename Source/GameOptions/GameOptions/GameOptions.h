@@ -124,6 +124,12 @@ public:
 	FKey ViewGroupmateMenu = EKeys::G;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey ViewMap = EKeys::M;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey ViewTalentAllocation = EKeys::T;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey JumpKey = EKeys::SpaceBar;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")

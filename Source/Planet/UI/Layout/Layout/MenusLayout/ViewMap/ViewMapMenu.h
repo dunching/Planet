@@ -32,7 +32,7 @@ public:
 protected:
 
 	virtual void NativeConstruct() override;
-	
+
 	virtual FReply NativeOnMouseButtonDown(
 		const FGeometry& InGeometry,
 		const FPointerEvent& InMouseEvent
@@ -58,6 +58,8 @@ private:
 	UFUNCTION()
 	void OnTeleportClicked();
 
+	void UpdatePlayerMarkPt()const;
+	
 	UPROPERTY(meta = (BindWidget))
 	UBorder* TeleportDecriptionBorder = nullptr;
 	
@@ -70,5 +72,12 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* TeleportDescription = nullptr;
 
+	UPROPERTY(meta = (BindWidget))
+	UBorder* PlayerBorder = nullptr;
+
 	TObjectPtr<ATeleport>TeleportPtr = nullptr;
+
+	FBoxSphereBounds OpenWorldBoundBox;
+
+	FTimerHandle UpdatePlayerMarkPtHandle;
 };

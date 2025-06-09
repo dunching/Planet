@@ -40,6 +40,11 @@ bool APlanetPlayerState::GetIsInChallenge() const
 	return bIsInChallenge;
 }
 
+FGameplayTag APlanetPlayerState::GetRegionTag() const
+{
+	return CurrentRegionTag;
+}
+
 void APlanetPlayerState::SetEntryChanlleng_Implementation(
 	bool bIsEntryChanlleng
 	)
@@ -79,6 +84,7 @@ void APlanetPlayerState::GetLifetimeReplicatedProps(
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME_CONDITION(ThisClass, CurrentRegionTag, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ThisClass, bIsInChallenge, COND_None);
 }
 
@@ -141,7 +147,40 @@ void APlanetPlayerState::UpdatePosition()
 	UpdateCurrentPosition(UGameplayTagsLibrary::Region_Default);
 }
 
-void APlanetPlayerState::UpdateCurrentPosition_Implementation(
+void APlanetPlayerState::OnRep_RegionTag()
+{
+	OnRegionChanged(CurrentRegionTag);
+
+	auto TableRow_RegionsPtr = UDataTableCollection::GetInstance()->GetTableRow_Region(CurrentRegionTag);
+	if (TableRow_RegionsPtr)
+	{
+		AudioComponentPtr->SetSound(TableRow_RegionsPtr->RegionBGM.LoadSynchronous());
+		AudioComponentPtr->Play();
+
+		if (UUIManagerSubSystem::GetInstance()->GetMainHUDLayout())
+		{
+			UUIManagerSubSystem::GetInstance()->GetMainHUDLayout()->DisplayWidget(
+				 UAssetRefMap::GetInstance()->RegionPromtClass,
+				 [TableRow_RegionsPtr](
+				 UUserWidget* WidgetPtr
+				 )
+				 {
+					 auto RegionPromtPtr = Cast<URegionPromt>(WidgetPtr);
+					 if (RegionPromtPtr)
+					 {
+						 RegionPromtPtr->SetRegionPromt(TableRow_RegionsPtr);
+					 }
+				 }
+				);
+		}
+	}
+	else
+	{
+		AudioComponentPtr->Stop();
+	}
+}
+
+void APlanetPlayerState::UpdateCurrentPosition(
 	const FGameplayTag& NewCurrentRegionTag
 	)
 {
@@ -152,41 +191,5 @@ void APlanetPlayerState::UpdateCurrentPosition_Implementation(
 
 	CurrentRegionTag = NewCurrentRegionTag;
 
-	auto TableRow_RegionsPtr = UDataTableCollection::GetInstance()->GetTableRow_Region(NewCurrentRegionTag);
-	if (TableRow_RegionsPtr)
-	{
-#if UE_EDITOR || UE_SERVER
-		if (GetNetMode() == NM_Client)
-		{
-			AudioComponentPtr->SetSound(TableRow_RegionsPtr->RegionBGM.LoadSynchronous());
-			AudioComponentPtr->Play();
-
-			if (UUIManagerSubSystem::GetInstance()->GetMainHUDLayout())
-			{
-				UUIManagerSubSystem::GetInstance()->GetMainHUDLayout()->DisplayWidget(
-					 UAssetRefMap::GetInstance()->RegionPromtClass,
-					 [TableRow_RegionsPtr](
-					 UUserWidget* WidgetPtr
-					 )
-					 {
-						 auto RegionPromtPtr = Cast<URegionPromt>(WidgetPtr);
-						 if (RegionPromtPtr)
-						 {
-							 RegionPromtPtr->SetRegionPromt(TableRow_RegionsPtr);
-						 }
-					 }
-					);
-			}
-		}
-#endif
-	}
-	else
-	{
-#if UE_EDITOR || UE_SERVER
-		if (GetNetMode() == NM_Client)
-		{
-			AudioComponentPtr->Stop();
-		}
-#endif
-	}
+	OnRegionChanged(CurrentRegionTag);
 }

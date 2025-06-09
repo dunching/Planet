@@ -328,9 +328,9 @@ void AHumanCharacter_Player::SetupPlayerInputComponent(
 	PlayerComponentPtr->SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
+void AHumanCharacter_Player::OnRep_GroupManagger()
 {
-	Super::OnRep_GroupSharedInfoChanged();
+	Super::OnRep_GroupManagger();
 
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() == ROLE_AutonomousProxy)
@@ -341,19 +341,6 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
-		// 在SetPawn之后调用
-		UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>(
-			 [this](
-			 auto NewProcessor
-			 )
-			 {
-				 NewProcessor->SetPawn(Cast<ThisClass>(this));
-			 }
-			);
-
-		// 
-		UGuideSubSystem::GetInstance()->InitializeMainThread();
-		UGuideSubSystem::GetInstance()->ActiveMainThread();
 	}
 #endif
 }
@@ -364,13 +351,8 @@ void AHumanCharacter_Player::OnGroupManaggerReady(
 {
 	Super::OnGroupManaggerReady(NewGroupSharedInfoPtr);
 
-#if UE_EDITOR || UE_CLIENT
-	if (GetLocalRole() == ROLE_AutonomousProxy)
-	{
-		// 显示
-		Cast<AMainHUD>(GetController<APlanetPlayerController>()->MyHUD)->InitalHUD();
-	}
-#endif
+	GetPlayerComponent()->OnPlayerDataIsOk();
+	GetPlayerComponent()->OnLocalPlayerDataIsOk();
 }
 
 UPlayerConversationComponent* AHumanCharacter_Player::GetPlayerConversationComponent() const

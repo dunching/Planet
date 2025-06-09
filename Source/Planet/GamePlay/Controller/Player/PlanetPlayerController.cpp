@@ -54,6 +54,7 @@
 #include "DataTableCollection.h"
 #include "InputProcessorSubSystem_Imp.h"
 #include "PlanetPlayerState.h"
+#include "PlayerComponent.h"
 #include "RewardsTD.h"
 #include "TeamMatesHelperComponent.h"
 
@@ -574,6 +575,8 @@ void APlanetPlayerController::GetActorEyesViewPoint(
 void APlanetPlayerController::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
+
+	GetPawn<FPawnType>()->GetPlayerComponent()->OnLocalPlayerDataIsOk();
 }
 
 void APlanetPlayerController::OnGroupManaggerReady(
@@ -1458,7 +1461,7 @@ void APlanetPlayerController::MakeRespawn_Implementation(
 	}
 }
 
-void APlanetPlayerController::OnRep_GroupSharedInfoChanged()
+void APlanetPlayerController::OnRep_GroupManagger()
 {
 	if (!GroupManaggerPtr)
 	{

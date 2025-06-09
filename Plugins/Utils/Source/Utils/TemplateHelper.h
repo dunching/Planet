@@ -10,7 +10,7 @@
 
 #include "TemplateHelper.generated.h"
 
-#pragma region Callback
+#pragma region 回调容器
 template<typename ValueType>
 class TOnValueChangedCallbackHandle final
 {

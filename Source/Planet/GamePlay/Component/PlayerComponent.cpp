@@ -3,15 +3,21 @@
 #include "EnhancedInputComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Subsystems/SubsystemBlueprintLibrary.h"
+#include "GameFramework/GameplayCameraComponent.h"
 
 #include "CharacterBase.h"
 #include "EnhancedInputSubsystems.h"
 #include "GroupManagger.h"
+#include "GuideSubSystem.h"
 #include "HumanAIController.h"
 #include "HumanCharacter_Player.h"
+#include "HumanRegularProcessor.h"
 #include "InputActions.h"
+#include "InputProcessorSubSystem_Imp.h"
+#include "MainHUD.h"
+#include "PlanetPlayerController.h"
 #include "TeamMatesHelperComponent.h"
-#include "GameFramework/GameplayCameraComponent.h"
+#include "PlanetPlayerState.h"
 
 FName UPlayerComponent::ComponentName = TEXT("PlayerComponent");
 
@@ -136,6 +142,58 @@ void UPlayerComponent::SetCameraType(
 	)
 {
 	CameraType = NewCameraType;
+}
+
+void UPlayerComponent::OnPlayerDataIsOk()
+{
+}
+
+void UPlayerComponent::OnLocalPlayerDataIsOk()
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetOwnerRole() == ROLE_AutonomousProxy)
+	{
+		auto OnwerActorPtr = GetOwner<FOwnerType>();
+		if (!OnwerActorPtr)
+		{
+			return;
+		}
+
+		if (!OnwerActorPtr->GetGroupManagger())
+		{
+			return;
+		}
+
+		auto PCPtr = OnwerActorPtr->GetController<APlanetPlayerController>();
+		if (!PCPtr)
+		{
+			return;
+		}
+
+		auto PSPtr = PCPtr->GetPlayerState<APlanetPlayerState>();
+		if (!PSPtr)
+		{
+			return;
+		}
+
+		// 显示
+		Cast<AMainHUD>(PCPtr->MyHUD)->InitalHUD();
+
+		// 在SetPawn之后调用
+		UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>(
+			 [this, OnwerActorPtr](
+			 auto NewProcessor
+			 )
+			 {
+				 NewProcessor->SetPawn(Cast<FOwnerType>(OnwerActorPtr));
+			 }
+			);
+
+		// 
+		UGuideSubSystem::GetInstance()->InitializeMainThread();
+		UGuideSubSystem::GetInstance()->ActiveMainThread();
+	}
+#endif
 }
 
 void UPlayerComponent::AddYawInput(

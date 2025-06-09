@@ -99,7 +99,7 @@ public:
 	 * ROLE_AutonomousProxy的数据准备好时
 	 */
 	UFUNCTION()
-	virtual void OnRep_GroupSharedInfoChanged();
+	virtual void OnRep_GroupManagger();
 
 	AGroupManagger* GetGroupManagger() const;
 
@@ -221,7 +221,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ConversationBorder)
 	TObjectPtr<UConversationComponent> ConversationComponentPtr = nullptr;
 
-	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
+	UPROPERTY(ReplicatedUsing = OnRep_GroupManagger)
 	TObjectPtr<AGroupManagger> GroupManaggerPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WolrdProcess)

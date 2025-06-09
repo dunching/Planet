@@ -198,7 +198,7 @@ public:
 private:
 	
 	UFUNCTION()
-	void OnRep_GroupSharedInfoChanged();
+	void OnRep_GroupManagger();
 
 	void OnAddToNewTeam(
 		const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr

@@ -200,6 +200,7 @@ public class Planet : ModuleRules
 			"ActorSequence",
 			"NetCore",
 			"ShaderConductor",
+			"Json",
 
 			// 引擎插件
 			"GameplayTags",

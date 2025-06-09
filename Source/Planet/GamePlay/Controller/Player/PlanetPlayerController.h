@@ -305,7 +305,7 @@ protected:
 	virtual void InitialGroupSharedInfo();
 
 	UFUNCTION()
-	void OnRep_GroupSharedInfoChanged();
+	void OnRep_GroupManagger();
 
 	UFUNCTION()
 	void OnRep_WolrdProcess();
@@ -323,7 +323,7 @@ protected:
 
 	FMakedDamageDelegate::FCallbackHandleSPtr MakedDamageDelegateHandle;
 	
-	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
+	UPROPERTY(ReplicatedUsing = OnRep_GroupManagger)
 	TObjectPtr<AGroupManagger> GroupManaggerPtr = nullptr;
 
 	UPROPERTY()

@@ -27,6 +27,9 @@ class PLANET_API APlanetPlayerState : public APlayerState
 
 public:
 
+	using FOnRegionChanged =
+	TCallbackHandleContainer<void(const FGameplayTag&)>;
+
 	APlanetPlayerState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	bool GetIsInChallenge()const;
@@ -35,6 +38,10 @@ public:
 	UFUNCTION(Server, Reliable)
 	void SetEntryChanlleng(bool bIsEntryChanlleng);
 #pragma endregion
+
+	FGameplayTag GetRegionTag()const;
+	
+	FOnRegionChanged OnRegionChanged;
 	
 protected:
 
@@ -54,14 +61,17 @@ private:
 
 	void UpdatePosition();
 
-	UFUNCTION(NetMulticast, Reliable)
 	void UpdateCurrentPosition(const FGameplayTag&NewCurrentRegionTag);
+	
+	UFUNCTION()
+	void OnRep_RegionTag();
 	
 	UPROPERTY(Transient)
 	TObjectPtr<UAudioComponent>AudioComponentPtr = nullptr;
 	
 	FString PlayerName;
 
+	UPROPERTY(ReplicatedUsing = OnRep_RegionTag)
 	FGameplayTag CurrentRegionTag;
 
 	UPROPERTY(Replicated)

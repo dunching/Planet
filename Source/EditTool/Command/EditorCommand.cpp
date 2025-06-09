@@ -4,6 +4,7 @@
 #include "Components/SplineComponent.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "WorldPartition/WorldPartitionMiniMap.h"
+#include "WorldPartition/WorldPartitionMiniMapVolume.h"
 #include "IImageWrapper.h"
 #include "IImageWrapperModule.h"
 #include "ImageUtils.h"
@@ -22,8 +23,10 @@
 #include "PlanetPlayerCameraManager.h"
 #include "GravityPlayerController.h"
 #include "DataTableCollection.h"
+#include "JsonObjectConverter.h"
 #include "PlanetPlayerController.h"
 #include "Tools.h"
+#include "Value.h"
 
 void EditorCommand::CopyID2RowName()
 {
@@ -685,54 +688,82 @@ void EditorCommand::ModifyElementalDataToTarget(
 void EditorCommand::ExportMinimapTexture()
 {
 	auto World = GEditor->GetEditorWorldContext().World();
-	auto ActorPtr = Cast<AWorldPartitionMiniMap>(UGameplayStatics::GetActorOfClass(World, AWorldPartitionMiniMap::StaticClass()));
-	if (!ActorPtr)
 	{
-		return;
-	}
-	FString PicturePath = FPaths::ProjectSavedDir() + TEXT("Minimap.png");
-
-	auto Texture = ActorPtr->MiniMapTexture;
-	
-	// record old settings
-	TextureCompressionSettings OldCompressionSettings = Texture->CompressionSettings;
-	TextureMipGenSettings OldMipGenSettings = Texture->MipGenSettings;
-	bool OldSRGB = Texture->SRGB;
-
-	// modified to exportable settings
-	Texture->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
-	Texture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
-	Texture->SRGB = false;
-	Texture->UpdateResource();
-
-	// export texture to image
-	FTexture2DMipMap& Mip = Texture->GetPlatformData()->Mips[0];
-	uint8* TextureData = (uint8*) Mip.BulkData.Lock(LOCK_READ_WRITE);
-	Mip.BulkData.Unlock();
-
-	int32 SizeX = Texture->GetPlatformData()->SizeX;
-	int32 SizeY = Texture->GetPlatformData()->SizeY;
-	TArray<FColor> ColorData;
-	for (int32 IndexY = 0; IndexY < SizeY; IndexY++)
-	{
-		for (int32 IndexX = 0; IndexX < SizeX; IndexX++)
+		// 纹理
+		auto ActorPtr = Cast<AWorldPartitionMiniMap>(UGameplayStatics::GetActorOfClass(World, AWorldPartitionMiniMap::StaticClass()));
+		if (!ActorPtr)
 		{
-			FColor PixelColor;
-			PixelColor.B = TextureData[(IndexY * SizeX + IndexX) * 4 + 0];
-			PixelColor.G = TextureData[(IndexY * SizeX + IndexX) * 4 + 1];
-			PixelColor.R = TextureData[(IndexY * SizeX + IndexX) * 4 + 2];
-			PixelColor.A = TextureData[(IndexY * SizeX + IndexX) * 4 + 3];
-			ColorData.Add(PixelColor);
+			return;
 		}
+		FString PicturePath = FPaths::ProjectSavedDir() + TEXT("Minimap.png");
+
+		auto Texture = ActorPtr->MiniMapTexture;
+	
+		// record old settings
+		TextureCompressionSettings OldCompressionSettings = Texture->CompressionSettings;
+		TextureMipGenSettings OldMipGenSettings = Texture->MipGenSettings;
+		bool OldSRGB = Texture->SRGB;
+
+		// modified to exportable settings
+		Texture->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
+		Texture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
+		Texture->SRGB = false;
+		Texture->UpdateResource();
+
+		// export texture to image
+		FTexture2DMipMap& Mip = Texture->GetPlatformData()->Mips[0];
+		uint8* TextureData = (uint8*) Mip.BulkData.Lock(LOCK_READ_WRITE);
+		Mip.BulkData.Unlock();
+
+		int32 SizeX = Texture->GetPlatformData()->SizeX;
+		int32 SizeY = Texture->GetPlatformData()->SizeY;
+		TArray<FColor> ColorData;
+		for (int32 IndexY = 0; IndexY < SizeY; IndexY++)
+		{
+			for (int32 IndexX = 0; IndexX < SizeX; IndexX++)
+			{
+				FColor PixelColor;
+				PixelColor.B = TextureData[(IndexY * SizeX + IndexX) * 4 + 0];
+				PixelColor.G = TextureData[(IndexY * SizeX + IndexX) * 4 + 1];
+				PixelColor.R = TextureData[(IndexY * SizeX + IndexX) * 4 + 2];
+				PixelColor.A = TextureData[(IndexY * SizeX + IndexX) * 4 + 3];
+				ColorData.Add(PixelColor);
+			}
+		}
+
+		TArray64<uint8> ImageData;
+		FImageUtils::PNGCompressImageArray(SizeX, SizeY, ColorData, ImageData);
+		FFileHelper::SaveArrayToFile(ImageData, *PicturePath);
+
+		// return to old settings
+		Texture->CompressionSettings = OldCompressionSettings;
+		Texture->MipGenSettings = OldMipGenSettings;
+		Texture->SRGB = OldSRGB;
+		Texture->UpdateResource();
 	}
+	{
+		// 大小
+		auto ActorPtr = Cast<AWorldPartitionMiniMapVolume>(UGameplayStatics::GetActorOfClass(World, AWorldPartitionMiniMapVolume::StaticClass()));
+		if (!ActorPtr)
+		{
+			return;
+		}
+		
+		const auto Box = ActorPtr->GetBounds();
 
-	TArray64<uint8> ImageData;
-	FImageUtils::PNGCompressImageArray(SizeX, SizeY, ColorData, ImageData);
-	FFileHelper::SaveArrayToFile(ImageData, *PicturePath);
+		// 创建 JSON 对象
+		TSharedPtr<FJsonObject> JsonObject = MakeShared<FJsonObject>();
+		
+		JsonObject->SetStringField(TEXT("Origin"), Box.Origin.ToString());
+		JsonObject->SetStringField(TEXT("BoxExtent"), Box.BoxExtent.ToString());
+		
+		// 序列化为 JSON 字符串
+		FString JsonString;
+		TSharedRef<TJsonWriter<>> JsonWriter = TJsonWriterFactory<>::Create(&JsonString);
+		FJsonSerializer::Serialize(JsonObject.ToSharedRef(), JsonWriter);
 
-	// return to old settings
-	Texture->CompressionSettings = OldCompressionSettings;
-	Texture->MipGenSettings = OldMipGenSettings;
-	Texture->SRGB = OldSRGB;
-	Texture->UpdateResource();
+		// 写入文件
+		const auto Path = GetOpenWorldBoundBox();
+		FFileHelper::SaveStringToFile(JsonString, *Path);
+	}
 }

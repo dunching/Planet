@@ -377,7 +377,7 @@ void UTeamMatesHelperComponent::SwitchTeammateOption_Server_Implementation(
 	SwitchTeammateOption(InTeammateOption);
 }
 
-void UTeamMatesHelperComponent::OnRep_GroupSharedInfoChanged()
+void UTeamMatesHelperComponent::OnRep_GroupManagger()
 {
 	TeamHelperChangedDelegateContainer();
 	PRINTINVOKEWITHSTR(FString(TEXT("")));
