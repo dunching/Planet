@@ -3,11 +3,15 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextBlock.h"
 #include <Blueprint/WidgetTree.h>
+#include <Components/ScrollBar.h>
+#include <Components/ScrollBox.h>
 
 #include "CharacterBase.h"
+#include "InventoryComponent.h"
 #include "PlanetPlayerController.h"
 #include "TalentAllocationComponent.h"
 #include "TalentIcon.h"
+#include "GroupmateIcon.h"
 
 struct FTalentAllocation : public TStructVariable<FTalentAllocation>
 {
@@ -27,11 +31,14 @@ void UTalentAllocation::NativeDestruct()
 void UTalentAllocation::EnableMenu()
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	if (CharacterPtr)
+	if (!CharacterPtr)
 	{
-		OnSelectedCharacterProxy(CharacterPtr->GetCharacterProxy());
+		return;
 	}
 
+	InitialGroupmateList();
+	OnSelectedCharacterProxy(CharacterPtr->GetCharacterProxy());
+	
 	if (CurrentProxyPtr)
 	{
 		const auto& CharacterTalentRef = CurrentProxyPtr->GetCharacterTalent();
@@ -44,7 +51,6 @@ void UTalentAllocation::EnableMenu()
 		}
 
 		OnUsedTalentNumChanged(Num, TalentNum);
-		UpdateTalenIconState();
 	}
 }
 
@@ -234,6 +240,46 @@ bool UTalentAllocation::OnAddPoint(
 	return false;
 }
 
+void UTalentAllocation::InitialGroupmateList()
+{
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	{
+		if (!GroupmateList)
+		{
+			return;
+		}
+		GroupmateList->ClearChildren();
+
+		auto HICPtr = CharacterPtr->GetInventoryComponent();
+		auto GroupmateProxyAry = HICPtr->GetCharacterProxyAry();
+
+		for (int32 Index = 0; Index < GroupmateProxyAry.Num(); Index++)
+		{
+			auto WidgetPtr = CreateWidget<UGroupmateIcon>(this, GroupmateIconClass);
+			if (WidgetPtr)
+			{
+				WidgetPtr->ResetToolUIByData(GroupmateProxyAry[Index]);
+				{
+					auto Handle = WidgetPtr->OnSelected.AddCallback(
+																	std::bind(
+																			  &ThisClass::OnSelectedCharacterProxy,
+																			  this,
+																			  std::placeholders::_1
+																			 )
+																   );
+					Handle->bIsAutoUnregister = false;
+				}
+				GroupmateList->AddChild(WidgetPtr);
+
+				if (Index == 0)
+				{
+					WidgetPtr->SwitchSelectState(true);
+				}
+			}
+		}
+	}
+}
+
 void UTalentAllocation::OnSelectedCharacterProxy(
 	const TSharedPtr<FCharacterProxy>& ProxyPtr
 	)
@@ -261,4 +307,5 @@ void UTalentAllocation::OnSelectedCharacterProxy(
 		                          }
 		                         );
 	}
+	UpdateTalenIconState();
 }

@@ -75,11 +75,6 @@ UAllocationSkillsMenu::UAllocationSkillsMenu(
 	) :
 	  Super(ObjectInitializer)
 {
-	ActiveSkills_1_Key = EKeys::Q;
-	ActiveSkills_2_Key = EKeys::E;
-	ActiveSkills_3_Key = EKeys::R;
-	ActiveSkills_4_Key = EKeys::F;
-	WeaponActiveSkills_Key = EKeys::LeftMouseButton;
 }
 
 void UAllocationSkillsMenu::PostCDOContruct()

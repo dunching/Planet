@@ -12,6 +12,8 @@
 #include "TalentAllocation.generated.h"
 
 class UTalentIcon;
+class UGroupmateIcon;
+class UScrollBox;
 
 struct FCharacterProxy;
 
@@ -51,7 +53,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSet<UTalentIcon*> EnableSocletIconSet;
 
+	UPROPERTY(meta = (BindWidget))
+	UScrollBox* GroupmateList = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UGroupmateIcon> GroupmateIconClass;
+
 private:
+	void InitialGroupmateList();
+
 	void OnSelectedCharacterProxy(
 		const TSharedPtr<FCharacterProxy>& ProxyPtr
 		);

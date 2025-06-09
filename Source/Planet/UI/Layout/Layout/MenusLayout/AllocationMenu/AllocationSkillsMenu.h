@@ -146,33 +146,6 @@ protected:
 
 	FOnWeaponChangedDelegate SecondaryDelegateHandleSPtr;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey ActiveSkills_1_Key;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey ActiveSkills_2_Key;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey ActiveSkills_3_Key;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey ActiveSkills_4_Key;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey WeaponActiveSkills_Key;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey Consumable_1_Key;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey Consumable_2_Key;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey Consumable_3_Key;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey Consumable_4_Key;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UGroupmateIcon> GroupmateIconClass;
 
