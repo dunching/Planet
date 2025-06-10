@@ -217,7 +217,7 @@ void UGameplayTask_TeleportPlayer::TickTask(
 				return;	
 			}
 			
-			if ((CurrentWaitTime >= MinWaitTime) && bIsOnLanded)
+			if (bIsOnLanded)
 			{
 #if UE_EDITOR || UE_CLIENT
 				if (TargetPCPtr->GetLocalRole() == ROLE_AutonomousProxy)

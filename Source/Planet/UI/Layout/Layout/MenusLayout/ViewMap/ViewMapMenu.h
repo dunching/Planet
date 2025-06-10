@@ -75,7 +75,7 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UBorder* PlayerBorder = nullptr;
 
-	TObjectPtr<ATeleport>TeleportPtr = nullptr;
+	TSoftObjectPtr<ATeleport>TeleportPtr = nullptr;
 
 	FBoxSphereBounds OpenWorldBoundBox;
 

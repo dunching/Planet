@@ -110,25 +110,6 @@ void UBasicFutures_Dash::ActivateAbility(
 	DoDash(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UBasicFutures_Dash::ApplyCost(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo
-) const
-{
-	UGameplayEffect* CostGE = GetCostGameplayEffect();
-	if (CostGE)
-	{
-		FGameplayEffectSpecHandle SpecHandle =
-			MakeOutgoingGameplayEffectSpec(CostGE->GetClass(), GetAbilityLevel());
-
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
-		SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_ModifyItem_Stamina, -Consume);
-
-		ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
-	}
-}
-
 bool UBasicFutures_Dash::CommitAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -138,22 +119,6 @@ bool UBasicFutures_Dash::CommitAbility(
 {
 	if (CharacterPtr)
 	{
-		// FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
-		// 	CharacterPtr);
-		//
-		// GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-		//
-		// FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-		//
-		// GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
-		//
-		// GAEventData.DataModify.Add(ECharacterPropertyType::PP, -Consume);
-		//
-		// GAEventDataPtr->DataAry.Add(GAEventData);
-		//
-		// auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		// ICPtr->SendEventImp(GAEventDataPtr);
-
 		if (CharacterPtr->GetCharacterMovement()->IsFlying() || CharacterPtr->GetCharacterMovement()->IsFalling())
 		{
 			DashInAir++;
@@ -231,6 +196,15 @@ void UBasicFutures_Dash::OnGameplayTaskDeactivated(UGameplayTask& Task)
 	{
 		K2_CancelAbility();
 	}
+}
+
+TMap<FGameplayTag, int32> UBasicFutures_Dash::GetCostMap() const
+{
+	return {
+		TPair<FGameplayTag, int32>{
+			UGameplayTagsLibrary::GEData_ModifyItem_Stamina, Consume
+		}
+	};
 }
 
 // void UBasicFutures_Dash::InitalDefaultTags()
@@ -393,4 +367,37 @@ bool FGameplayAbilityTargetData_Dash::NetSerialize(FArchive& Ar, class UPackageM
 	Ar << DashDirection;
 
 	return true;
+}
+
+void UBasicFutures_Dash::ApplyCostImp(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const TMap<FGameplayTag, int32>& CostMap
+	) const
+{
+	auto AbilitySystemComponentPtr = Cast<UCharacterAbilitySystemComponent>(ActorInfo->AbilitySystemComponent.Get());
+	if (!AbilitySystemComponentPtr)
+	{
+		return;
+	}
+
+	UGameplayEffect* CostGE = GetCostGameplayEffect();
+	if (CostGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(CostGE->GetClass(), GetAbilityLevel());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::BaseFeature_Dash);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+
+		const auto CostsMap = AbilitySystemComponentPtr->GetCost(CostMap);
+		for (const auto& Iter : CostsMap)
+		{
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   Iter.Key,
+														   -Iter.Value
+														  );
+		}
+		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
 }

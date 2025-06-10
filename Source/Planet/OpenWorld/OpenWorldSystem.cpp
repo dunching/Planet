@@ -366,7 +366,7 @@ TSoftObjectPtr<ATeleport> UOpenWorldSubSystem::GetTeleport(
 }
 
 ETeleport UOpenWorldSubSystem::GetTeleportType(
-	const TObjectPtr<ATeleport>& TeleportPtr
+	const TSoftObjectPtr<ATeleport>& TeleportPtr
 	) const
 {
 	auto DT_TeleportPtr = UDataTableCollection::GetInstance()->DataTable_Teleport.LoadSynchronous();

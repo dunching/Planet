@@ -4,13 +4,14 @@
 #include "CoreMinimal.h"
 
 #include "PlanetGameplayAbility.h"
+#include "Skill_Base.h"
 
 #include "BasicFuturesBase.generated.h"
 
 class ACharacterBase;
 
 UCLASS()
-class PLANET_API UBasicFuturesBase : public UPlanetGameplayAbility
+class PLANET_API UBasicFuturesBase : public UPlanetGameplayAbilityBase
 {
 	GENERATED_BODY()
 
@@ -24,12 +25,6 @@ public:
 	) override;
 
 protected:
-
-	virtual UGameplayEffect* GetCooldownGameplayEffect() const override;
-
-	virtual UGameplayEffect* GetCostGameplayEffect() const override;
-
-	// virtual void InitalDefaultTags()override;
 
 	TObjectPtr<ACharacterBase> CharacterPtr = nullptr;
 

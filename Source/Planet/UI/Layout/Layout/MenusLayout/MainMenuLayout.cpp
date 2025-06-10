@@ -33,6 +33,18 @@ void UMainMenuLayout::NativeDestruct()
 void UMainMenuLayout::Enable()
 {
 	ILayoutInterfacetion::Enable();
+	
+	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainMenuLayout::Get().WidgetSwitcher));
+	if (UIPtr)
+	{
+		{
+			auto MenuInterfacePtr = Cast<IMenuInterface>(UIPtr->GetActiveWidget());
+			if (MenuInterfacePtr)
+			{
+				MenuInterfacePtr->EnableMenu();
+			}
+		}
+	}
 }
 
 void UMainMenuLayout::DisEnable()

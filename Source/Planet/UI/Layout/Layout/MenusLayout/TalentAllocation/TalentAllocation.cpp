@@ -30,28 +30,15 @@ void UTalentAllocation::NativeDestruct()
 
 void UTalentAllocation::EnableMenu()
 {
+	InitialGroupmateList();
+
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!CharacterPtr)
 	{
 		return;
 	}
 
-	InitialGroupmateList();
 	OnSelectedCharacterProxy(CharacterPtr->GetCharacterProxy());
-	
-	if (CurrentProxyPtr)
-	{
-		const auto& CharacterTalentRef = CurrentProxyPtr->GetCharacterTalent();
-		const auto TalentNum = CurrentProxyPtr->GetTalentNum();
-
-		int32 Num = 0;
-		for (const auto& Iter : CharacterTalentRef.AllocationMap)
-		{
-			Num += Iter.Value;
-		}
-
-		OnUsedTalentNumChanged(Num, TalentNum);
-	}
 }
 
 void UTalentAllocation::DisEnableMenu()
@@ -71,28 +58,8 @@ EMenuType UTalentAllocation::GetMenuType() const
 	return EMenuType::kAllocationTalent;
 }
 
-void UTalentAllocation::UpdateTalenIconState()
+void UTalentAllocation::UpdateAllTalenIconState()
 {
-	auto& CharacterTalentRef = CurrentProxyPtr->GetCharacterTalent();
-	const auto TalentNum = CurrentProxyPtr->GetTalentNum();
-
-	// 总使用
-	int32 TotalNum = 0;
-
-	// 当前插槽使用
-	for (const auto& Iter : CharacterTalentRef.AllocationMap)
-	{
-		TotalNum += Iter.Value;
-	}
-
-	for (auto Iter : EnableSocletIconSet)
-	{
-		if (Iter)
-		{
-			Iter->bPreviousIsOK = true;
-		}
-	}
-
 	WidgetTree->ForEachWidget(
 	                          [this](
 	                          UWidget* Widget
@@ -106,10 +73,42 @@ void UTalentAllocation::UpdateTalenIconState()
 				                          return;
 			                          }
 
-			                          UIPtr->SetIsEnabled(UIPtr->bPreviousIsOK);
+			                          UIPtr->Reset();
 		                          }
 	                          }
 	                         );
+
+	for (auto Iter : EnableSocletIconSet)
+	{
+		if (Iter)
+		{
+			UpdateTalenIconState(Iter);
+		}
+	}
+}
+
+void UTalentAllocation::UpdateTalenIconState(
+	UTalentIcon* TalentIconPtr
+	)
+{
+	if (TalentIconPtr)
+	{
+		TalentIconPtr->Update();
+		
+		auto& CharacterTalentRef = CurrentProxyPtr->GetCharacterTalent();
+
+		if (CharacterTalentRef.AllocationMap.Contains(TalentIconPtr->TalentSocket))
+		{
+			const auto Value = CharacterTalentRef.AllocationMap[TalentIconPtr->TalentSocket];
+			if (Value >= TalentIconPtr->MaxNum)
+			{
+				for (auto Iter : TalentIconPtr->NextSocletIconSet)
+				{
+					UpdateTalenIconState(Iter);
+				}
+			}
+		}
+	}
 }
 
 void UTalentAllocation::OnUsedTalentNumChanged(
@@ -146,33 +145,6 @@ bool UTalentAllocation::OnAddPoint(
 				TotalNum += Iter.Value;
 			}
 
-			auto Lambda = [&CurrentNum, TalentIconPtr, this]
-			{
-				//
-				if (CurrentNum >= TalentIconPtr->MaxNum)
-				{
-					for (auto Iter :TalentIconPtr->NextSocletIconSet)
-					{
-						if (Iter)
-						{
-							Iter->bPreviousIsOK = true;
-						}
-					}
-				}
-				else
-				{
-					for (auto Iter :TalentIconPtr->NextSocletIconSet)
-					{
-						if (Iter)
-						{
-							Iter->bPreviousIsOK = false;
-						}
-					}
-				}
-
-				UpdateTalenIconState();
-			};
-
 			if (bIsAdd)
 			{
 				TotalNum++;
@@ -199,13 +171,15 @@ bool UTalentAllocation::OnAddPoint(
 					}
 
 					OnUsedTalentNumChanged(TotalNum, TalentNum);
-					Lambda();
+
+					UpdateAllTalenIconState();
+					
 					return true;
 				}
 			}
 			else
 			{
-				for (auto Iter :TalentIconPtr->NextSocletIconSet)
+				for (auto Iter : TalentIconPtr->NextSocletIconSet)
 				{
 					if (Iter)
 					{
@@ -231,7 +205,9 @@ bool UTalentAllocation::OnAddPoint(
 					}
 
 					OnUsedTalentNumChanged(TotalNum, TalentNum);
-					Lambda();
+					
+					UpdateAllTalenIconState();
+					
 					return true;
 				}
 			}
@@ -261,12 +237,12 @@ void UTalentAllocation::InitialGroupmateList()
 				WidgetPtr->ResetToolUIByData(GroupmateProxyAry[Index]);
 				{
 					auto Handle = WidgetPtr->OnSelected.AddCallback(
-																	std::bind(
-																			  &ThisClass::OnSelectedCharacterProxy,
-																			  this,
-																			  std::placeholders::_1
-																			 )
-																   );
+					                                                std::bind(
+					                                                          &ThisClass::OnSelectedCharacterProxy,
+					                                                          this,
+					                                                          std::placeholders::_1
+					                                                         )
+					                                               );
 					Handle->bIsAutoUnregister = false;
 				}
 				GroupmateList->AddChild(WidgetPtr);
@@ -285,6 +261,21 @@ void UTalentAllocation::OnSelectedCharacterProxy(
 	)
 {
 	CurrentProxyPtr = ProxyPtr;
+
+	if (CurrentProxyPtr)
+	{
+		const auto& CharacterTalentRef = CurrentProxyPtr->GetCharacterTalent();
+		const auto TalentNum = CurrentProxyPtr->GetTalentNum();
+
+		int32 Num = 0;
+		for (const auto& Iter : CharacterTalentRef.AllocationMap)
+		{
+			Num += Iter.Value;
+		}
+
+		OnUsedTalentNumChanged(Num, TalentNum);
+	}
+	
 	if (WidgetTree)
 	{
 		WidgetTree->ForEachWidget(
@@ -307,5 +298,29 @@ void UTalentAllocation::OnSelectedCharacterProxy(
 		                          }
 		                         );
 	}
-	UpdateTalenIconState();
+
+	UpdateAllTalenIconState();
+
+	if (!GroupmateList)
+	{
+		return;
+	}
+	auto ChildrensAry = GroupmateList->GetAllChildren();
+	for (auto Iter : ChildrensAry)
+	{
+		auto CharacterIconPtr = Cast<UGroupmateIcon>(Iter);
+		if (CharacterIconPtr)
+		{
+			if (CharacterIconPtr->ProxyPtr == ProxyPtr)
+			{
+				DisEnableMenu();
+
+				continue;
+			}
+			else
+			{
+				CharacterIconPtr->SwitchSelectState(false);
+			}
+		}
+	}
 }

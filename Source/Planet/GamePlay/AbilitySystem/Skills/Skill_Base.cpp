@@ -142,81 +142,6 @@ void USkill_Base::OnRemoveAbility(
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
-UGameplayEffect* USkill_Base::GetCooldownGameplayEffect() const
-{
-	return UAssetRefMap::GetInstance()->DurationGEClass.GetDefaultObject();
-}
-
-UGameplayEffect* USkill_Base::GetCostGameplayEffect() const
-{
-	return UAssetRefMap::GetInstance()->OnceGEClass.GetDefaultObject();
-}
-
-bool USkill_Base::CheckCooldown(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	FGameplayTagContainer* OptionalRelevantTags
-	) const
-{
-	if (!ensure(ActorInfo))
-	{
-		return true;
-	}
-
-	TArray<FGameplayTag> SourceTags{UGameplayTagsLibrary::GEData_CD};
-
-	const FGameplayTagContainer CooldownTags = FGameplayTagContainer::CreateFromArray(SourceTags);
-
-	if (!CooldownTags.IsEmpty())
-	{
-		if (UAbilitySystemComponent* AbilitySystemComponent = ActorInfo->AbilitySystemComponent.Get())
-		{
-			if (AbilitySystemComponent->HasAnyMatchingGameplayTags(CooldownTags))
-			{
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
-const FGameplayTagContainer* USkill_Base::GetCooldownTags() const
-{
-	return nullptr;
-}
-
-bool USkill_Base::CheckCost(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	FGameplayTagContainer* OptionalRelevantTags
-	) const
-{
-	if (!ensure(ActorInfo))
-	{
-		return true;
-	}
-
-	auto AbilitySystemComponentPtr = Cast<UCharacterAbilitySystemComponent>(ActorInfo->AbilitySystemComponent.Get());
-	if (!AbilitySystemComponentPtr )
-	{
-		return false;
-	}
-
-	const auto CostsMap = AbilitySystemComponentPtr->GetCost(GetCostMap());
-	return AbilitySystemComponentPtr->CheckCost(CostsMap);
-}
-
-TArray<FActiveGameplayEffectHandle> USkill_Base::MyApplyGameplayEffectSpecToTarget(
-	const FGameplayAbilitySpecHandle AbilityHandle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	FGameplayEffectSpecHandle SpecHandle,
-	const FGameplayAbilityTargetDataHandle& TargetData
-	) const
-{
-	return ApplyGameplayEffectSpecToTarget(AbilityHandle, ActorInfo, ActivationInfo, SpecHandle, TargetData);
-}
-
 const TArray<FAbilityTriggerData>& USkill_Base::GetTriggers() const
 {
 	return AbilityTriggers;
@@ -602,11 +527,6 @@ void USkill_Base::ApplyCostImp(
 		}
 		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
 	}
-}
-
-TMap<FGameplayTag, int32> USkill_Base::GetCostMap() const
-{
-	return {};
 }
 
 TSet<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistance(

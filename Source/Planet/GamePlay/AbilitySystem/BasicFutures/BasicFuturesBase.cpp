@@ -2,10 +2,12 @@
 #include "BasicFuturesBase.h"
 
 #include "AssetRefMap.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CharacterBase.h"
+#include "GameplayTagsLibrary.h"
 
 UBasicFuturesBase::UBasicFuturesBase() :
-	Super()
+                                       Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 
@@ -21,19 +23,4 @@ void UBasicFuturesBase::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, 
 	if (CharacterPtr)
 	{
 	}
-}
-
-// void UBasicFuturesBase::InitalDefaultTags()
-// {
-// 	Super::InitalDefaultTags();
-// }
-
-UGameplayEffect* UBasicFuturesBase::GetCooldownGameplayEffect() const
-{
-	return UAssetRefMap::GetInstance()->DurationGEClass.GetDefaultObject();
-}
-
-UGameplayEffect* UBasicFuturesBase::GetCostGameplayEffect() const
-{
-	return UAssetRefMap::GetInstance()->OnceGEClass.GetDefaultObject();
 }

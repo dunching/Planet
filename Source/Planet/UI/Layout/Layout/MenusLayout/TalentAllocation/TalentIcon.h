@@ -34,8 +34,8 @@ public:
 		bool
 		)>;
 	
-	virtual void SetIsEnabled(bool bInIsEnabled) override;
-	
+	void Update();
+
 	void Reset();
 
 	TSharedPtr<FCharacterProxy> CurrentProxyPtr = nullptr;
@@ -49,6 +49,8 @@ public:
 	TSet<UTalentIcon*> NextSocletIconSet;
 
 protected:
+	virtual void SetIsEnabled(bool bInIsEnabled) override;
+	
 	virtual void NativeConstruct() override;
 
 	virtual FReply NativeOnMouseButtonDown(

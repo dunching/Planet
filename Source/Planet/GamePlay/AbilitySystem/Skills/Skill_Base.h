@@ -5,8 +5,8 @@
 #include "Abilities/GameplayAbilityTypes.h"
 
 #include "PlanetGameplayAbility.h"
-
 #include "GenerateTypes.h"
+#include "PlanetGameplayAbilityBase.h"
 
 #include "Skill_Base.generated.h"
 
@@ -46,7 +46,7 @@ struct TStructOpsTypeTraits<FGameplayAbilityTargetData_RegisterParam_SkillBase> 
 };
 
 UCLASS()
-class PLANET_API USkill_Base : public UPlanetGameplayAbility
+class PLANET_API USkill_Base : public UPlanetGameplayAbilityBase
 {
 	GENERATED_BODY()
 
@@ -103,41 +103,6 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
 		) override;
-
-	virtual UGameplayEffect* GetCooldownGameplayEffect() const override;
-
-	virtual UGameplayEffect* GetCostGameplayEffect() const override;
-
-	virtual bool CheckCooldown(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-		) const override;
-
-	virtual const FGameplayTagContainer* GetCooldownTags() const override;
-
-	virtual bool CheckCost(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-		) const override;
-
-	/**
-	 * 
-	 * @param AbilityHandle 
-	 * @param ActorInfo 
-	 * @param ActivationInfo 
-	 * @param SpecHandle 
-	 * @param TargetData 
-	 * @return 
-	 */
-	TArray<FActiveGameplayEffectHandle> MyApplyGameplayEffectSpecToTarget(
-		const FGameplayAbilitySpecHandle AbilityHandle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		FGameplayEffectSpecHandle SpecHandle,
-		const FGameplayAbilityTargetDataHandle& TargetData
-		) const;
 
 	const TArray<FAbilityTriggerData>& GetTriggers() const;
 
@@ -200,15 +165,13 @@ protected:
 		float Elemental_Damage_Magnification
 		) const;
 
-	void ApplyCostImp(
+	virtual void ApplyCostImp(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const TMap<FGameplayTag, int32>& CostMap
-		) const;
+		) const override;
 
-	virtual TMap<FGameplayTag, int32>GetCostMap()const;
-	
 	TObjectPtr<ACharacterBase> CharacterPtr = nullptr;
 
 	TSharedPtr<FSkillProxy> SkillProxyPtr = nullptr;

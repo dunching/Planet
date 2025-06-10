@@ -27,9 +27,22 @@ void UTalentIcon::SetIsEnabled(
 	Super::SetIsEnabled(bInIsEnabled);
 }
 
+void UTalentIcon::Update()
+{
+	bPreviousIsOK = true;
+
+	UpdateNum();
+
+	SetIsEnabled(bPreviousIsOK);
+}
+
 void UTalentIcon::Reset()
 {
+	bPreviousIsOK = false;
+
 	UpdateNum();
+
+	SetIsEnabled(bPreviousIsOK);
 }
 
 void UTalentIcon::NativeConstruct()

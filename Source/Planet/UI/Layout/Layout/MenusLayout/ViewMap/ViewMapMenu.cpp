@@ -138,7 +138,7 @@ void UViewMapMenu::OnTeleportPointWidgetClicked(
 
 		TeleportDecriptionBorder->SetVisibility(ESlateVisibility::Visible);
 
-		TeleportPtr = TeleportPointWidgetPtr->TeleportRef.LoadSynchronous();
+		TeleportPtr = TeleportPointWidgetPtr->TeleportRef;
 		if (!TeleportPtr)
 		{
 			return;
@@ -192,9 +192,9 @@ void UViewMapMenu::UpdatePlayerMarkPt() const
 		const auto Box = OpenWorldBoundBox.GetBox();
 		const auto Size = Box.GetSize();
 
-		const auto FactorX = (Box.Max.X - Location.X) / Size.X;
-		const auto FactorY = (Box.Max.Y - Location.Y) / Size.Y;
+		const auto FactorX = (Location.X - Box.Min.X) / Size.X;
+		const auto FactorY = (Location.Y - Box.Min.Y) / Size.Y;
 
-		PlayerBorder->SetRenderTranslation(DesiredSize * FVector2D(FactorX, -FactorY));
+		PlayerBorder->SetRenderTranslation(DesiredSize * FVector2D(FactorY, -FactorX));
 	}
 }

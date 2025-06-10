@@ -59,7 +59,7 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
-	);
+	) override;
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -68,12 +68,6 @@ public:
 		const FGameplayEventData* TriggerEventData
 	) override;
 	
-	virtual void ApplyCost(
-		const FGameplayAbilitySpecHandle Handle, 
-		const FGameplayAbilityActorInfo* ActorInfo, 
-		const FGameplayAbilityActivationInfo ActivationInfo
-		) const override;
-
 	virtual bool CommitAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -87,7 +81,7 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateEndAbility,
 		bool bWasCancelled
-	);
+	) override;
 
 	virtual bool CanActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -104,6 +98,15 @@ public:
 protected:
 
 	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
+
+	virtual TMap<FGameplayTag, int32>GetCostMap()const override;
+	
+	virtual void ApplyCostImp(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const TMap<FGameplayTag, int32>& CostMap
+		) const override;
 
 	// virtual void InitalDefaultTags()override;
 

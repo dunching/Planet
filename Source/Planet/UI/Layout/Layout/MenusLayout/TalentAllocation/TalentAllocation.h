@@ -43,7 +43,12 @@ protected:
 
 	virtual EMenuType GetMenuType()const override final;
 
-	void UpdateTalenIconState();
+	/**
+	 * 根据角色配置刷新天赋图标
+	 */
+	void UpdateAllTalenIconState();
+	
+	void UpdateTalenIconState(UTalentIcon* TalentIconPtr);
 	
 	void OnUsedTalentNumChanged(int32 UsedNum, int32 TatolNum);
 
