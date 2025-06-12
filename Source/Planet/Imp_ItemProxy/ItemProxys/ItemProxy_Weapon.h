@@ -69,6 +69,9 @@ public:
 	
 };
 
+/**
+ * 武器道具
+ */
 USTRUCT()
 struct PLANET_API FWeaponProxy :
 public FPlanet_BasicProxy,

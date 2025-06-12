@@ -8,8 +8,8 @@
 
 #include "WeatherSystem.generated.h"
 
-class ADynamic_Sky;
-class ADynamic_Weather;
+class ADynamic_SkyBase;
+class ADynamic_WeatherBase;
 
 using FOnHourly = std::function<void(
 	int32
@@ -45,9 +45,9 @@ public:
 		const FOnHourly& OnHourly
 		);
 
-	ADynamic_Sky* GetDynamicSky();
+	ADynamic_SkyBase* GetDynamicSky();
 
-	ADynamic_Weather* GetDynamicWeather();
+	ADynamic_WeatherBase* GetDynamicWeather();
 
 protected:
 
@@ -64,7 +64,7 @@ private:
 
 	float OriginalSpeed = 1.f;
 
-	ADynamic_Sky* Dynamic_SkyPtr = nullptr;
+	ADynamic_SkyBase* Dynamic_SkyPtr = nullptr;
 
-	ADynamic_Weather* Dynamic_WeatherPtr = nullptr;
+	ADynamic_WeatherBase* Dynamic_WeatherPtr = nullptr;
 };

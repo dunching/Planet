@@ -38,6 +38,9 @@ class PLANET_API UItemProxy_Description_Coin : public UItemProxy_Description
 public:
 };
 
+/**
+ * 货币道具
+ */
 USTRUCT()
 struct PLANET_API FCoinProxy :
 	public FPlanet_BasicProxy,

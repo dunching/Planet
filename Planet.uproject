@@ -91,7 +91,7 @@
 			"Enabled": true
 		},
 		{
-			"Name": "GuideSystem",
+			"Name": "QuestSystem",
 			"Enabled": true
 		},
 		{

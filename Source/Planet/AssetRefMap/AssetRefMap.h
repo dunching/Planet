@@ -50,7 +50,7 @@ class UGE_Duration;
 class UGE_Damage_Callback;
 class AMinimapSceneCapture2D;
 class ATargetPoint_Runtime;
-class AGuideThread_Branch;
+class AQuestChain_Branch;
 class AGuideThread_Challenge;
 
 UCLASS(BlueprintType, Blueprintable)
@@ -124,13 +124,13 @@ public:
 
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideLine")
-	TSubclassOf<AGuideThread_Branch> GuideBranchThreadTestClass;
+	TSubclassOf<AQuestChain_Branch> GuideBranchThreadTestClass;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideLine")
-	TSubclassOf<AGuideThread_Branch> GuideBranchThreadTest1Class;
+	TSubclassOf<AQuestChain_Branch> GuideBranchThreadTest1Class;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideLine")
-	TSubclassOf<AGuideThread_Branch> GuideBranchThreadTest2Class;
+	TSubclassOf<AQuestChain_Branch> GuideBranchThreadTest2Class;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideLine")
 	TSubclassOf<AGuideThread_Challenge> GuideThreadChallengeActorClass;

@@ -49,7 +49,7 @@ public class EditTool : ModuleRules
 			"Common_UMG",
 			"CommonUser",
 			"Gravity",
-			"GuideSystem",
+			"QuestSystem",
 			"StateProcessor",
 			"Utils",
 			"Weather",

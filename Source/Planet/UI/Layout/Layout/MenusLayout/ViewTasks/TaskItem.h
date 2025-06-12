@@ -11,9 +11,9 @@
 #include "TaskItem.generated.h"
 
 class UTalentIcon;
-class AGuideThreadBase;
-class AGuideThread_MainBase;
-class AGuideThread_BranchBase;
+class AQuestChainBase;
+class AQuestChain_MainBase;
+class AQuestChain_BranchBase;
 
 /**
  *
@@ -30,9 +30,9 @@ public:
 	
 	virtual void NativeConstruct()override;
 
-	void SetGuideThreadType(const TSubclassOf<AGuideThread_MainBase>& GuideThreadClass);
+	void SetGuideThreadType(const TSubclassOf<AQuestChain_MainBase>& GuideThreadClass);
 
-	void SetGuideThreadType(const TSubclassOf<AGuideThread_BranchBase>& GuideThreadClass);
+	void SetGuideThreadType(const TSubclassOf<AQuestChain_BranchBase>& GuideThreadClass);
 
 	UFUNCTION()
 	void OnClicked();
@@ -41,9 +41,9 @@ public:
 
 	FOnSeleted OnSeleted; 
 	
-	TSubclassOf<AGuideThread_MainBase> MainGuideThreadClass;
+	TSubclassOf<AQuestChain_MainBase> MainGuideThreadClass;
 	
-	TSubclassOf<AGuideThread_BranchBase> BrandGuideThreadClass;
+	TSubclassOf<AQuestChain_BranchBase> BrandGuideThreadClass;
 
 protected:
 	

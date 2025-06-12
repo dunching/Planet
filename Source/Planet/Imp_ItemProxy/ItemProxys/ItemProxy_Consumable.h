@@ -71,6 +71,9 @@ public:
 	float PerformActionInterval = 1.f;
 };
 
+/**
+ * 消耗品道具
+ */
 USTRUCT()
 struct PLANET_API FConsumableProxy :
 	public FPlanet_BasicProxy,

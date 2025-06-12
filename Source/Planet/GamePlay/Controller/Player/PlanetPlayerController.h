@@ -277,7 +277,7 @@ protected:
 		) override;
 
 	virtual bool InputKey(
-		const FInputKeyParams& Params
+		const FInputKeyEventArgs& Params
 		) override;
 
 	virtual void GetActorEyesViewPoint(

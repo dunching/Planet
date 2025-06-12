@@ -20,8 +20,8 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GroupManagger_NPC.h"
-#include "GuideInteraction.h"
-#include "GuideSubSystem.h"
+#include "QuestInteraction.h"
+#include "QuestSubSystem.h"
 #include "HumanCharacter_Player.h"
 #include "TeamMatesHelperComponent.h"
 
@@ -39,7 +39,7 @@ void USceneCharacterAIInteractionComponent::BeginPlay()
 }
 
 void USceneCharacterAIInteractionComponent::StartInteractionItem(
-	const TSubclassOf<AGuideInteractionBase>& Item
+	const TSubclassOf<AQuestInteractionBase>& Item
 )
 {
 	Super::StartInteractionItem(Item);
@@ -70,7 +70,7 @@ void USceneCharacterAIInteractionComponent::StartInteractionItem(
 }
 
 void USceneCharacterAIInteractionComponent::ChangedInterationState(
-	const TSubclassOf<AGuideInteractionBase>& Item,
+	const TSubclassOf<AQuestInteractionBase>& Item,
 	bool bIsEnable
 	)
 {

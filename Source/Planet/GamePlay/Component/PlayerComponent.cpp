@@ -8,7 +8,7 @@
 #include "CharacterBase.h"
 #include "EnhancedInputSubsystems.h"
 #include "GroupManagger.h"
-#include "GuideSubSystem.h"
+#include "QuestSubSystem.h"
 #include "HumanAIController.h"
 #include "HumanCharacter_Player.h"
 #include "HumanRegularProcessor.h"
@@ -190,8 +190,8 @@ void UPlayerComponent::OnLocalPlayerDataIsOk()
 			);
 
 		// 
-		UGuideSubSystem::GetInstance()->InitializeMainThread();
-		UGuideSubSystem::GetInstance()->ActiveMainThread();
+		UQuestSubSystem::GetInstance()->InitializeMainThread();
+		UQuestSubSystem::GetInstance()->ActiveMainThread();
 	}
 #endif
 }

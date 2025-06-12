@@ -6,8 +6,8 @@
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "Materials/MaterialParameterCollection.h"
 
-#include "Dynamic_Weather.h"
-#include "Dynamic_Sky.h"
+#include "Dynamic_WeatherBase.h"
+#include "Dynamic_SkyBase.h"
 
 UWorld* GetWorldImp()
 {
@@ -113,7 +113,7 @@ int32 UWeatherSystem::AddOnHourly(
 	return -1;
 }
 
-ADynamic_Sky* UWeatherSystem::GetDynamicSky()
+ADynamic_SkyBase* UWeatherSystem::GetDynamicSky()
 {
 	if (!Dynamic_SkyPtr)
 	{
@@ -123,7 +123,7 @@ ADynamic_Sky* UWeatherSystem::GetDynamicSky()
 			bool bIsBreak = false;
 			for (auto SecondIter : Iter->Actors)
 			{
-				Dynamic_SkyPtr = Cast<ADynamic_Sky>(SecondIter);
+				Dynamic_SkyPtr = Cast<ADynamic_SkyBase>(SecondIter);
 				if (Dynamic_SkyPtr)
 				{
 					bIsBreak = true;
@@ -139,7 +139,7 @@ ADynamic_Sky* UWeatherSystem::GetDynamicSky()
 	return Dynamic_SkyPtr;
 }
 
-ADynamic_Weather* UWeatherSystem::GetDynamicWeather()
+ADynamic_WeatherBase* UWeatherSystem::GetDynamicWeather()
 {
 	if (!Dynamic_WeatherPtr)
 	{
@@ -149,7 +149,7 @@ ADynamic_Weather* UWeatherSystem::GetDynamicWeather()
 			bool bIsBreak = false;
 			for (auto SecondIter : Iter->Actors)
 			{
-				Dynamic_WeatherPtr = Cast<ADynamic_Weather>(SecondIter);
+				Dynamic_WeatherPtr = Cast<ADynamic_WeatherBase>(SecondIter);
 				if (Dynamic_WeatherPtr)
 				{
 					bIsBreak = true;

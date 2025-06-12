@@ -33,6 +33,7 @@ public:
 
 	/**
 	 * 获取距离离开开放世界时最近的传送点
+	 * OnlyServer
 	 * @param ChallengeLevelType 
 	 * @param PCPtr 
 	 */
@@ -40,6 +41,7 @@ public:
 
 	/**
 	 * 获取最近的传送点
+	 * OnlyServer
 	 * @param ChallengeLevelType 
 	 * @param PCPtr 
 	 */
@@ -47,6 +49,7 @@ public:
 
 	/**
 	 * 根据传送点切换数据层
+	 * OnlyServer
 	 * @param ChallengeLevelType 
 	 * @param PCPtr 
 	 */
@@ -54,6 +57,7 @@ public:
 
 	/**
 	 * 确认切换的数据层中，必须的数据是否已存在
+	 * OnlyServer
 	 * @param ChallengeLevelType 
 	 * @return 
 	 */
@@ -61,6 +65,7 @@ public:
 
 	/**
 	 * 根据传送点切换数据层
+	 * OnlyServer
 	 * @param ChallengeLevelType 
 	 * @param PCPtr 
 	 */
@@ -68,6 +73,7 @@ public:
 
 	/**
 	 * 根据传送点切换数据层
+	 * OnlyServer
 	 * @param ChallengeLevelType 
 	 * @param PCPtr 
 	 */

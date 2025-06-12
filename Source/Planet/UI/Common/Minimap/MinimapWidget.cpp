@@ -9,7 +9,7 @@
 #include "HumanCharacter_Player.h"
 #include "PlanetPlayerState.h"
 #include "DataTableCollection.h"
-#include "Dynamic_Sky.h"
+#include "Dynamic_SkyBase.h"
 #include "MinimapSceneCapture2D.h"
 #include "Regions.h"
 #include "WeatherSystem.h"

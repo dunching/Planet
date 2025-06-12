@@ -2,7 +2,7 @@
 
 #include "Components/Button.h"
 
-#include "GuideInteraction.h"
+#include "QuestInteraction.h"
 #include "HumanInteractionWithChallengeEntry.h"
 #include "HumanInteractionWithNPC.h"
 #include "InputProcessorSubSystemBase.h"
@@ -149,7 +149,7 @@ void UInteractionOptionsLayout::CloseOption()
 }
 
 void UInteractionOptionsLayout::SelectedInteractionItem(
-	const TSubclassOf<AGuideInteractionBase>& GuideInteractionClass
+	const TSubclassOf<AQuestInteractionBase>& GuideInteractionClass
 )
 {
 	if (SceneActorInteractionInterfacePtr)

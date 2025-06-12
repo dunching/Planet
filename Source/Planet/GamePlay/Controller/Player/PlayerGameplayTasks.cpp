@@ -1,7 +1,7 @@
 #include "PlayerGameplayTasks.h"
 
 #include "CharacterAbilitySystemComponent.h"
-#include "Dynamic_Weather.h"
+#include "Dynamic_WeatherBase.h"
 #include "GameplayTagsLibrary.h"
 #include "HumanRegularProcessor.h"
 #include "InputProcessorSubSystemBase.h"
@@ -11,6 +11,7 @@
 #include "HumanCharacter_Player.h"
 #include "InputProcessorSubSystem_Imp.h"
 #include "LogWriter.h"
+#include "PlanetPlayerState.h"
 #include "TransitionProcessor.h"
 #include "WeatherSystem.h"
 
@@ -42,7 +43,7 @@ void UPlayerControllerGameplayTasksComponent::TeleportPlayerToOpenWorld_Server_I
 
 	auto Teleport = UOpenWorldSubSystem::GetInstance()->GetTeleportLastPtInOpenWorld(OwnerPtr);
 
-	EntryLevel_ActiveTask(Teleport, OpenWorldWeather);
+	EntryLevel_ActiveTask(Teleport);
 }
 
 void UPlayerControllerGameplayTasksComponent::TeleportPlayerToNearest_Server_Implementation()
@@ -57,7 +58,7 @@ void UPlayerControllerGameplayTasksComponent::TeleportPlayerToNearest_Server_Imp
 
 	FGameplayTag NewWeather = UOpenWorldSubSystem::GetInstance()->GetTeleportWeather(Teleport);
 
-	EntryLevel_ActiveTask(Teleport, NewWeather);
+	EntryLevel_ActiveTask(Teleport);
 }
 
 void UPlayerControllerGameplayTasksComponent::EntryChallengeLevel_Server_Implementation(
@@ -66,12 +67,11 @@ void UPlayerControllerGameplayTasksComponent::EntryChallengeLevel_Server_Impleme
 {
 	FGameplayTag NewWeather = UOpenWorldSubSystem::GetInstance()->GetTeleportWeather(Teleport);
 
-	EntryLevel_ActiveTask(Teleport, NewWeather);
+	EntryLevel_ActiveTask(Teleport);
 }
 
 void UPlayerControllerGameplayTasksComponent::EntryLevel_ActiveTask_Implementation(
-	ETeleport Teleport,
-	const FGameplayTag& NewWeather
+	ETeleport Teleport
 	)
 {
 	auto OwnerPtr = GetOwner<FOwnerType>();
@@ -88,7 +88,6 @@ void UPlayerControllerGameplayTasksComponent::EntryLevel_ActiveTask_Implementati
 																			   );
 	GameplayTaskPtr->Teleport = Teleport;
 	GameplayTaskPtr->TargetPCPtr = OwnerPtr;
-	GameplayTaskPtr->Weather = NewWeather;
 	GameplayTaskPtr->OnEnd.AddUObject(this, &ThisClass::EntryLevelEnd);
 
 	GameplayTaskPtr->ReadyForActivation();
@@ -171,17 +170,15 @@ void UGameplayTask_TeleportPlayer::Activate()
 #if UE_EDITOR || UE_SERVER
 	if (TargetPCPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		if (Weather.IsValid())
-		{
-			TargetPCPtr->GetGameplayTasksComponent()->OpenWorldWeather = UWeatherSystem::GetInstance()->GetDynamicWeather()
-				->GetCurrentWeather();
-	
-			// 改变天气
-			UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather(Weather);
-		}
-		
 		UOpenWorldSubSystem::GetInstance()->SwitchDataLayer(Teleport, TargetPCPtr);
 	}
+#endif
+
+#if UE_EDITOR || UE_CLIENT
+	if (TargetPCPtr->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+	}
+#endif
 
 	// 
 	auto CharacterPtr = Cast<ACharacterBase>(TargetPCPtr->GetPawn<ACharacterBase>());
@@ -189,8 +186,7 @@ void UGameplayTask_TeleportPlayer::Activate()
 	{
 		CharacterPtr->LandedDelegate.AddDynamic(this, &ThisClass::OnLanded);
 	}
-#endif
-
+	
 	if (TargetPCPtr->GetLocalRole() > ROLE_SimulatedProxy)
 	{
 	}
@@ -228,6 +224,7 @@ void UGameplayTask_TeleportPlayer::TickTask(
 #if UE_EDITOR || UE_SERVER
 				if (TargetPCPtr->GetLocalRole() == ROLE_Authority)
 				{
+					TargetPCPtr->GetPlayerState<APlanetPlayerState>()->SetCurrentTeleport(Teleport);
 				}
 #endif
 

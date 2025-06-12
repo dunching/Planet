@@ -10,7 +10,7 @@
 
 #include "ChallengeEntry.generated.h"
 
-class AGuideInteractionBase;
+class AQuestInteractionBase;
 class AGuideThread_Challenge;
 class USceneActorInteractionComponent;
 class UWidgetComponent;
@@ -66,6 +66,6 @@ class PLANET_API USceneChallengeEntryInteractionComponent : public USceneActorIn
 public:
 	using FOwnerType = AChallengeEntry;
 
-	virtual void StartInteractionItem(const TSubclassOf<AGuideInteractionBase>& Item)override;
+	virtual void StartInteractionItem(const TSubclassOf<AQuestInteractionBase>& Item)override;
 	
 };

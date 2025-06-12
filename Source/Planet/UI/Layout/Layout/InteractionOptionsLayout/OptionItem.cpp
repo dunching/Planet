@@ -5,8 +5,8 @@
 #include "Kismet/GameplayStatics.h"
 
 
-#include "GuideActorBase.h"
-#include "GuideInteraction.h"
+#include "QuestsActorBase.h"
+#include "QuestInteraction.h"
 #include "InputProcessorSubSystemBase.h"
 #include "InteractionList.h"
 #include "MainHUD.h"
@@ -48,8 +48,8 @@ void UOptionItem::NativeDestruct()
 }
 
 void UOptionItem::SetData(
-	const TSubclassOf<AGuideInteractionBase>& InTaskNode,
-	const std::function<void(const TSubclassOf<AGuideInteractionBase>&)>& InCallback
+	const TSubclassOf<AQuestInteractionBase>& InTaskNode,
+	const std::function<void(const TSubclassOf<AQuestInteractionBase>&)>& InCallback
 )
 {
 	if (!InTaskNode.Get())

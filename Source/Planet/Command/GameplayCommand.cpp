@@ -9,7 +9,7 @@
 #include "PlanetPlayerController.h"
 #include "ChallengeSystem.h"
 #include "GroupManagger.h"
-#include "GuideSubSystem.h"
+#include "QuestSubSystem.h"
 #include "HumanViewSetting.h"
 #include "HumanViewTalentAllocation.h"
 #include "InputProcessorSubSystem_Imp.h"
@@ -20,7 +20,7 @@
 
 void GameplayCommand::ActiveGuideMainThread()
 {
-	UGuideSubSystem::GetInstance()->ActiveMainThread();
+	UQuestSubSystem::GetInstance()->ActiveMainThread();
 }
 
 void GameplayCommand::ViewAllocationMenu()

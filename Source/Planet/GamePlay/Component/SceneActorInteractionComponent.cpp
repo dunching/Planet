@@ -3,8 +3,8 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "HumanCharacter_AI.h"
-#include "GuideInteraction.h"
-#include "GuideSubSystem.h"
+#include "QuestInteraction.h"
+#include "QuestSubSystem.h"
 #include "HumanCharacter_Player.h"
 #include "MainHUD.h"
 #include "MainHUDLayout.h"
@@ -22,9 +22,9 @@ USceneActorInteractionComponent::USceneActorInteractionComponent(
 	// bStartLogicAutomatically = false;
 }
 
-TArray<TSubclassOf<AGuideInteractionBase>> USceneActorInteractionComponent::GetInteractionLists() const
+TArray<TSubclassOf<AQuestInteractionBase>> USceneActorInteractionComponent::GetInteractionLists() const
 {
-	TArray<TSubclassOf<AGuideInteractionBase>> Results;
+	TArray<TSubclassOf<AQuestInteractionBase>> Results;
 
 	for (const auto& Iter : GuideInteractionAry)
 	{
@@ -37,7 +37,7 @@ TArray<TSubclassOf<AGuideInteractionBase>> USceneActorInteractionComponent::GetI
 	return Results;
 }
 
-TObjectPtr<AGuideInteractionBase> USceneActorInteractionComponent::GetCurrentInteraction() const
+TObjectPtr<AQuestInteractionBase> USceneActorInteractionComponent::GetCurrentInteraction() const
 {
 	return GuideInteractionActorPtr;
 }
@@ -48,7 +48,7 @@ TArray<FGuideInterationSetting> USceneActorInteractionComponent::GetGuideInterac
 }
 
 void USceneActorInteractionComponent::StartInteractionItem(
-	const TSubclassOf<AGuideInteractionBase>& Item
+	const TSubclassOf<AQuestInteractionBase>& Item
 	)
 {
 }
@@ -57,7 +57,7 @@ void USceneActorInteractionComponent::StopInteractionItem()
 {
 	if (GuideInteractionActorPtr)
 	{
-		UGuideSubSystem::GetInstance()->AddGuidePostion(
+		UQuestSubSystem::GetInstance()->AddGuidePostion(
 		                                                GuideInteractionActorPtr->GetGuideID(),
 		                                                GuideInteractionActorPtr->GetCurrentTaskID()
 		                                               );
@@ -68,7 +68,7 @@ void USceneActorInteractionComponent::StopInteractionItem()
 }
 
 void USceneActorInteractionComponent::ChangedInterationState(
-	const TSubclassOf<AGuideInteractionBase>& Item,
+	const TSubclassOf<AQuestInteractionBase>& Item,
 	bool bIsEnable
 	)
 {
@@ -88,8 +88,8 @@ bool USceneActorInteractionComponent::GetIsEnableInteraction() const
 }
 
 void USceneActorInteractionComponent::StartInteractionImp(
-	const TSubclassOf<AGuideInteractionBase>& Item,
-	const TObjectPtr<AGuideInteractionBase>& GuideInteraction_ActorPtr
+	const TSubclassOf<AQuestInteractionBase>& Item,
+	const TObjectPtr<AQuestInteractionBase>& GuideInteraction_ActorPtr
 	)
 {
 	GuideInteractionActorPtr = GuideInteraction_ActorPtr;
@@ -101,7 +101,7 @@ void USceneActorInteractionComponent::StartInteractionImp(
 	}
 	
 	FGuid CurrentTaskID;
-	if (UGuideSubSystem::GetInstance()->ConsumeGuidePostion(NewGuideID, CurrentTaskID))
+	if (UQuestSubSystem::GetInstance()->ConsumeGuidePostion(NewGuideID, CurrentTaskID))
 	{
 		//
 		GuideInteractionActorPtr->SetPreviousTaskID(CurrentTaskID);

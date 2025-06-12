@@ -12,7 +12,7 @@ struct FUTaskItemCategory : public TStructVariable<FUTaskItemCategory>
 };
 
 void UTaskItemCategory::SetTaskType(
-	EGuideThreadType GuideThreadType
+	EQuestChainType GuideThreadType
 )
 {
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FUTaskItemCategory::Get().Text));
@@ -20,12 +20,12 @@ void UTaskItemCategory::SetTaskType(
 	{
 		switch (GuideThreadType)
 		{
-		case EGuideThreadType::kMain:
+		case EQuestChainType::kMain:
 			{
 				UIPtr->SetText(FText::FromString(UTextSubSystem::GetInstance()->GetText(TextCollect::MainThread)));
 			}
 			break;
-		case EGuideThreadType::kBrand:
+		case EQuestChainType::kBrand:
 			{
 				UIPtr->SetText(FText::FromString(UTextSubSystem::GetInstance()->GetText(TextCollect::BrandThread)));
 			}

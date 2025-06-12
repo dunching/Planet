@@ -35,7 +35,7 @@ namespace HumanProcessor
 
 		FHumanRegularProcessor(
 			FOwnerPawnType* CharacterPtr
-		);
+			);
 
 		virtual ~FHumanRegularProcessor();
 
@@ -46,22 +46,16 @@ namespace HumanProcessor
 	protected:
 		virtual bool InputKey(
 			const FInputKeyEventArgs& EventArgs
-		) override;
+			) override;
 
 		virtual bool InputAxis(
-			FViewport* Viewport,
-			FInputDeviceId InputDevice,
-			FKey Key,
-			float Delta,
-			float DeltaTime,
-			int32 NumSamples = 1,
-			bool bGamepad = false
-		) override;
+			const FInputKeyEventArgs& EventArgs
+			) override;
 
 	private:
 		virtual void TickImp(
 			float Delta
-		) override;
+			) override;
 
 		void SwitchWeapon();
 
@@ -69,7 +63,7 @@ namespace HumanProcessor
 
 		void AddOrRemoveUseMenuItemEvent(
 			bool bIsAdd
-		);
+			);
 
 		void UpdateLookAtObject();
 

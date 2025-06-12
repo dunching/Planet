@@ -21,8 +21,8 @@
 #include "GroupManagger.h"
 #include "Tools.h"
 #include "GuideList.h"
-#include "GuideSubSystem.h"
-#include "GuideThread.h"
+#include "QuestSubSystem.h"
+#include "QuestChain.h"
 #include "GuideThreadChallenge.h"
 #include "HUD_TeamInfo.h"
 #include "HumanCharacter_Player.h"
@@ -168,11 +168,17 @@ void URegularActionLayout::Enable()
 	}
 
 	{
-		StartGuideDelegateHandle = UGuideSubSystem::GetInstance()->GetOnStartGuide().AddUObject(
+		StartGuideDelegateHandle = UQuestSubSystem::GetInstance()->GetOnStartGuide().AddUObject(
 			 this,
 			 &ThisClass::OnStartGuide
 			);
-		StopGuideDelegateHandle = UGuideSubSystem::GetInstance()->GetOnStopGuide().AddUObject(
+		const auto Ary = UQuestSubSystem::GetInstance()->GetActivedGuideThreadsAry();
+		for (const auto &Iter : Ary)
+		{
+			OnStartGuide(Iter);	
+		}
+		
+		StopGuideDelegateHandle = UQuestSubSystem::GetInstance()->GetOnStopGuide().AddUObject(
 			 this,
 			 &ThisClass::OnStopGuide
 			);
@@ -181,18 +187,6 @@ void URegularActionLayout::Enable()
 		if (UIPtr)
 		{
 			UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnQuitChallengeBtnClicked);
-
-			auto GroupManaggerGASPtr = Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()))
-			                           ->
-			                           GetGroupManagger()->GetAbilitySystemComponent();
-			if (GroupManaggerGASPtr->HasMatchingGameplayTag(UGameplayTagsLibrary::State_ActiveGuide_Challenge))
-			{
-				UIPtr->SetVisibility(ESlateVisibility::Visible);
-			}
-			else
-			{
-				UIPtr->SetVisibility(ESlateVisibility::Hidden);
-			}
 		}
 	}
 }
@@ -252,8 +246,8 @@ void URegularActionLayout::DisEnable()
 	}
 
 	{
-		UGuideSubSystem::GetInstance()->GetOnStartGuide().Remove(StartGuideDelegateHandle);
-		UGuideSubSystem::GetInstance()->GetOnStopGuide().Remove(StopGuideDelegateHandle);
+		UQuestSubSystem::GetInstance()->GetOnStartGuide().Remove(StartGuideDelegateHandle);
+		UQuestSubSystem::GetInstance()->GetOnStopGuide().Remove(StopGuideDelegateHandle);
 
 		auto UIPtr = Cast<UButton>(GetWidgetFromName(FRegularActionLayout::Get().QuitChallengeBtn));
 		if (UIPtr)
@@ -271,7 +265,7 @@ ELayoutCommon URegularActionLayout::GetLayoutType() const
 }
 
 void URegularActionLayout::OnStartGuide(
-	AGuideThreadBase* GuideThread
+	AQuestChainBase* GuideThread
 	)
 {
 	if (GuideThread)
@@ -288,7 +282,7 @@ void URegularActionLayout::OnStartGuide(
 }
 
 void URegularActionLayout::OnStopGuide(
-	AGuideThreadBase* GuideThread
+	AQuestChainBase* GuideThread
 	)
 {
 	if (GuideThread)
@@ -307,7 +301,7 @@ void URegularActionLayout::OnStopGuide(
 void URegularActionLayout::OnQuitChallengeBtnClicked()
 {
 	// 停止挑战任务
-	UGuideSubSystem::GetInstance()->StopParallelGuideThread(
+	UQuestSubSystem::GetInstance()->StopParallelGuideThread(
 	                                                        UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass
 	                                                       );
 

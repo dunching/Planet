@@ -15,7 +15,7 @@ class UPAD_TaskNode;
 class UPAD_TaskNode_Preset;
 class UTaskNode_Temporary;
 class UPAD_TaskNode_Interaction;
-class AGuideInteractionBase;
+class AQuestInteractionBase;
 class UTaskPromt;
 
 USTRUCT(BlueprintType, Blueprintable)
@@ -24,7 +24,7 @@ struct PLANET_API FGuideInterationSetting
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AGuideInteractionBase> GuideInteraction;
+	TSubclassOf<AQuestInteractionBase> GuideInteraction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsEnable = true;
@@ -55,20 +55,20 @@ public:
 		const FObjectInitializer& ObjectInitializer
 		);
 
-	TArray<TSubclassOf<AGuideInteractionBase>> GetInteractionLists() const;
+	TArray<TSubclassOf<AQuestInteractionBase>> GetInteractionLists() const;
 
-	TObjectPtr<AGuideInteractionBase> GetCurrentInteraction() const;
+	TObjectPtr<AQuestInteractionBase> GetCurrentInteraction() const;
 
 	TArray<FGuideInterationSetting> GetGuideInteractionAry() const;
 
 	virtual void StartInteractionItem(
-		const TSubclassOf<AGuideInteractionBase>& Item
+		const TSubclassOf<AQuestInteractionBase>& Item
 		);
 
 	void StopInteractionItem();
 
 	virtual void ChangedInterationState(
-		const TSubclassOf<AGuideInteractionBase>& Item,
+		const TSubclassOf<AQuestInteractionBase>& Item,
 		bool bIsEnable
 		);
 
@@ -79,8 +79,8 @@ public:
 
 protected:
 	void StartInteractionImp(
-		const TSubclassOf<AGuideInteractionBase>& Item,
-		const TObjectPtr<AGuideInteractionBase>& GuideInteraction_ActorPtr
+		const TSubclassOf<AQuestInteractionBase>& Item,
+		const TObjectPtr<AQuestInteractionBase>& GuideInteraction_ActorPtr
 		);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -89,7 +89,7 @@ protected:
 	/**
 	 * 当前正在执行的交互引导
 	 */
-	TObjectPtr<AGuideInteractionBase> GuideInteractionActorPtr = nullptr;
+	TObjectPtr<AQuestInteractionBase> GuideInteractionActorPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bEnableInteraction = true;

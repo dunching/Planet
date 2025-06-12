@@ -15,7 +15,7 @@
 
 class UToolsMenu;
 class UOptionList;
-class AGuideInteractionBase;
+class AQuestInteractionBase;
 class ISceneActorInteractionInterface;
 
 
@@ -47,7 +47,7 @@ public:
 	void CloseOption();
 
 protected:
-	void SelectedInteractionItem(const TSubclassOf<AGuideInteractionBase>&GuideInteractionClass);
+	void SelectedInteractionItem(const TSubclassOf<AQuestInteractionBase>&GuideInteractionClass);
 
 	UFUNCTION()
 	void OnQuitBtnClicked();
@@ -60,6 +60,6 @@ protected:
 	/**
 	 * 交互的节点
 	 */
-	TObjectPtr<AGuideInteractionBase>GuideInteractionActorPtr = nullptr;
+	TObjectPtr<AQuestInteractionBase>GuideInteractionActorPtr = nullptr;
 	
 };

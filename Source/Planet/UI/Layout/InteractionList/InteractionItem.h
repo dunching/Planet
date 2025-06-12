@@ -15,7 +15,7 @@
 class AGuideActor;
 class UPAD_TaskNode_Guide;
 class UPAD_TaskNode_Interaction;
-class AGuideInteractionBase;
+class AQuestInteractionBase;
 
 using FOnInteractionItemClicked = TMulticastDelegate<void()>;
 

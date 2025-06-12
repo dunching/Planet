@@ -58,7 +58,7 @@ void UAbilityTask_ARM_Tornado::SharedInitAndApply()
 	{
 		MovementComponent = Cast<UCharacterMovementComponent>(ASC->AbilityActorInfo->MovementComponent.Get());
 
-		if (MovementComponent && TornadoPtr.IsValid())
+		if (MovementComponent.IsValid() && TornadoPtr.IsValid())
 		{
 			ForceName = ForceName.IsNone() ? FName("AbilityTaskApplyRootMotionRadialForce") : ForceName;
 			auto RootMotionSourceSPtr = MakeShared<
@@ -148,7 +148,7 @@ void UAbilityTask_ARM_Tornado::OnDestroy(
 	bool AbilityIsEnding
 )
 {
-	if (MovementComponent)
+	if (MovementComponent.IsValid())
 	{
 		MovementComponent->RemoveRootMotionSourceByID(RootMotionSourceID);
 	}

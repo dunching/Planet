@@ -225,7 +225,8 @@ namespace HumanProcessor
 
 				if (EventArgs.Key == GameOptionsPtr->ViewAllocationMenu)
 				{
-					UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
+					UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<
+						FHumanViewAlloctionSkillsProcessor>();
 					return true;
 				}
 
@@ -277,16 +278,10 @@ namespace HumanProcessor
 	}
 
 	bool FHumanRegularProcessor::InputAxis(
-		FViewport* Viewport,
-		FInputDeviceId InputDevice,
-		FKey Key,
-		float Delta,
-		float DeltaTime,
-		int32 NumSamples,
-		bool bGamepad
+		const FInputKeyEventArgs& EventArgs
 		)
 	{
-		return Super::InputAxis(Viewport, InputDevice, Key, Delta, DeltaTime, NumSamples, bGamepad);
+		return Super::InputAxis(EventArgs);
 	}
 
 	void FHumanRegularProcessor::AddOrRemoveUseMenuItemEvent(

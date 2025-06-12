@@ -4,8 +4,8 @@
 #include "Components/VerticalBox.h"
 
 #include "CharacterBase.h"
-#include "GuideSubSystem.h"
-#include "GuideThread.h"
+#include "QuestSubSystem.h"
+#include "QuestChain.h"
 #include "PlanetRichTextBlock.h"
 #include "GuideItem.h"
 
@@ -38,8 +38,8 @@ void UGuideList::Enable()
 		UIPtr->ClearChildren();
 	}
 	
-	UGuideSubSystem::GetInstance()->GetOnStartGuide().AddUObject(this, &ThisClass::OnStartGuide);
-	OnStartGuide(UGuideSubSystem::GetInstance()->GetCurrentGuideThread());
+	UQuestSubSystem::GetInstance()->GetOnStartGuide().AddUObject(this, &ThisClass::OnStartGuide);
+	OnStartGuide(UQuestSubSystem::GetInstance()->GetCurrentGuideThread());
 }
 
 void UGuideList::DisEnable()
@@ -47,7 +47,7 @@ void UGuideList::DisEnable()
 	ILayoutItemInterfacetion::DisEnable();
 }
 
-void UGuideList::OnStartGuide(AGuideThreadBase* NewGuidePtr)
+void UGuideList::OnStartGuide(AQuestChainBase* NewGuidePtr)
 {
 	if (NewGuidePtr)
 	{

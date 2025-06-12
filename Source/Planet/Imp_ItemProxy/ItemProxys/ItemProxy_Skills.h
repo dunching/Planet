@@ -66,6 +66,9 @@ public:
 	TSubclassOf<USkill_Base> SkillClass;
 };
 
+/**
+ * 技能道具
+ */
 USTRUCT()
 struct PLANET_API FSkillProxy :
 	public FPlanet_BasicProxy,

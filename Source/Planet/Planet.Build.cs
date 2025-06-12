@@ -153,23 +153,23 @@ public class Planet : ModuleRules
 		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/VehicleProcessor");
 		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/VehicleProcessor/4WheeledVehicle");
 
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/ChallengeSystem");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/ChallengeSystem/GuideActor");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/ChallengeSystem/STE");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/ChallengeSystem/STT");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/GuideActor");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/GuideActor/GuideInteraction");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/GuideActor/GuideThread");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/STT");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/STT/GuideInteraction");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/STT/GuideThread");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/STE");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/STE/GuideInteraction");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/STE/GuideThread");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/GuideSystem_GameplayTask");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/GuideSystem_GameplayTask/GuideThread");
-		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/GuideSystem_GameplayTask/GuideInteraction");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/ChallengeSystem");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/ChallengeSystem/GuideActor");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/ChallengeSystem/STE");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/ChallengeSystem/STT");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/QuestSystem");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/QuestSystem/QuestActor");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/QuestSystem/QuestActor/Interaction");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/QuestSystem/QuestActor/Chain");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/QuestSystem/STT");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/QuestSystem/STT/Interaction");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/QuestSystem/STT/Chain");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/QuestSystem/STE");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/QuestSystem/STE/Interaction");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/QuestSystem/STE/Chain");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/QuestSystem/QuestSystem_GameplayTask");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/QuestSystem/QuestSystem_GameplayTask/Interaction");
+		PublicIncludePaths.Add("Planet/Imp_QuestSystem/QuestSystem/QuestSystem_GameplayTask/Chain");
 
 		PublicIncludePaths.Add("Planet/Imp_GroupManagger");
 		PublicIncludePaths.Add("Planet/Imp_GroupManagger/GroupManagger");
@@ -217,7 +217,7 @@ public class Planet : ModuleRules
 			"GameplayEffectDataModify",
 			"Gravity",
 			"GroupManagger",
-			"GuideSystem",
+			"QuestSystem",
 			"ItemProxy",
 			"NetAbilitySystem",
 			"NPCGenerator",

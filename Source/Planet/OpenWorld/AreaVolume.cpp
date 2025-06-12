@@ -1,7 +1,7 @@
 #include "AreaVolume.h"
 
 #include "CollisionDataStruct.h"
-#include "GuideSubSystem.h"
+#include "QuestSubSystem.h"
 #include "NiagaraComponent.h"
 #include "Async/TaskGraphInterfaces.h"
 #include "UObject/ConstructorHelpers.h"
@@ -11,7 +11,7 @@
 #include "Engine/Texture2D.h"
 #include "Components/BrushComponent.h"
 
-#include "GuideThread.h"
+#include "QuestChain.h"
 #include "HumanCharacter_Player.h"
 #include "TestCommand.h"
 
@@ -52,7 +52,7 @@ void AAreaVolume::OnActorBeginOverlapCB(AActor* OverlappedActor, AActor* OtherAc
 		const auto bIsLocallyControlled = CharacterPtr->IsLocallyControlled();
 		if (bIsLocallyControlled)
 		{
-			UGuideSubSystem::GetInstance()->StartParallelGuideThread(GuideBranchThreadClass);
+			UQuestSubSystem::GetInstance()->StartParallelGuideThread(GuideBranchThreadClass);
 		}
 		// FActorSpawnParameters SpawnParameters;
 		//
@@ -70,7 +70,7 @@ void AAreaVolume::OnActorEndOverlapCB(AActor* OverlappedActor, AActor* OtherActo
 		const auto bIsLocallyControlled = CharacterPtr->IsLocallyControlled();
 		if (bIsLocallyControlled)
 		{
-			// UGuideSubSystem::GetInstance()->StopActiveTargetGuideThread(GuideBranchThreadClass);
+			// UQuestSubSystem::GetInstance()->StopActiveTargetGuideThread(GuideBranchThreadClass);
 		}
 	}
 }

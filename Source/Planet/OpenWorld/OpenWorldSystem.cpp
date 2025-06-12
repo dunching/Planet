@@ -12,6 +12,7 @@
 #include "DataTableCollection.h"
 #include "PlanetPlayerController.h"
 #include "OpenWorldDataLayer.h"
+#include "PlanetPlayerState.h"
 #include "PlayerGameplayTasks.h"
 #include "SpawnPoints.h"
 #include "Teleport.h"
@@ -55,7 +56,7 @@ ETeleport UOpenWorldSubSystem::GetTeleportLastPtInOpenWorld(
 			TArray<FTableRow_Teleport*> Result;
 			DT_TeleportPtr->GetAllRows<FTableRow_Teleport>(TEXT("GetChallenge"), Result);
 
-			const auto PlayerCharacterPt = PCPtr->GetGameplayTasksComponent()->OpenWorldTransform.GetLocation();
+			const auto PlayerCharacterPt = PCPtr->GetPlayerState<APlanetPlayerState>()->OpenWorldTransform.GetLocation();
 
 			ATeleport* TargetTeleportActorPtr = nullptr;
 			int32 Distance = -1;
@@ -135,9 +136,11 @@ void UOpenWorldSubSystem::TeleportPlayer(
 {
 	if (ChallengeLevelType == ETeleport::kReturnOpenWorld)
 	{
+		const auto OpenWorldTransform = PCPtr->GetPlayerState<APlanetPlayerState>()->OpenWorldTransform;
+
 		if (PCPtr->GetPawn()->TeleportTo(
-		                                 PCPtr->GetGameplayTasksComponent()->OpenWorldTransform.GetLocation(),
-		                                 PCPtr->GetGameplayTasksComponent()->OpenWorldTransform.GetRotation().Rotator()
+		                                 OpenWorldTransform.GetLocation(),
+		                                 OpenWorldTransform.GetRotation().Rotator()
 		                                ))
 		{
 		}
@@ -155,7 +158,7 @@ void UOpenWorldSubSystem::TeleportPlayer(
 			{
 				if (RowIter->ChallengeLevelType == ChallengeLevelType)
 				{
-					PCPtr->GetGameplayTasksComponent()->OpenWorldTransform = PCPtr->GetPawn()->
+					PCPtr->GetPlayerState<APlanetPlayerState>()->OpenWorldTransform = PCPtr->GetPawn()->
 						GetActorTransform();
 
 					auto TeleportPtr = RowIter->TeleportRef.LoadSynchronous();

@@ -6,8 +6,8 @@
 
 #include "ActionConsumablesIcon.h"
 #include "CharacterBase.h"
-#include "GuideActorBase.h"
-#include "GuideSubSystem.h"
+#include "QuestsActorBase.h"
+#include "QuestSubSystem.h"
 #include "HumanCharacter_Player.h"
 #include "ProxyProcessComponent.h"
 

@@ -126,7 +126,7 @@ void UAbilityTask_ApplyRootMotion_FlyAway::SharedInitAndApply()
 		ASC->AddLooseGameplayTag(UGameplayTagsLibrary::State_RootMotion_FlyAway);
 
 		MovementComponent = Cast<UCharacterMovementComponent>(ASC->AbilityActorInfo->MovementComponent.Get());
-		if (MovementComponent)
+		if (MovementComponent.IsValid())
 		{
 			ForceName = ForceName.IsNone() ? FName("AbilityTask_ApplyRootMotion_FlyAway") : ForceName;
 			auto RootMotionSourceSPtr = MakeShared<FRootMotionSource_FlyAway>();
@@ -163,7 +163,7 @@ void UAbilityTask_ApplyRootMotion_FlyAway::OnDestroy(
 		ASC->RemoveLooseGameplayTag(UGameplayTagsLibrary::State_RootMotion_FlyAway);
 	}
 
-	if (MovementComponent)
+	if (MovementComponent.IsValid())
 	{
 		MovementComponent->RemoveRootMotionSourceByID(RootMotionSourceID);
 	}
@@ -173,7 +173,7 @@ void UAbilityTask_ApplyRootMotion_FlyAway::OnDestroy(
 
 void UAbilityTask_ApplyRootMotion_FlyAway::UpdateDuration()
 {
-	if (MovementComponent)
+	if (MovementComponent.IsValid())
 	{
 		auto Ptr = MovementComponent->GetRootMotionSourceByID(RootMotionSourceID);
 		TSharedPtr<FRootMotionSource_FlyAway> RootMotionSourceSPtr(

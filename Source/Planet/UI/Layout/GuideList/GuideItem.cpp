@@ -8,12 +8,12 @@
 
 #include "ActionConsumablesIcon.h"
 #include "CharacterBase.h"
-#include "GuideActorBase.h"
-#include "GuideSubSystem.h"
-#include "GuideThread.h"
+#include "QuestsActorBase.h"
+#include "QuestSubSystem.h"
+#include "QuestChain.h"
 #include "PlanetRichTextBlock.h"
 #include "ProxyProcessComponent.h"
-#include "STT_GuideThread.h"
+#include "STT_QuestChain.h"
 
 struct FUGuideItem : public TStructVariable<FUGuideItem>
 {
@@ -34,12 +34,12 @@ void UGuideItem::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 void UGuideItem::NativeDestruct()
 {
-	UGuideSubSystem::GetInstance()->GetOnStopGuide().Remove(OnStartGuideHandle);
+	UQuestSubSystem::GetInstance()->GetOnStopGuide().Remove(OnStartGuideHandle);
 	
 	Super::NativeDestruct();
 }
 
-void UGuideItem::BindGuide(AGuideThreadBase* NewGuidePtr)
+void UGuideItem::BindGuide(AQuestChainBase* NewGuidePtr)
 {
 
 	CurrentLineGuidePtr = NewGuidePtr;
@@ -64,7 +64,7 @@ void UGuideItem::Enable()
 {
 	ILayoutItemInterfacetion::Enable();
 	
-	UGuideSubSystem::GetInstance()->GetOnStopGuide().AddUObject(this, &ThisClass::OnStopGuide);
+	UQuestSubSystem::GetInstance()->GetOnStopGuide().AddUObject(this, &ThisClass::OnStopGuide);
 }
 
 void UGuideItem::DisEnable()
@@ -72,7 +72,7 @@ void UGuideItem::DisEnable()
 	ILayoutItemInterfacetion::DisEnable();
 }
 
-void UGuideItem::OnStopGuide(AGuideThreadBase* NewGuidePtr)
+void UGuideItem::OnStopGuide(AQuestChainBase* NewGuidePtr)
 {
 	if (CurrentLineGuidePtr == NewGuidePtr)
 	{

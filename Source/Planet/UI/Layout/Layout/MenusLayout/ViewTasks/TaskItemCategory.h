@@ -6,7 +6,7 @@
 #include "UserWidget_Override.h"
 
 #include "GenerateTypes.h"
-#include "GuideThreadType.h"
+#include "QuestChainType.h"
 #include "MenuInterface.h"
 
 #include "TaskItemCategory.generated.h"
@@ -24,6 +24,6 @@ class PLANET_API UTaskItemCategory :
 
 public:
 
-	void SetTaskType(EGuideThreadType GuideThreadType);
+	void SetTaskType(EQuestChainType GuideThreadType);
 	
 };

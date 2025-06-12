@@ -1,7 +1,7 @@
 #include "SpawnPoints.h"
 
 #include "CollisionDataStruct.h"
-#include "GuideSubSystem.h"
+#include "QuestSubSystem.h"
 #include "NiagaraComponent.h"
 #include "Async/TaskGraphInterfaces.h"
 #include "UObject/ConstructorHelpers.h"
@@ -11,7 +11,7 @@
 #include "Engine/Texture2D.h"
 #include "Components/BrushComponent.h"
 
-#include "GuideThread.h"
+#include "QuestChain.h"
 #include "HumanCharacter_Player.h"
 #include "TestCommand.h"
 

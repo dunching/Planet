@@ -43,7 +43,7 @@
 #include "InventoryComponent.h"
 #include "MainHUD.h"
 #include "PlanetWorldSettings.h"
-#include "GuideActorBase.h"
+#include "QuestsActorBase.h"
 #include "GroupManagger_Player.h"
 #include "HumanCharacter_AI.h"
 #include "ItemProxy_Coin.h"
@@ -52,18 +52,20 @@
 #include "PlanetGameViewportClient.h"
 #include "PlayerGameplayTasks.h"
 #include "DataTableCollection.h"
+#include "Dynamic_WeatherBase.h"
 #include "InputProcessorSubSystem_Imp.h"
 #include "PlanetPlayerState.h"
 #include "PlayerComponent.h"
 #include "RewardsTD.h"
 #include "TeamMatesHelperComponent.h"
+#include "WeatherSystem.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
-	 TEXT("PlanetPlayerController.DrawControllerRotation"),
-	 0,
-	 TEXT("")
-	 TEXT(" default: 0")
-	);
+                                                                                 TEXT("PlanetPlayerController.DrawControllerRotation"),
+                                                                                 0,
+                                                                                 TEXT("")
+                                                                                 TEXT(" default: 0")
+                                                                                );
 
 APlanetPlayerController::APlanetPlayerController(
 	const FObjectInitializer& ObjectInitializer
@@ -346,6 +348,7 @@ void APlanetPlayerController::UpdateWeather_Implementation(
 	const FGameplayTag& WeatherType
 	)
 {
+	UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather_Server(WeatherType);
 }
 
 void APlanetPlayerController::AddOrRemoveState_Implementation(
@@ -544,7 +547,7 @@ void APlanetPlayerController::SetPawn(
 }
 
 bool APlanetPlayerController::InputKey(
-	const FInputKeyParams& Params
+	const FInputKeyEventArgs& Params
 	)
 {
 	auto Result = Super::InputKey(Params);

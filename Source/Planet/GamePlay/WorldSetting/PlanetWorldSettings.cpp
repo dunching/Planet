@@ -5,8 +5,8 @@
 #include "AssetRefMap.h"
 #include "RewardsTD.h"
 #include "DataTableCollection.h"
-#include "GuideSubSystem.h"
-#include "GuideSubSystem_Imp.h"
+#include "QuestSubSystem.h"
+#include "QuestSystem_Imp.h"
 #include "ModifyItemProxyStrategy.h"
 #include "InputProcessorSubSystem_Imp.h"
 
@@ -37,12 +37,12 @@ UDataTableCollection* APlanetWorldSettings::GetSceneProxyExtendInfoMap() const
 	return SceneProxyExtendInfoMapPtr.LoadSynchronous();
 }
 
-UGuideSubSystem* APlanetWorldSettings::GetGuideSubSystem() const
+UQuestSubSystem* APlanetWorldSettings::GetGuideSubSystem() const
 {
-	return Cast<UGuideSubSystem_Imp>(
+	return Cast<UQuestSubSystem_Imp>(
 								 USubsystemBlueprintLibrary::GetWorldSubsystem(
 																			   GetWorldImp(),
-																			   UGuideSubSystem_Imp::StaticClass()
+																			   UQuestSubSystem_Imp::StaticClass()
 																			  )
 								);
 }

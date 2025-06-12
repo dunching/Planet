@@ -1,6 +1,6 @@
 #include "ViewTaskMenu.h"
 
-#include "GuideSubSystem.h"
+#include "QuestSubSystem.h"
 #include "PlanetWorldSettings.h"
 #include "TaskItem.h"
 #include "Components/Button.h"
@@ -9,7 +9,7 @@
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 
-#include "GuideThread.h"
+#include "QuestChain.h"
 #include "HumanRegularProcessor.h"
 #include "InputProcessorSubSystemBase.h"
 #include "TaskItemCategory.h"
@@ -77,7 +77,7 @@ inline void UViewTaskMenu::EnableMenu()
 				auto WeidgetPtr = CreateWidget<UTaskItemCategory>(this, TaskItemCategoryClass);
 				if (WeidgetPtr)
 				{
-					WeidgetPtr->SetTaskType(EGuideThreadType::kMain);
+					WeidgetPtr->SetTaskType(EQuestChainType::kMain);
 					UIPtr->AddChild(WeidgetPtr);
 				}
 			}
@@ -85,7 +85,7 @@ inline void UViewTaskMenu::EnableMenu()
 				auto WeidgetPtr = CreateWidget<UTaskItem>(this, TaskItemClass);
 				if (WeidgetPtr)
 				{
-					const auto CurrentMainGuideThread = UGuideSubSystem::GetInstance()->GetCurrentMainGuideThread();
+					const auto CurrentMainGuideThread = UQuestSubSystem::GetInstance()->GetCurrentMainGuideThread();
 
 					WeidgetPtr->OnSeleted.BindUObject(this, &ThisClass::OnSelected);
 					WeidgetPtr->SetGuideThreadType(CurrentMainGuideThread);
@@ -93,7 +93,7 @@ inline void UViewTaskMenu::EnableMenu()
 				}
 			}
 
-			const auto GuideThreadAry = UGuideSubSystem::GetInstance()->GetGuideThreadAry();
+			const auto GuideThreadAry = UQuestSubSystem::GetInstance()->GetGuideThreadAry();
 			if (GuideThreadAry.IsEmpty())
 			{
 			}
@@ -103,7 +103,7 @@ inline void UViewTaskMenu::EnableMenu()
 					auto WeidgetPtr = CreateWidget<UTaskItemCategory>(this, TaskItemCategoryClass);
 					if (WeidgetPtr)
 					{
-						WeidgetPtr->SetTaskType(EGuideThreadType::kBrand);
+						WeidgetPtr->SetTaskType(EQuestChainType::kBrand);
 						UIPtr->AddChild(WeidgetPtr);
 					}
 				}
@@ -140,7 +140,7 @@ void UViewTaskMenu::ActiveCurrentCorrespondingItem()
 	auto UIPtr = Cast<UScrollBox>(GetWidgetFromName(FUViewTaskMenu::Get().TaskList));
 	if (UIPtr)
 	{
-		const auto CurrentGuideThread = UGuideSubSystem::GetInstance()->GetCurrentGuideThread();
+		const auto CurrentGuideThread = UQuestSubSystem::GetInstance()->GetCurrentGuideThread();
 		if (!CurrentGuideThread)
 		{
 			return;
@@ -198,11 +198,11 @@ void UViewTaskMenu::OnActiveGuideThread()
 
 	if (TaskItemPtr->MainGuideThreadClass)
 	{
-		UGuideSubSystem::GetInstance()->ActiveMainThread();
+		UQuestSubSystem::GetInstance()->ActiveMainThread();
 	}
 	else if (TaskItemPtr->BrandGuideThreadClass)
 	{
-		UGuideSubSystem::GetInstance()->ActiveBrandGuideThread(TaskItemPtr->BrandGuideThreadClass);
+		UQuestSubSystem::GetInstance()->ActiveBrandGuideThread(TaskItemPtr->BrandGuideThreadClass);
 	}
 
 	UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
@@ -210,7 +210,7 @@ void UViewTaskMenu::OnActiveGuideThread()
 
 void UViewTaskMenu::ModifyTaskText()
 {
-	AGuideThreadBase* GuideThreadPtr = nullptr;
+	AQuestChainBase* GuideThreadPtr = nullptr;
 	if (TaskItemPtr->MainGuideThreadClass)
 	{
 		GuideThreadPtr = TaskItemPtr->MainGuideThreadClass.GetDefaultObject();
@@ -243,7 +243,7 @@ void UViewTaskMenu::ModifyTaskText()
 
 void UViewTaskMenu::ModifyActiveGuideThreadText()
 {
-	const auto CurrentGuideThread = UGuideSubSystem::GetInstance()->GetCurrentGuideThread();
+	const auto CurrentGuideThread = UQuestSubSystem::GetInstance()->GetCurrentGuideThread();
 	if (!CurrentGuideThread)
 	{
 		return;

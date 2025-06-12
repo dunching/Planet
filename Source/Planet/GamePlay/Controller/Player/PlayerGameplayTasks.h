@@ -58,16 +58,6 @@ public:
 		ETeleport Teleport
 	);
 
-	/*
-	 *	角色进入副本之前在开放世界的位置信息
-	 */
-	FTransform OpenWorldTransform = FTransform::Identity;
-	
-	/*
-	 *	角色进入副本之前，开放世界的天气
-	 */
-	FGameplayTag OpenWorldWeather;
-	
 private:
 	UFUNCTION(Server, Reliable)
 	void TeleportPlayerToOpenWorld_Server();
@@ -82,8 +72,7 @@ private:
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void EntryLevel_ActiveTask(
-		ETeleport Teleport,
-		const FGameplayTag &NewWeather
+		ETeleport Teleport
 	);
 
 	void EntryLevelEnd(
@@ -124,8 +113,6 @@ public:
 
 	ETeleport Teleport = ETeleport::kNone;
 
-	FGameplayTag Weather;
-	
 	FOnEnd OnEnd;
 
 private:

@@ -7,15 +7,15 @@
 #include "Components/BoxComponent.h"
 
 #include "HumanCharacter_Player.h"
-#include "GuideInteraction.h"
-#include "GuideInteractionBase.h"
+#include "QuestInteraction.h"
+#include "QuestInteractionBase.h"
 
 AChallengeEntry::AChallengeEntry(const FObjectInitializer& ObjectInitializer):
-Super(
-	ObjectInitializer.
-	SetDefaultSubobjectClass<USceneChallengeEntryInteractionComponent>(
-		USceneChallengeEntryInteractionComponent::ComponentName)
-		)
+                                                                             Super(
+	                                                                              ObjectInitializer.
+	                                                                              SetDefaultSubobjectClass<USceneChallengeEntryInteractionComponent>(
+	                                                                               USceneChallengeEntryInteractionComponent::ComponentName)
+	                                                                             )
 {
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComp"));
 	
@@ -74,7 +74,7 @@ void AChallengeEntry::HasBeenEndedLookAt()
 }
 
 void USceneChallengeEntryInteractionComponent::StartInteractionItem(
-	const TSubclassOf<AGuideInteractionBase>& Item
+	const TSubclassOf<AQuestInteractionBase>& Item
 )
 {
 	Super::StartInteractionItem(Item);

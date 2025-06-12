@@ -5,7 +5,7 @@
 #include <GameplayTagContainer.h>
 
 #include "WeatherSystem.h"
-#include "Dynamic_Weather.h"
+#include "Dynamic_WeatherBase.h"
 
 void WeatherSystemCommand::AdjustHour(const TArray< FString >& Args)
 {
@@ -28,6 +28,6 @@ void WeatherSystemCommand::AdjustWeather(const TArray< FString >& Args)
 
 	const auto Time = FDateTime::Now();
 
-	UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather(FGameplayTag::RequestGameplayTag(*Args[0]));
+	UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather_Server(FGameplayTag::RequestGameplayTag(*Args[0]));
 }
 

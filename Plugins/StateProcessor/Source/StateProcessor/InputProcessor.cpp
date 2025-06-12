@@ -103,13 +103,7 @@ bool FInputProcessor::InputKey(
 }
 
 bool FInputProcessor::InputAxis(
-	FViewport* Viewport,
-	FInputDeviceId InputDevice,
-	FKey Key,
-	float Delta,
-	float DeltaTime,
-	int32 NumSamples,
-	bool bGamepad
+	const FInputKeyEventArgs& EventArgs
 	)
 {
 	return true;

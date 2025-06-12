@@ -93,7 +93,7 @@ public:
 };
 
 /*
- * 角色的角色的武器、技能插槽分配配置
+ * 角色的武器、技能插槽分配配置
  */
 USTRUCT()
 struct PLANET_API FCharacterSocket
@@ -198,6 +198,10 @@ struct TStructOpsTypeTraits<FCharacterTalent> :
 	};
 };
 
+/**
+ * 角色道具
+ * 如玩家或者玩家的队友的代理，如【射雕】里面的【侠士】
+ */
 USTRUCT()
 struct PLANET_API FCharacterProxy :
 	public FPlanet_BasicProxy,

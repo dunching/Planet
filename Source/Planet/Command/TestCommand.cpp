@@ -9,7 +9,7 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "GroupManagger.h"
-#include "GuideSubSystem.h"
+#include "QuestSubSystem.h"
 #include "GuideThreadChallenge.h"
 #include "HumanCharacter_Player.h"
 #include "InventoryComponent.h"
@@ -80,28 +80,28 @@ void TestCommand::AddAICharacterTestDataImp(
 void TestCommand::ActiveBrandTest()
 {
 #if WITH_EDITOR
-	UGuideSubSystem::GetInstance()->ActiveBrandGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTestClass);
+	UQuestSubSystem::GetInstance()->ActiveBrandGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTestClass);
 #endif
 }
 
 void TestCommand::ActiveBrandTest1()
 {
 #if WITH_EDITOR
-	UGuideSubSystem::GetInstance()->ActiveBrandGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTest1Class);
+	UQuestSubSystem::GetInstance()->ActiveBrandGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTest1Class);
 #endif
 }
 
 void TestCommand::ActiveBrandTest2()
 {
 #if WITH_EDITOR
-	UGuideSubSystem::GetInstance()->ActiveBrandGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTest2Class);
+	UQuestSubSystem::GetInstance()->ActiveBrandGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTest2Class);
 #endif
 }
 
 void TestCommand::ChallengeTest()
 {
 #if WITH_EDITOR
-	UGuideSubSystem::GetInstance()->StartParallelGuideThread(
+	UQuestSubSystem::GetInstance()->StartParallelGuideThread(
 	                                                         UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass
 	                                                        );
 #endif
@@ -283,6 +283,24 @@ void TestCommand::SetCharacterAttributeValue(
 	if (PCPtr)
 	{
 		PCPtr->SetCharacterAttributeValue(Args);
+	}
+#endif
+}
+
+void TestCommand::UpdateWeather(
+	const TArray<FString>& Args
+	)
+{
+#if WITH_EDITOR
+	if (!Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (PCPtr)
+	{
+		PCPtr->UpdateWeather(FGameplayTag::RequestGameplayTag(*Args[0]));
 	}
 #endif
 }

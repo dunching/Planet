@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-#include "Dynamic_Weather.h"
+#include "Dynamic_WeatherBase.h"
 #include "WeatherSystem.h"
 #include "Engine/TargetPoint.h"
 #include "Kismet/GameplayStatics.h"
@@ -21,7 +21,6 @@ void AMain_LevelScriptActor::BeginPlay()
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather(WeatherSettings::Clear_Skies);
 	}
 #endif
 	

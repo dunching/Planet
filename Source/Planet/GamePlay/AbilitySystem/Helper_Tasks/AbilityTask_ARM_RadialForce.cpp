@@ -56,7 +56,7 @@ void UAbilityTask_ARM_RadialForce::SharedInitAndApply()
 	{
 		MovementComponent = Cast<UCharacterMovementComponent>(ASC->AbilityActorInfo->MovementComponent.Get());
 
-		if (MovementComponent && TractionPoinAcotrPtr.IsValid())
+		if (MovementComponent.IsValid() && TractionPoinAcotrPtr.IsValid())
 		{
 			ForceName = ForceName.IsNone() ? FName("AbilityTaskApplyRootMotionRadialForce") : ForceName;
 			auto RadialForce = MakeShared<
@@ -146,7 +146,7 @@ void UAbilityTask_ARM_RadialForce::OnDestroy(
 	bool AbilityIsEnding
 )
 {
-	if (MovementComponent)
+	if (MovementComponent.IsValid())
 	{
 		MovementComponent->RemoveRootMotionSourceByID(RootMotionSourceID);
 	}
@@ -158,7 +158,7 @@ void UAbilityTask_ARM_RadialForce::UpdateLocation(
 	TWeakObjectPtr<ATractionPoint> InTractionPointPtr
 )
 {
-	if (MovementComponent)
+	if (MovementComponent.IsValid())
 	{
 		TSharedPtr<FRootMotionSource> RMS = MovementComponent->GetRootMotionSourceByID(RootMotionSourceID);
 		if (RMS.IsValid())

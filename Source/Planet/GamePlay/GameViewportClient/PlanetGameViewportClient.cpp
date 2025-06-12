@@ -81,18 +81,12 @@ inline bool UPlanetGameViewportClient::InputKey(
 }
 
 inline bool UPlanetGameViewportClient::InputAxis(
-	FViewport* InViewport,
-	FInputDeviceId InputDevice,
-	FKey Key,
-	float Delta,
-	float DeltaTime,
-	int32 NumSamples,
-	bool bGamepad
+	const FInputKeyEventArgs& EventArgs
 	)
 {
-	if (InputProcessorSubSystemPtr->InputAxis(InViewport, InputDevice, Key, Delta, DeltaTime, NumSamples, bGamepad))
+	if (InputProcessorSubSystemPtr->InputAxis(EventArgs))
 	{
-		return Super::InputAxis(InViewport, InputDevice, Key, Delta, DeltaTime, NumSamples, bGamepad);
+		return Super::InputAxis(EventArgs);
 	}
 	return false;
 }

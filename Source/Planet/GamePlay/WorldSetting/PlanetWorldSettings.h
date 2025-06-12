@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "GetModifyItemProxyStrategiesInterface.h"
-#include "GuideSubSystem.h"
+#include "QuestSubSystem.h"
 #include "InputProcessorSubSystemBase.h"
 #include "PAD_ItemProxyCollection.h"
 
@@ -16,8 +16,8 @@ class UStateTagExtendInfoMap;
 class UDataTableCollection;
 class UGameOptions;
 class AGuideActor;
-class AGuideThread_Main;
-class AGuideThread_MainBase;
+class AQuestChain_Main;
+class AQuestChain_MainBase;
 class UPAD_RewardsItems;
 class UPAD_ItemProxyCollection;
 
@@ -29,7 +29,7 @@ class PLANET_API APlanetWorldSettings :
 	public AWorldSettings,
 	public IGetItemProxyCollectionInterface,
 	public IGetModifyItemProxyStrategies,
-	public IGetGuideSubSystemInterface
+	public IGetQuestSubSystemInterface
 {
 	GENERATED_BODY()
 
@@ -45,18 +45,18 @@ public:
 
 	UDataTableCollection* GetSceneProxyExtendInfoMap()const;
 
-	virtual UGuideSubSystem* GetGuideSubSystem()const override;
+	virtual UQuestSubSystem* GetGuideSubSystem()const override;
 	
 	virtual const UPAD_ItemProxyCollection*GetItemProxyCollection()const override;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideThread")
-	TArray<TSubclassOf<AGuideThread_MainBase>> MainGuideThreadChaptersAry;
+	TArray<TSubclassOf<AQuestChain_MainBase>> MainGuideThreadChaptersAry;
 
 	/**
 	 * 提示[未完待续]的任务引导
 	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideThread")
-	TSubclassOf<AGuideThread_MainBase> ToBeContinueGuideThread;
+	TSubclassOf<AQuestChain_MainBase> ToBeContinueGuideThread;
 
 protected:
 

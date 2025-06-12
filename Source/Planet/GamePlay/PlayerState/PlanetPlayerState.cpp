@@ -1,11 +1,7 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
-
 #include "PlanetPlayerState.h"
 
-#include "GeomTools.h"
-#include "AbilitySystemComponent.h"
-#include "AssetRefMap.h"
 #include "Components/AudioComponent.h"
 #include "Components/SplineComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -21,8 +17,15 @@
 #include "MainHUDLayout.h"
 #include "Regions.h"
 #include "DataTableCollection.h"
+#include "Dynamic_WeatherBase.h"
+#include "GameState_Main.h"
+#include "OpenWorldSystem.h"
 #include "SplineMesh.h"
 #include "UIManagerSubSystem.h"
+#include "WeatherSystem.h"
+#include "GeomTools.h"
+#include "AbilitySystemComponent.h"
+#include "AssetRefMap.h"
 
 APlanetPlayerState::APlanetPlayerState(
 	const FObjectInitializer& ObjectInitializer
@@ -43,6 +46,13 @@ bool APlanetPlayerState::GetIsInChallenge() const
 FGameplayTag APlanetPlayerState::GetRegionTag() const
 {
 	return CurrentRegionTag;
+}
+
+void APlanetPlayerState::SetCurrentTeleport(
+	ETeleport InCurrentTeleport
+	)
+{
+	CurrentTeleport = InCurrentTeleport;
 }
 
 void APlanetPlayerState::SetEntryChanlleng_Implementation(
@@ -86,6 +96,7 @@ void APlanetPlayerState::GetLifetimeReplicatedProps(
 
 	DOREPLIFETIME_CONDITION(ThisClass, CurrentRegionTag, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ThisClass, bIsInChallenge, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, CurrentTeleport, COND_None);
 }
 
 void APlanetPlayerState::InitialData()
@@ -177,6 +188,52 @@ void APlanetPlayerState::OnRep_RegionTag()
 	else
 	{
 		AudioComponentPtr->Stop();
+	}
+}
+
+void APlanetPlayerState::OnRep_CurrentTeleport()
+{
+	switch (CurrentTeleport)
+	{
+	case ETeleport::kChallenge_LevelType_1:
+	case ETeleport::kChallenge_LevelType_2:
+		{
+			auto TeleportDTPtr = UOpenWorldSubSystem::GetInstance()->GetTeleportDT(CurrentTeleport);
+			if (!TeleportDTPtr)
+			{
+				return;
+			}
+
+			for (auto Iter : TeleportDTPtr->WeatherTagMap)
+			{
+				const auto Weather = Iter;
+				if (Weather.IsValid())
+				{
+					// 改变天气
+					UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather_Client(Weather);
+					break;
+				}
+			}
+		}
+		break;
+	default:
+		{
+			auto GSPtr=  Cast<AGameState_Main>(UGameplayStatics::GetGameState(this));
+
+			if (!GSPtr)
+			{
+				return;
+			}
+			
+			const auto Weather = GSPtr->GetOpenWorldWeather();
+			if (!Weather.IsValid())
+			{
+				// 改变天气
+				break;
+			}
+
+			UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather_Client(Weather);
+		};
 	}
 }
 

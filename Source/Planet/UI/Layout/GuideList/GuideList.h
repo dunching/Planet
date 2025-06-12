@@ -13,8 +13,8 @@
 #include "GuideList.generated.h"
 
 class AGuideActor;
-class AGuideThread;
-class AGuideThreadBase;
+class AQuestChain;
+class AQuestChainBase;
 class UGuideItem;
 class UPAD_TaskNode_Guide;
 
@@ -37,7 +37,7 @@ public:
 	virtual void DisEnable() override;
 
 protected:
-	void OnStartGuide(AGuideThreadBase* NewGuidePtr);
+	void OnStartGuide(AQuestChainBase* NewGuidePtr);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Item Class")
 	TSubclassOf<UGuideItem>GuideItemClass;

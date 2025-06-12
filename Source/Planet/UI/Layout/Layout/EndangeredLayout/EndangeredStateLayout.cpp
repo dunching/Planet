@@ -6,7 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "GameplayCommand.h"
-#include "GuideSubSystem.h"
+#include "QuestSubSystem.h"
 #include "HumanCharacter_Player.h"
 #include "GuideThreadChallenge.h"
 #include "LayoutCommon.h"
@@ -51,7 +51,7 @@ void UEndangeredStateLayout::OnClicked()
 	{
 		if (PCPtr->GetPlayerState<APlanetPlayerState>()->GetIsInChallenge())
 		{
-			if (auto GuideThreadPtr = UGuideSubSystem::GetInstance()->IsActivedGuideThread(
+			if (auto GuideThreadPtr = UQuestSubSystem::GetInstance()->IsActivedGuideThread(
 				 AGuideThread_Challenge::StaticClass()
 				))
 			{

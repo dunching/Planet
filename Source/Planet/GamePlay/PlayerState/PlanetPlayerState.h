@@ -8,6 +8,7 @@
 
 #include "PlanetAbilitySystemComponent.h"
 #include "ItemProxy_Minimal.h"
+#include "OpenWorldDataLayer.h"
 
 #include "PlanetPlayerState.generated.h"
 
@@ -40,8 +41,15 @@ public:
 #pragma endregion
 
 	FGameplayTag GetRegionTag()const;
+
+	void SetCurrentTeleport(ETeleport InCurrentTeleport);
 	
 	FOnRegionChanged OnRegionChanged;
+	
+	/*
+	 *	角色进入副本之前在开放世界的位置信息
+	 */
+	FTransform OpenWorldTransform = FTransform::Identity;
 	
 protected:
 
@@ -66,6 +74,9 @@ private:
 	UFUNCTION()
 	void OnRep_RegionTag();
 	
+	UFUNCTION()
+	void OnRep_CurrentTeleport();
+	
 	UPROPERTY(Transient)
 	TObjectPtr<UAudioComponent>AudioComponentPtr = nullptr;
 	
@@ -76,4 +87,8 @@ private:
 
 	UPROPERTY(Replicated)
 	bool bIsInChallenge = false;
+
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentTeleport)
+	ETeleport CurrentTeleport = ETeleport::kNone;
+	
 };

@@ -12,8 +12,8 @@ class UStaticMeshComponent;
 class USceneComponent;
 class UWidgetComponent;
 class UBillboardComponent;
-class AGuideThread_Branch;
-class AGuideThread_Area;
+class AQuestChain_Branch;
+class AQuestChain_Area;
 
 /**
  *
@@ -30,7 +30,7 @@ public:
 
 protected:
 	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "GuideLine")
-	TSubclassOf<AGuideThread_Area> GuideBranchThreadClass;
+	TSubclassOf<AQuestChain_Area> GuideBranchThreadClass;
 
 private:
 	UFUNCTION()
@@ -40,5 +40,5 @@ private:
 	void OnActorEndOverlapCB(AActor* OverlappedActor, AActor* OtherActor);
 
 	// UPROPERTY(ReplicatedUsing = OnRep_WolrdProcess)
-	TObjectPtr<AGuideThread_Area> GuidePtr = nullptr;
+	TObjectPtr<AQuestChain_Area> GuidePtr = nullptr;
 };

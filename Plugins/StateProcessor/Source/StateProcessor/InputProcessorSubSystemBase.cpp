@@ -154,18 +154,12 @@ bool UInputProcessorSubSystemBase::InputKey(
 }
 
 bool UInputProcessorSubSystemBase::InputAxis(
-	FViewport* Viewport,
-	FInputDeviceId InputDevice,
-	FKey Key,
-	float Delta,
-	float DeltaTime,
-	int32 NumSamples,
-	bool bGamepad
+	const FInputKeyEventArgs& EventArgs
 )
 {
 	if (CurrentProcessorSPtr)
 	{
-		return CurrentProcessorSPtr->InputAxis(Viewport, InputDevice, Key, Delta, DeltaTime, NumSamples, bGamepad);
+		return CurrentProcessorSPtr->InputAxis(EventArgs);
 	}
 	else
 	{

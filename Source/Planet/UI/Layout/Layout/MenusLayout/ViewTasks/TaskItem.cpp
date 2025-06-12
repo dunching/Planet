@@ -1,8 +1,8 @@
 
 #include "TaskItem.h"
 
-#include "GuideSubSystem.h"
-#include "GuideThread.h"
+#include "QuestSubSystem.h"
+#include "QuestChain.h"
 #include "Components/TextBlock.h"
 
 #include "TemplateHelper.h"
@@ -27,7 +27,7 @@ void UTaskItem::NativeConstruct()
 }
 
 void UTaskItem::SetGuideThreadType(
-	const TSubclassOf<AGuideThread_MainBase>& GuideThreadClass
+	const TSubclassOf<AQuestChain_MainBase>& GuideThreadClass
 )
 {
 	MainGuideThreadClass = GuideThreadClass;
@@ -44,7 +44,7 @@ void UTaskItem::SetGuideThreadType(
 }
 
 void UTaskItem::SetGuideThreadType(
-	const TSubclassOf<AGuideThread_BranchBase>& GuideThreadClass
+	const TSubclassOf<AQuestChain_BranchBase>& GuideThreadClass
 )
 {
 	BrandGuideThreadClass = GuideThreadClass;

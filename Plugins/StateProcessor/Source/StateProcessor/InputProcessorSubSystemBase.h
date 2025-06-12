@@ -79,13 +79,7 @@ public:
 		);
 
 	virtual bool InputAxis(
-		FViewport* Viewport,
-		FInputDeviceId InputDevice,
-		FKey Key,
-		float Delta,
-		float DeltaTime,
-		int32 NumSamples = 1,
-		bool bGamepad = false
+	const FInputKeyEventArgs& EventArgs
 		);
 
 protected:

@@ -12,7 +12,7 @@ class UStaticMeshComponent;
 class USceneComponent;
 class UWidgetComponent;
 class UBillboardComponent;
-class AGuideThread_Branch;
+class AQuestChain_Branch;
 
 /**
  * 在挑战/爬塔关卡时，可以生成NPC的点位

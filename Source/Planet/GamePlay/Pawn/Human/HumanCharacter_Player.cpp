@@ -10,7 +10,7 @@
 #include "GravitySpringArmComponent.h"
 #include "PlayerComponent.h"
 #include "GroupManagger.h"
-#include "GuideSubSystem.h"
+#include "QuestSubSystem.h"
 #include "HumanAIController.h"
 #include "HumanCharacter_AI.h"
 #include "HumanRegularProcessor.h"
