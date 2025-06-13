@@ -20,7 +20,7 @@ struct FTableRowProxy_PassiveSkillExtendInfo;
 struct FTableRowProxy_WeaponSkillExtendInfo;
 struct FTableRowProxy_CharacterGrowthAttribute;
 struct FTableRowProxy_Consumable;
-struct FTableRowProxy_PropertyEntrys;
+struct FTableRowProxy_GeneratiblePropertyEntrys;
 struct FTableRowProxy_CharacterType;
 struct FCharacterProxy;
 
@@ -86,7 +86,7 @@ public:
 	 * 
 	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TArray<FCharacterGrowthAttribute> CharacterGrowthAttributeAry;
+	TArray<FCharacterGrowthAttribute> GrowthAttributeAry;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<AHumanCharacter_AI> CharacterClass;
@@ -220,13 +220,13 @@ public:
 		const IDType& ID
 		);
 
-	void UpdateByRemote(
-		const TSharedPtr<FCharacterProxy>& RemoteSPtr
-		);
-
 	virtual void InitialProxy(
 		const FGameplayTag& ProxyType
 		) override;
+
+	void UpdateByRemote(
+		const TSharedPtr<FCharacterProxy>& RemoteSPtr
+		);
 
 	virtual bool NetSerialize(
 		FArchive& Ar,
@@ -278,10 +278,10 @@ public:
 
 	FString GetDisplayTitle() const;
 
-	void AddExperience(uint32 Value);
-
 	uint8 GetTalentNum()const;
 	
+	void AddExperience(uint32 Value);
+
 	uint8 GetLevel()const;
 	
 	uint8 GetExperience()const;

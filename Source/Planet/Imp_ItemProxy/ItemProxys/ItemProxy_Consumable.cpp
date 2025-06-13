@@ -43,8 +43,11 @@ void FConsumableProxy::UpdateByRemote(
 	const TSharedPtr<FConsumableProxy>& RemoteSPtr
 	)
 {
-	Super::UpdateByRemote(RemoteSPtr);
+	Super::UpdateByRemote(RemoteSPtr);	
+
+	ProxyPtr = this;
 	UpdateByRemote_Allocationble(RemoteSPtr);
+	
 	UpdateByRemote_Unique(RemoteSPtr);
 }
 

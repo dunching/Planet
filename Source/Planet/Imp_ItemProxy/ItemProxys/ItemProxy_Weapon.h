@@ -25,7 +25,7 @@ struct FTableRowProxy_PassiveSkillExtendInfo;
 struct FTableRowProxy_WeaponSkillExtendInfo;
 struct FTableRowProxy_CharacterGrowthAttribute;
 struct FTableRowProxy_Consumable;
-struct FTableRowProxy_PropertyEntrys;
+struct FTableRowProxy_GeneratiblePropertyEntrys;
 struct FTableRowProxy_CharacterType;
 struct FCharacterProxy;
 struct FWeaponSkillProxy;
@@ -52,21 +52,20 @@ class PLANET_API UItemProxy_Description_Weapon : public UItemProxy_Description
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<APlanetWeapon_Base> ToolActorClass;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag WeaponSkillProxyType = FGameplayTag::EmptyTag;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	EAnimLinkClassType AnimLinkClassType = EAnimLinkClassType::kUnarmed;
-	
+
 	// 武器的主属性词条
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
 	FGameplayTag PropertyEntry;
-	
+
 	// 在使用这个武器时，最大攻击范围为多少(AI会使用这个进行场景查询)
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
 	int32 MaxAttackDistance = 50;
-	
 };
 
 /**
@@ -74,8 +73,8 @@ public:
  */
 USTRUCT()
 struct PLANET_API FWeaponProxy :
-public FPlanet_BasicProxy,
-public IProxy_Allocationble
+	public FPlanet_BasicProxy,
+	public IProxy_Allocationble
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -87,13 +86,13 @@ public:
 
 	FWeaponProxy();
 
-	void UpdateByRemote(
-		const TSharedPtr<FWeaponProxy>& RemoteSPtr
-		);
-
 	virtual void InitialProxy(
 		const FGameplayTag& ProxyType
 		) override;
+
+	void UpdateByRemote(
+		const TSharedPtr<FWeaponProxy>& RemoteSPtr
+		);
 
 	virtual bool Active() override;
 
@@ -119,7 +118,7 @@ public:
 	void RetractputWeapon();
 
 	// 主词条
-	FTableRowProxy_PropertyEntrys* GetMainPropertyEntry() const;
+	FTableRowProxy_GeneratiblePropertyEntrys* GetMainPropertyEntry() const;
 
 	int32 GetMaxAttackDistance() const;
 

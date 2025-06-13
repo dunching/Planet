@@ -15,5 +15,11 @@
 				"Win64"
 			]
 		}
+	],
+	"Plugins": [
+		{
+			"Name": "Utils",
+			"Enabled": true
+		}
 	]
 }

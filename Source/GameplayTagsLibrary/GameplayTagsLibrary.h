@@ -15,6 +15,9 @@ class GAMEPLAYTAGSLIBRARY_API UGameplayTagsLibrary : public UBlueprintFunctionLi
 	GENERATED_BODY()
 
 public:
+
+	static FString GetModifyItemTagName(const FGameplayTag&Tag);
+	
 	static FGameplayTag BaseFeature_Reply;
 
 	static FGameplayTag BaseFeature_Dash;

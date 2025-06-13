@@ -75,18 +75,22 @@ void UItemDecriptionBaseWidget::SetUIStyle()
 {
 	if (ProxySPtr)
 	{
-		auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(FItemDecriptionBaseWidget::Get().Title));
-		if (WidgetPtr)
 		{
-			WidgetPtr->SetText(FText::FromString(ProxySPtr->GetProxyName()));
+			auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(FItemDecriptionBaseWidget::Get().Title));
+			if (WidgetPtr)
+			{
+				WidgetPtr->SetText(FText::FromString(ProxySPtr->GetProxyName()));
+			}
 		}
 	}
 	else if (ProxyType.IsValid())
 	{
-		auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(FItemDecriptionBaseWidget::Get().Title));
-		if (WidgetPtr)
 		{
-			WidgetPtr->SetText(FText::FromString(ItemProxy_Description.LoadSynchronous()->ProxyName));
+			auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(FItemDecriptionBaseWidget::Get().Title));
+			if (WidgetPtr)
+			{
+				WidgetPtr->SetText(FText::FromString(ItemProxy_Description->ProxyName));
+			}
 		}
 	}
 	

@@ -54,6 +54,9 @@ struct FDataModify_key_compare
 	}
 };
 
+/**
+ * 输出修正
+ */
 class GAMEPLAYEFFECTDATAMODIFY_API IOutputDataModifyInterface : public IDataModifyInterface
 {
 public:
@@ -82,6 +85,9 @@ public:
 		);
 };
 
+/**
+ * 输入修正
+ */
 class GAMEPLAYEFFECTDATAMODIFY_API IInputDataModifyInterface : public IDataModifyInterface
 {
 public:
@@ -100,6 +106,12 @@ public:
 		);
 };
 
+/**
+ * 数值修正
+ * 比如移速是由
+ * FDataComposition：多个来源组成，再加上对这些总数的乘数，有时也会强制把某个值改为特定的值，
+ * 比如在魅惑的时候，会将移速固定在200以下
+ */
 class GAMEPLAYEFFECTDATAMODIFY_API IGetValueModifyInterface : public IDataModifyInterface
 {
 public:
@@ -115,6 +127,10 @@ public:
 		) const;
 };
 
+/**
+ * 消耗修正
+ * 如我们需要将普通的Mana消耗，部分转为HP消耗
+ */
 class GAMEPLAYEFFECTDATAMODIFY_API IGostModifyInterface : public IDataModifyInterface
 {
 public:
@@ -128,4 +144,65 @@ public:
 		const TMap<FGameplayTag, int32>& Original,
 		const TMap<FGameplayTag, int32>& CurrentOriginal
 		) const;
+};
+
+/**
+ * 范围大小修正
+ */
+class GAMEPLAYEFFECTDATAMODIFY_API IRangeModifyInterface : public IDataModifyInterface
+{
+public:
+	using FPawnType = ACharacter;
+
+	IRangeModifyInterface(
+		int32 InPriority = 1
+		);
+
+	virtual float GetRangeMagnitude() const;
+};
+
+/**
+ * 持续时长修正
+ */
+class GAMEPLAYEFFECTDATAMODIFY_API IDurationModifyInterface : public IDataModifyInterface
+{
+public:
+	using FPawnType = ACharacter;
+
+	IDurationModifyInterface(
+		int32 InPriority = 1
+		);
+
+	virtual int32 GetDuration(int32 Duration) const;
+};
+
+/**
+ * 冷却修正
+ */
+class GAMEPLAYEFFECTDATAMODIFY_API ICooldownModifyInterface : public IDataModifyInterface
+{
+public:
+	using FPawnType = ACharacter;
+
+	ICooldownModifyInterface(
+		int32 InPriority = 1
+		);
+
+	virtual int32 GetCooldown(int32 Cooldown) const;
+};
+
+/**
+ * 额外的效果修正
+ * 类似LOL里面羊刀触发的攻击特效
+ */
+class GAMEPLAYEFFECTDATAMODIFY_API IExtraEffectModifyInterface : public IDataModifyInterface
+{
+public:
+	using FPawnType = ACharacter;
+
+	IExtraEffectModifyInterface(
+		int32 InPriority = 1
+		);
+
+	virtual int32 GetExtraEffectCount() const;
 };

@@ -34,7 +34,7 @@ public:
 };
 
 UCLASS()
-class PLANET_API UItemDecription_Skill_PassiveSkill_XR : public UItemDecription
+class PLANET_API UItemDecription_Skill_PassiveSkill_XR : public UItemDecription_Skill_PassiveSkill
 {
 	GENERATED_BODY()
 

@@ -3,16 +3,14 @@
 using System.IO;
 using UnrealBuildTool;
 
-public class Common_UMG : ModuleRules
+public class PropertyEntrySystem : ModuleRules
 {
-	public Common_UMG(ReadOnlyTargetRules Target) : base(Target)
+	public PropertyEntrySystem(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 		
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
 
-		CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Error;
-		bWarningsAsErrors = true;
 		CppStandard = CppStandardVersion.Cpp20;
 
 		bUseRTTI = true;
@@ -20,12 +18,18 @@ public class Common_UMG : ModuleRules
 		PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...
-				Path.Combine(PluginDirectory, "Source/WidgetScreenLayer"),
-				Path.Combine(PluginDirectory, "Source/ScaleableWidget"),
-				Path.Combine(PluginDirectory, "Source/Common_UMG"),
-				Path.Combine(PluginDirectory, "Source/Common_UMG/RichTextBlock"),
+				Path.Combine(PluginDirectory, "Source"),
+				Path.Combine(PluginDirectory, "Source/PropertyEntrySystem"),
 			}
 			);
+			
+		PrivateIncludePaths.AddRange(
+			new string[] {
+				// ... add public include paths required here ...
+				Path.Combine(PluginDirectory, "Source/Command"),
+			}
+			);
+				
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
@@ -48,13 +52,9 @@ public class Common_UMG : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
-				"Slate",
-				"SlateCore", 
-				"UMG",
+				"GameplayTags",
 				// ... add private dependencies that you statically link with here ...	
-				
-				"InputCore",
-				"Utils",
+				"Utils", 
 			}
 			);
 		

@@ -23,12 +23,14 @@ class ITEMPROXY_API UItemDecriptionBaseWidget : public UUserWidget_Override
 	GENERATED_BODY()
 
 public:
-	UItemDecriptionBaseWidget(const FObjectInitializer& ObjectInitializer);
+	UItemDecriptionBaseWidget(
+		const FObjectInitializer& ObjectInitializer
+		);
 
 	virtual void BindData(
 		const TSharedPtr<FBasicProxy>& ProxySPtr,
 		const TSoftObjectPtr<UItemProxy_Description>& ItemProxy_Description
-	);
+		);
 
 	virtual void BindData(
 		const FGameplayTag &InProxyType,
@@ -37,23 +39,23 @@ public:
 
 protected:
 	virtual void NativeConstruct() override;
-	
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+
+	virtual void NativeTick(
+		const FGeometry& MyGeometry,
+		float InDeltaTime
+		) override;
 
 	/**
 	 * 这个里面的数据是动态的，比如我们需要得到一些特殊的加成
 	 */
 	TSharedPtr<FBasicProxy> ProxySPtr = nullptr;
 
-	/**
-	 * 
-	 */
 	FGameplayTag ProxyType;
-	
-	TSoftObjectPtr<UItemProxy_Description> ItemProxy_Description;
-private:
 
-	void  UpdatePosstion();
-	
+	TSoftObjectPtr<UItemProxy_Description> ItemProxy_Description;
+
+private:
+	void UpdatePosstion();
+
 	virtual void SetUIStyle();
 };

@@ -7,6 +7,7 @@
 #include "GameplayTagsLibrary.h"
 #include "CharacterAttibutes.h"
 #include "AllocationSkills.h"
+#include "AssetRefMap.h"
 #include "TeamMatesHelperComponent.h"
 #include "PropertyEntrys.h"
 #include "Skill_Base.h"
@@ -21,6 +22,7 @@
 #include "Skill_WeaponActive_Bow.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 #include "ItemProxy_Character.h"
+#include "PropertyEntrySussystem.h"
 #include "Tools.h"
 
 FSkillProxy::FSkillProxy() :
@@ -32,11 +34,11 @@ bool FSkillProxy::NetSerialize(
 	FArchive& Ar,
 	class UPackageMap* Map,
 	bool& bOutSuccess
-)
+	)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 	NetSerialize_Allocationble(Ar, Map, bOutSuccess);
-	
+
 	Ar << Level;
 	Ar << GameplayAbilitySpecHandle;
 
@@ -55,18 +57,20 @@ void FSkillProxy::InitialProxy(
 void FSkillProxy::SetAllocationCharacterProxy(
 	const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr,
 	const FGameplayTag& InSocketTag
-)
+	)
 {
 	IProxy_Allocationble::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 }
 
 void FSkillProxy::UpdateByRemote(
 	const TSharedPtr<FSkillProxy>& RemoteSPtr
-)
+	)
 {
 	Super::UpdateByRemote(RemoteSPtr);
-	UpdateByRemote_Allocationble(RemoteSPtr);
 	
+	ProxyPtr = this;
+	UpdateByRemote_Allocationble(RemoteSPtr);
+
 	Level = RemoteSPtr->Level;
 	GameplayAbilitySpecHandle = RemoteSPtr->GameplayAbilitySpecHandle;
 }
@@ -96,7 +100,7 @@ void FSkillProxy::RegisterSkill()
 		{
 			return;
 		}
-		
+
 		auto AllocationCharacter = GetAllocationCharacterProxy()->GetCharacterActor();
 		// 确认是否生成了CharacterActor
 		if (!AllocationCharacter.IsValid())
@@ -110,21 +114,21 @@ void FSkillProxy::RegisterSkill()
 
 		const auto InputID = FMath::RandHelper(std::numeric_limits<int32>::max());
 		FGameplayAbilitySpec GameplayAbilitySpec(
-			GetSkillClass(),
-			Level,
-			InputID
-		);
+		                                         GetSkillClass(),
+		                                         Level,
+		                                         InputID
+		                                        );
 
 		FGameplayEventData GameplayEventData;
 		GameplayEventData.TargetData.Add(GameplayAbilityTargetDataPtr);
 
 		AllocationCharacter->GetCharacterAbilitySystemComponent()->ReplicateEventData(
-			InputID,
-			GameplayEventData
-		);
+			 InputID,
+			 GameplayEventData
+			);
 		GameplayAbilitySpecHandle = AllocationCharacter->GetCharacterAbilitySystemComponent()->GiveAbility(
-			GameplayAbilitySpec
-		);
+			 GameplayAbilitySpec
+			);
 	}
 #endif
 }
@@ -447,6 +451,22 @@ int32 FActiveSkillProxy::GetCount() const
 	return -1;
 }
 
+UItemProxy_Description_PassiveSkill::UItemProxy_Description_PassiveSkill(
+	const FObjectInitializer& ObjectInitializer
+	):
+	 Super(ObjectInitializer)
+{
+	GrowthAttributeMap =
+	{
+		{1, FPassiveGrowthAttribute{100, {1}}},
+		{5, FPassiveGrowthAttribute{200, {1, 2}}},
+		{10, FPassiveGrowthAttribute{300, {1, 2, 3}}},
+		{15, FPassiveGrowthAttribute{400, {1}}},
+		{20, FPassiveGrowthAttribute{500, {1, 2}}},
+		{25, FPassiveGrowthAttribute{600, {1, 2, 3}}},
+	};
+}
+
 FPassiveSkillProxy::FPassiveSkillProxy()
 {
 }
@@ -456,6 +476,67 @@ void FPassiveSkillProxy::InitialProxy(
 	)
 {
 	Super::InitialProxy(InProxyType);
+
+	GenerationPropertyEntry();
+}
+
+void FPassiveSkillProxy::UpdateByRemote(
+	const TSharedPtr<FPassiveSkillProxy>& RemoteSPtr
+	)
+{
+	Super::UpdateByRemote(RemoteSPtr);
+	UpdateByRemote_Allocationble(RemoteSPtr);
+
+	GeneratedPropertyEntryAry = RemoteSPtr->GeneratedPropertyEntryAry;
+	Level = RemoteSPtr->Level;
+	Experience = RemoteSPtr->Experience;
+}
+
+bool FPassiveSkillProxy::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+	)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+	NetSerialize_Allocationble(Ar, Map, bOutSuccess);
+
+	if (Ar.IsSaving())
+	{
+		int32 size = GeneratedPropertyEntryAry.size();
+		Ar << size;
+		
+		for (auto Iter : GeneratedPropertyEntryAry)
+		{
+			int32 Value = Iter.first;
+			Ar << Value;
+			
+			Iter.second.NetSerialize(Ar, Map, bOutSuccess);
+		}
+	}
+	else if (Ar.IsLoading())
+	{
+		GeneratedPropertyEntryAry.clear();
+
+		int32 size = 0;
+		Ar << size;
+		
+		for (int32 Index = 0; Index < size; Index++)
+		{
+			int32 Value = 0;
+			Ar << Value;
+
+			FGeneratedPropertyEntryInfo GeneratedPropertyEntryInfo;
+			GeneratedPropertyEntryInfo.NetSerialize(Ar, Map, bOutSuccess);
+			
+			GeneratedPropertyEntryAry.emplace(Value, GeneratedPropertyEntryInfo);
+		}
+	}
+
+	Ar << Level;
+	Ar << Experience;
+
+	return true;
 }
 
 void FPassiveSkillProxy::Allocation()
@@ -465,19 +546,38 @@ void FPassiveSkillProxy::Allocation()
 #if UE_EDITOR || UE_SERVER
 	if (GetInventoryComponent()->GetNetMode() == NM_DedicatedServer)
 	{
-		auto AllocationCharacter = GetAllocationCharacter();
-		// 词条
+		auto CharacterSPtr = GetAllocationCharacter();
+		if (!CharacterSPtr)
 		{
-			auto MainPropertyEntryPtr = GetMainPropertyEntry();
-			if (MainPropertyEntryPtr)
-			{
-				TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+			return;
+		}
+		
+		UPlanetAbilitySystemComponent* GASPtr = nullptr;
+		GASPtr = CharacterSPtr->GetAbilitySystemComponent();
+		if (!GASPtr)
+		{
+			return;
+		}
 
-				for (const auto& Iter : MainPropertyEntryPtr->Map)
-				{
-					ModifyPropertyMap.Add(Iter);
-				}
-			}
+		for (const auto& Iter : GeneratedPropertyEntryAry)
+		{
+			auto SpecHandle = GASPtr->MakeOutgoingSpec(
+													   UAssetRefMap::GetInstance()->OnceGEClass,
+													   1,
+													   GASPtr->MakeEffectContext()
+													  );
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(
+													  UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data
+													 );
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(Iter.second.PropertyTag);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   GetProxyType(),
+														   Iter.second.Value
+														  );
+
+			GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 		}
 	}
 #endif
@@ -488,11 +588,84 @@ void FPassiveSkillProxy::UnAllocation()
 #if UE_EDITOR || UE_SERVER
 	if (GetInventoryComponent()->GetNetMode() == NM_DedicatedServer)
 	{
-		auto AllocationCharacter = GetAllocationCharacter();
+		auto CharacterSPtr = GetAllocationCharacter();
+		if (!CharacterSPtr)
+		{
+			return;
+		}
+		
+		UPlanetAbilitySystemComponent* GASPtr = nullptr;
+		GASPtr = CharacterSPtr->GetAbilitySystemComponent();
+		if (!GASPtr)
+		{
+			return;
+		}
+
+		for (const auto& Iter : GeneratedPropertyEntryAry)
+		{
+			auto SpecHandle = GASPtr->MakeOutgoingSpec(
+													   UAssetRefMap::GetInstance()->OnceGEClass,
+													   1,
+													   GASPtr->MakeEffectContext()
+													  );
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(
+													  UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data
+													 );
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(Iter.second.PropertyTag);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   GetProxyType(),
+														   0
+														  );
+
+			GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
 	}
 #endif
 
 	Super::UnAllocation();
+}
+
+void FPassiveSkillProxy::GenerationPropertyEntry()
+{
+	// 已根据等级生成的词条索引
+	uint8 NeedGenerationLevel = 0;
+	for (const auto& Iter : GeneratedPropertyEntryAry)
+	{
+		NeedGenerationLevel = Iter.first;
+	}
+
+	auto TableRowProxy_PassiveSkillExtendInfoPtr = GetTableRowProxy_PassiveSkillExtendInfo();
+	if (!TableRowProxy_PassiveSkillExtendInfoPtr)
+	{
+		return;
+	}
+
+	if (Level > TableRowProxy_PassiveSkillExtendInfoPtr->GrowthAttributeMap.Num())
+	{
+		return;
+	}
+
+	for (; NeedGenerationLevel <= Level; NeedGenerationLevel++)
+	{
+		if (!TableRowProxy_PassiveSkillExtendInfoPtr->GrowthAttributeMap.Contains(NeedGenerationLevel))
+		{
+			continue;
+		}
+
+		// 
+		const auto GrowthAttribute = TableRowProxy_PassiveSkillExtendInfoPtr->GrowthAttributeMap[NeedGenerationLevel];
+		const auto Ary = UPropertyEntrySussystem::GetInstance()->GenerationPropertyEntry(
+			 GrowthAttribute.
+			 GeneratiblePropertyEntryAry
+			);
+
+		for (const auto& Iter : Ary)
+		{
+			GeneratedPropertyEntryAry.emplace(NeedGenerationLevel, Iter);
+		}
+	}
 }
 
 UItemProxy_Description_PassiveSkill* FPassiveSkillProxy::GetTableRowProxy_PassiveSkillExtendInfo() const
@@ -502,26 +675,6 @@ UItemProxy_Description_PassiveSkill* FPassiveSkillProxy::GetTableRowProxy_Passiv
 		 TableRowPtr->ItemProxy_Description.LoadSynchronous()
 		);
 	return ItemProxy_Description_SkillPtr;
-}
-
-FTableRowProxy_PropertyEntrys* FPassiveSkillProxy::GetMainPropertyEntry() const
-{
-	auto SceneProxyExtendInfoMapPtr = UDataTableCollection::GetInstance();
-	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
-
-	// 
-	TArray<FTableRowProxy_PropertyEntrys*> ResultAry;
-	DataTable->GetAllRows(TEXT("GetProxy"), ResultAry);
-	if (!ResultAry.IsEmpty())
-	{
-		return ResultAry[FMath::RandRange(0, ResultAry.Num() - 1)];
-	}
-
-	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_PropertyEntrys>(
-		 *GetProxyType().ToString(),
-		 TEXT("GetProxy")
-		);
-	return SceneProxyExtendInfoPtr;
 }
 
 TSubclassOf<USkill_Base> FPassiveSkillProxy::GetSkillClass() const
@@ -616,6 +769,104 @@ void FPassiveSkillProxy::ApplyCooldown()
 
 void FPassiveSkillProxy::OffsetCooldownTime()
 {
+}
+
+void FPassiveSkillProxy::AddExperience(
+	uint32 Value
+	)
+{
+	const auto CharacterGrowthAttributeAry = GetTableRowProxy_PassiveSkillExtendInfo()->GrowthAttributeMap;
+
+	if (CharacterGrowthAttributeAry.Num() <= Level)
+	{
+		//满级了
+		return;
+	}
+
+	const auto OldExperience = Experience;
+
+	Experience += Value;
+
+	int32 LevelExperience = 0;
+
+	int32 NewLevelExperience = 0;
+
+	ON_SCOPE_EXIT
+	{
+#if UE_EDITOR || UE_SERVER
+		if (GetInventoryComponent()->GetNetMode() == NM_DedicatedServer)
+		{
+			GetInventoryComponent()->UpdateProxy(GetID());
+		}
+#endif
+
+		ExperienceChangedDelegate.ValueChanged(OldExperience, Experience);
+
+		if (LevelExperience > 0 && NewLevelExperience > 0)
+		{
+			LevelExperienceChangedDelegate.ValueChanged(LevelExperience, NewLevelExperience);
+		}
+	};
+
+	for (; Level > 0 && Level < CharacterGrowthAttributeAry.Num();)
+	{
+		const auto& CurrentLevelAttribute = CharacterGrowthAttributeAry[Level - 1];
+
+		// 当前等级升级所需经验
+		LevelExperience = CurrentLevelAttribute.LevelExperience;
+
+		if (Experience < LevelExperience)
+		{
+			return;
+		}
+
+		// 调整数据
+		const auto OldLevel = Level;
+		Level++;
+
+		LevelChangedDelegate.ValueChanged(OldLevel, Level);
+
+		if (Level < CharacterGrowthAttributeAry.Num())
+		{
+			Experience -= LevelExperience;
+
+			LevelExperience = CurrentLevelAttribute.LevelExperience;
+
+			NewLevelExperience = CharacterGrowthAttributeAry[Level].LevelExperience;
+		}
+		else
+		{
+			Experience = CurrentLevelAttribute.LevelExperience;
+
+			LevelExperience = CurrentLevelAttribute.LevelExperience;
+
+			NewLevelExperience = CurrentLevelAttribute.LevelExperience;
+		}
+	}
+
+	GenerationPropertyEntry();
+}
+
+uint8 FPassiveSkillProxy::GetLevel() const
+{
+	return Level;
+}
+
+uint8 FPassiveSkillProxy::GetExperience() const
+{
+	return Experience;
+}
+
+uint8 FPassiveSkillProxy::GetLevelExperience() const
+{
+	const auto CharacterGrowthAttributeAry = GetTableRowProxy_PassiveSkillExtendInfo()->GrowthAttributeMap;
+
+	if (CharacterGrowthAttributeAry.Num() < 0)
+	{
+		return -1;
+	}
+
+	return CharacterGrowthAttributeAry[Level - 1].LevelExperience;
 }
 
 bool FWeaponSkillProxy::Active()

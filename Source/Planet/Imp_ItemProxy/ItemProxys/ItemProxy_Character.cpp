@@ -17,7 +17,7 @@ UItemProxy_Description_Character::UItemProxy_Description_Character(
 	):
 	 Super(ObjectInitializer)
 {
-	CharacterGrowthAttributeAry.SetNum(27);
+	GrowthAttributeAry.SetNum(27);
 }
 
 bool FCharacterSocket::NetSerialize(
@@ -94,6 +94,8 @@ void FCharacterProxy::UpdateByRemote(
 	)
 {
 	Super::UpdateByRemote(RemoteSPtr);
+	
+	ProxyPtr = this;
 	UpdateByRemote_Allocationble(RemoteSPtr);
 
 	TeammateConfigureMap = RemoteSPtr->TeammateConfigureMap;
@@ -451,7 +453,7 @@ void FCharacterProxy::AddExperience(
 	uint32 Value
 	)
 {
-	const auto CharacterGrowthAttributeAry = GetTableRowProxy_Character()->CharacterGrowthAttributeAry;
+	const auto CharacterGrowthAttributeAry = GetTableRowProxy_Character()->GrowthAttributeAry;
 
 	if (CharacterGrowthAttributeAry.Num() <= Level)
 	{
@@ -513,7 +515,6 @@ void FCharacterProxy::AddExperience(
 			                                          );
 
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina);
 
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 			                                               UGameplayTagsLibrary::GEData_ModifyItem_HP,
@@ -585,7 +586,7 @@ uint8 FCharacterProxy::GetExperience() const
 
 uint8 FCharacterProxy::GetLevelExperience() const
 {
-	const auto CharacterGrowthAttributeAry = GetTableRowProxy_Character()->CharacterGrowthAttributeAry;
+	const auto CharacterGrowthAttributeAry = GetTableRowProxy_Character()->GrowthAttributeAry;
 
 	if (CharacterGrowthAttributeAry.Num() < 0)
 	{

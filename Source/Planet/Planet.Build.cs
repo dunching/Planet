@@ -11,7 +11,7 @@ public class Planet : ModuleRules
 
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
 
-		UndefinedIdentifierWarningLevel = WarningLevel.Error;
+		CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Error;
 		bWarningsAsErrors = true;
 		bEnableExceptions = true;
 
@@ -217,10 +217,11 @@ public class Planet : ModuleRules
 			"GameplayEffectDataModify",
 			"Gravity",
 			"GroupManagger",
-			"QuestSystem",
 			"ItemProxy",
 			"NetAbilitySystem",
 			"NPCGenerator",
+			"PropertyEntrySystem",
+			"QuestSystem",
 			"SceneActor",
 			"StateProcessor",
 			"Utils",

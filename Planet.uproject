@@ -119,6 +119,10 @@
 			"Enabled": true
 		},
 		{
+			"Name": "PropertyEntrySystem",
+			"Enabled": true
+		},
+		{
 			"Name": "Weather",
 			"Enabled": true
 		}

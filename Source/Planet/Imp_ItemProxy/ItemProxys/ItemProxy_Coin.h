@@ -19,7 +19,7 @@ struct FTableRowProxy_PassiveSkillExtendInfo;
 struct FTableRowProxy_WeaponSkillExtendInfo;
 struct FTableRowProxy_CharacterGrowthAttribute;
 struct FTableRowProxy_Consumable;
-struct FTableRowProxy_PropertyEntrys;
+struct FTableRowProxy_GeneratiblePropertyEntrys;
 struct FTableRowProxy_CharacterType;
 struct FCharacterProxy;
 

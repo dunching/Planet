@@ -8,6 +8,7 @@
 #include "QuestSubSystem.h"
 #include "InputProcessorSubSystemBase.h"
 #include "PAD_ItemProxyCollection.h"
+#include "PropertyEntrySussystem.h"
 
 #include "PlanetWorldSettings.generated.h"
 
@@ -29,7 +30,8 @@ class PLANET_API APlanetWorldSettings :
 	public AWorldSettings,
 	public IGetItemProxyCollectionInterface,
 	public IGetModifyItemProxyStrategies,
-	public IGetQuestSubSystemInterface
+	public IGetQuestSubSystemInterface,
+	public IGetPropertyEntrysDTInterface
 {
 	GENERATED_BODY()
 
@@ -48,6 +50,8 @@ public:
 	virtual UQuestSubSystem* GetGuideSubSystem()const override;
 	
 	virtual const UPAD_ItemProxyCollection*GetItemProxyCollection()const override;
+	
+	virtual TSoftObjectPtr<UDataTable>GetPropertyEntrysDT()const ;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideThread")
 	TArray<TSubclassOf<AQuestChain_MainBase>> MainGuideThreadChaptersAry;

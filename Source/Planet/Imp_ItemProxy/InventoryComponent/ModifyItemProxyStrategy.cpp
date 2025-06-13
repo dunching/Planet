@@ -21,6 +21,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Character::Add(
 {
 	auto NewResultSPtr = MakeShared<FItemProxyType>();
 
+	NewResultSPtr->SetInventoryComponentBase(InventoryComponentPtr);
 	NewResultSPtr->InitialProxy(InProxyType);
 
 	InventoryComponentPtr->AddToContainer(NewResultSPtr);
@@ -41,6 +42,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Weapon::Add(
 {
 	auto NewResultSPtr = MakeShared<FItemProxyType>();
 
+	NewResultSPtr->SetInventoryComponentBase(InventoryComponentPtr);
 	NewResultSPtr->InitialProxy(InProxyType);
 
 	InventoryComponentPtr->AddToContainer(NewResultSPtr);
@@ -85,6 +87,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_WeaponSkill::Add(
 {
 	auto NewResultSPtr = MakeShared<FItemProxyType>();
 
+	NewResultSPtr->SetInventoryComponentBase(InventoryComponentPtr);
 	NewResultSPtr->InitialProxy(InProxyType);
 
 	InventoryComponentPtr->AddToContainer(NewResultSPtr);
@@ -124,6 +127,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_ActiveSkill::Add(
 {
 	auto NewResultSPtr = MakeShared<FItemProxyType>();
 
+	NewResultSPtr->SetInventoryComponentBase(InventoryComponentPtr);
 	NewResultSPtr->InitialProxy(InProxyType);
 
 	InventoryComponentPtr->AddToContainer(NewResultSPtr);
@@ -163,6 +167,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_PassveSkill::Add(
 {
 	auto NewResultSPtr = MakeShared<FItemProxyType>();
 
+	NewResultSPtr->SetInventoryComponentBase(InventoryComponentPtr);
 	NewResultSPtr->InitialProxy(InProxyType);
 
 	InventoryComponentPtr->AddToContainer(NewResultSPtr);
@@ -229,6 +234,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Coin::Add(
 	{
 		auto NewResultSPtr = MakeShared<FItemProxyType>();
 
+		NewResultSPtr->SetInventoryComponentBase(InventoryComponentPtr);
 		NewResultSPtr->InitialProxy(InProxyType);
 
 		InventoryComponentPtr->AddToContainer(NewResultSPtr);
@@ -347,6 +353,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Consumable::Add(
 
 		auto NewResultSPtr = MakeShared<FItemProxyType>();
 
+		NewResultSPtr->SetInventoryComponentBase(InventoryComponentPtr);
 		NewResultSPtr->InitialProxy(InProxyType);
 
 		InventoryComponentPtr->AddToContainer(NewResultSPtr);

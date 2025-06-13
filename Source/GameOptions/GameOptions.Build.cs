@@ -8,7 +8,7 @@ public class GameOptions : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        UndefinedIdentifierWarningLevel = WarningLevel.Error;
+        CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Error;
         bWarningsAsErrors = true;
         bEnableExceptions = true;
 

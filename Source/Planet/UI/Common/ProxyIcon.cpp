@@ -23,11 +23,11 @@ inline void UProxyIcon::ResetToolUIByData(
 {
 	if (InBasicProxyPtr)
 	{
-		ProxyType = InBasicProxyPtr->GetProxyType();
+		ProxySPtr = InBasicProxyPtr;
 	}
 	else
 	{
-		ProxyType = FGameplayTag::EmptyTag;
+		ProxySPtr = nullptr;
 	}
 
 	SetItemType();
@@ -49,28 +49,56 @@ void UProxyIcon::NativeOnMouseEnter(
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 
-	if (ProxyType.IsValid() && bIsDisplayInfo)
+	if (bIsDisplayInfo)
 	{
-		auto ProxyDTSPtr = GetTableRowProxy(ProxyType);
-		if (ProxyDTSPtr)
+		if (ProxySPtr)
 		{
-			if (ItemDecriptionPtr)
+			auto ProxyDTSPtr = GetTableRowProxy(ProxySPtr->GetProxyType());
+			if (ProxyDTSPtr)
 			{
-			}
-			else
-			{
-				if (!ProxyDTSPtr->ItemProxy_Description || !ProxyDTSPtr->ItemDecriptionClass)
+				if (ItemDecriptionPtr)
 				{
-					return;
 				}
+				else
+				{
+					if (!ProxyDTSPtr->ItemProxy_Description || !ProxyDTSPtr->ItemDecriptionClass)
+					{
+						return;
+					}
 
-				ItemDecriptionPtr = CreateWidget<UItemDecription>(this, ProxyDTSPtr->ItemDecriptionClass);
+					ItemDecriptionPtr = CreateWidget<UItemDecription>(this, ProxyDTSPtr->ItemDecriptionClass);
+				}
+				if (ItemDecriptionPtr)
+				{
+					ItemDecriptionPtr->BindData(ProxySPtr, ProxyDTSPtr->ItemProxy_Description);
+
+					ItemDecriptionPtr->AddToViewport(EUIOrder::kHoverDecription);
+				}
 			}
-			if (ItemDecriptionPtr)
+		}
+		else if (ProxyType.IsValid())
+		{
+			auto ProxyDTSPtr = GetTableRowProxy(ProxySPtr->GetProxyType());
+			if (ProxyDTSPtr)
 			{
-				ItemDecriptionPtr->BindData(ProxyType, ProxyDTSPtr->ItemProxy_Description);
+				if (ItemDecriptionPtr)
+				{
+				}
+				else
+				{
+					if (!ProxyDTSPtr->ItemProxy_Description || !ProxyDTSPtr->ItemDecriptionClass)
+					{
+						return;
+					}
 
-				ItemDecriptionPtr->AddToViewport(EUIOrder::kHoverDecription);
+					ItemDecriptionPtr = CreateWidget<UItemDecription>(this, ProxyDTSPtr->ItemDecriptionClass);
+				}
+				if (ItemDecriptionPtr)
+				{
+					ItemDecriptionPtr->BindData(ProxySPtr, ProxyDTSPtr->ItemProxy_Description);
+
+					ItemDecriptionPtr->AddToViewport(EUIOrder::kHoverDecription);
+				}
 			}
 		}
 	}
@@ -94,16 +122,42 @@ void UProxyIcon::SetItemType()
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FProxyIcon::Get().Icon));
 	if (ImagePtr)
 	{
-		auto ProxyDTSPtr = GetTableRowProxy(ProxyType);
-		if (ProxyDTSPtr)
+		if (ProxySPtr)
 		{
-			if (auto ItemProxy_Description = ProxyDTSPtr->ItemProxy_Description.LoadSynchronous())
+			auto ProxyDTSPtr = GetTableRowProxy(ProxySPtr->GetProxyType());
+			if (ProxyDTSPtr)
 			{
-				ImagePtr->SetVisibility(ESlateVisibility::Visible);
+				if (auto ItemProxy_Description = ProxyDTSPtr->ItemProxy_Description.LoadSynchronous())
+				{
+					ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
-				AsyncLoadText(ItemProxy_Description->DefaultIcon, ImagePtr);
+					AsyncLoadText(ItemProxy_Description->DefaultIcon, ImagePtr);
 
-				return;
+					return;
+				}
+			}
+			else
+			{
+				ImagePtr->SetVisibility(ESlateVisibility::Hidden);
+			}
+		}
+		else if (ProxyType.IsValid())
+		{
+			auto ProxyDTSPtr = GetTableRowProxy(ProxySPtr->GetProxyType());
+			if (ProxyDTSPtr)
+			{
+				if (auto ItemProxy_Description = ProxyDTSPtr->ItemProxy_Description.LoadSynchronous())
+				{
+					ImagePtr->SetVisibility(ESlateVisibility::Visible);
+
+					AsyncLoadText(ItemProxy_Description->DefaultIcon, ImagePtr);
+
+					return;
+				}
+			}
+			else
+			{
+				ImagePtr->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
 		else

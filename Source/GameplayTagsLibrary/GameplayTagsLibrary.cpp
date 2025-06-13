@@ -601,3 +601,132 @@ FGameplayTag UGameplayTagsLibrary::Region_Default =
 
 FGameplayTag UGameplayTagsLibrary::Region_NoviceVillage =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Region.NoviceVillage")));
+
+FString UGameplayTagsLibrary::GetModifyItemTagName(
+	const FGameplayTag& Tag
+	)
+{
+	if (Tag == GEData_ModifyItem_CriticalDamage)
+	{
+		return TEXT("会心伤害");
+	}
+	else if (Tag == GEData_ModifyItem_CriticalHitRate)
+	{
+		return TEXT("会心率");
+	}
+	else if (Tag == GEData_ModifyItem_HitRate)
+	{
+		return TEXT("命中率");
+	}
+	else if (Tag == GEData_ModifyItem_EvadeRate)
+	{
+		return TEXT("闪避率");
+	}
+	else if (Tag == GEData_ModifyItem_MaxHP)
+	{
+		return TEXT("最大生命值");
+	}
+	else if (Tag == GEData_ModifyItem_MaxStamina)
+	{
+		return TEXT("最大体力值");
+	}
+	else if (Tag == GEData_ModifyItem_MaxMana)
+	{
+		return TEXT("最大战斗资源值");
+	}
+	else if (Tag == GEData_ModifyItem_MoveSpeed)
+	{
+		return TEXT("移速");
+	}
+	else if (Tag == GEData_ModifyItem_PerformSpeed)
+	{
+		return TEXT("攻击速度");
+	}
+	
+	else if (Tag == GEData_ModifyItem_Metal_Value)
+	{
+		return TEXT("金元素强度");
+	}
+	else if (Tag == GEData_ModifyItem_Metal_Penetration)
+	{
+		return TEXT("金元素穿透");
+	}
+	else if (Tag == GEData_ModifyItem_Metal_PercentPenetration)
+	{
+		return TEXT("金元素百分比穿透");
+	}
+	else if (Tag == GEData_ModifyItem_Metal_Resistance)
+	{
+		return TEXT("金元素抗性");
+	}
+	
+	else if (Tag == GEData_ModifyItem_Wood_Value)
+	{
+		return TEXT("金元素强度");
+	}
+	else if (Tag == GEData_ModifyItem_Wood_Penetration)
+	{
+		return TEXT("金元素穿透");
+	}
+	else if (Tag == GEData_ModifyItem_Wood_PercentPenetration)
+	{
+		return TEXT("金元素百分比穿透");
+	}
+	else if (Tag == GEData_ModifyItem_Wood_Resistance)
+	{
+		return TEXT("金元素抗性");
+	}
+	
+	else if (Tag == GEData_ModifyItem_Water_Value)
+	{
+		return TEXT("金元素强度");
+	}
+	else if (Tag == GEData_ModifyItem_Water_Penetration)
+	{
+		return TEXT("金元素穿透");
+	}
+	else if (Tag == GEData_ModifyItem_Water_PercentPenetration)
+	{
+		return TEXT("金元素百分比穿透");
+	}
+	else if (Tag == GEData_ModifyItem_Water_Resistance)
+	{
+		return TEXT("金元素抗性");
+	}
+	
+	else if (Tag == GEData_ModifyItem_Fire_Value)
+	{
+		return TEXT("金元素强度");
+	}
+	else if (Tag == GEData_ModifyItem_Fire_Penetration)
+	{
+		return TEXT("金元素穿透");
+	}
+	else if (Tag == GEData_ModifyItem_Fire_PercentPenetration)
+	{
+		return TEXT("金元素百分比穿透");
+	}
+	else if (Tag == GEData_ModifyItem_Fire_Resistance)
+	{
+		return TEXT("金元素抗性");
+	}
+	
+	else if (Tag == GEData_ModifyItem_Earth_Value)
+	{
+		return TEXT("金元素强度");
+	}
+	else if (Tag == GEData_ModifyItem_Earth_Penetration)
+	{
+		return TEXT("金元素穿透");
+	}
+	else if (Tag == GEData_ModifyItem_Earth_PercentPenetration)
+	{
+		return TEXT("金元素百分比穿透");
+	}
+	else if (Tag == GEData_ModifyItem_Earth_Resistance)
+	{
+		return TEXT("金元素抗性");
+	}
+	
+	return TEXT("");
+}

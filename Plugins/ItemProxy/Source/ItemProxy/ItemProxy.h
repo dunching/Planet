@@ -23,7 +23,7 @@ struct FTableRowProxy_PassiveSkillExtendInfo;
 struct FTableRowProxy_WeaponSkillExtendInfo;
 struct FTableRowProxy_CharacterGrowthAttribute;
 struct FTableRowProxy_Consumable;
-struct FTableRowProxy_PropertyEntrys;
+struct FTableRowProxy_GeneratiblePropertyEntrys;
 struct FTableRowProxy_CharacterType;
 class UTexture2D;
 class AToolProxyBase;
@@ -108,10 +108,13 @@ struct ITEMPROXY_API FBasicProxy
 	GENERATED_USTRUCT_BODY()
 
 public:
-	friend UInventoryComponentBase; 
-	
+	friend UInventoryComponentBase;
+
 	using FOnAllocationCharacterProxyChanged =
-	TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)>;
+	TCallbackHandleContainer<void(
+		const TWeakPtr<FCharacterProxy>&
+		
+		)>;
 
 	using IDType = FGuid;
 
@@ -120,16 +123,24 @@ public:
 	virtual ~FBasicProxy();
 
 	// FBasicProxy operator=(const FBasicProxy&) = delete;
-	
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
-	virtual void InitialProxy(const FGameplayTag& InProxyType);
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		class UPackageMap* Map,
+		bool& bOutSuccess
+		);
+
+	virtual void InitialProxy(
+		const FGameplayTag& InProxyType
+		);
 
 	/**
 	 * 通过远程的更新客户端的数据
 	 * @param RemoteSPtr 
 	 */
-	void UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr);
+	void UpdateByRemote(
+		const TSharedPtr<FBasicProxy>& RemoteSPtr
+		);
 
 	// 装备至插槽
 	virtual void Allocation();
@@ -158,9 +169,11 @@ public:
 	// 
 	FString GetProxyName() const;
 
-	TObjectPtr<UItemProxy_Description>GetItemProxy_Description()const;
-	
-	void SetInventoryComponentBase(const TObjectPtr<UInventoryComponentBase>&InventoryComponentPtr);
+	TObjectPtr<UItemProxy_Description> GetItemProxy_Description() const;
+
+	void SetInventoryComponentBase(
+		const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr
+		);
 
 	TObjectPtr<UInventoryComponentBase> GetInventoryComponentBase() const;
 
@@ -170,21 +183,20 @@ public:
 	virtual void UpdateData();
 
 private:
-
 	/**
 	 * 是否是唯一的，比如货币
 	 * @return 
 	 */
-	virtual bool IsUnique()const;
+	virtual bool IsUnique() const;
 
 protected:
-	
 	const FTableRowProxy* GetTableRowProxy() const;
 
-	void SetID(const IDType& NewID);
-	
+	void SetID(
+		const IDType& NewID
+		);
+
 private:
-	
 	// Root组件,不为空
 	TObjectPtr<UInventoryComponentBase> InventoryComponentPtr = nullptr;
 
@@ -192,7 +204,6 @@ private:
 	FGameplayTag ProxyType = FGameplayTag::EmptyTag;
 
 	IDType ID;
-
 };
 
 template <>

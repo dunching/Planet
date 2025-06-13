@@ -24,28 +24,33 @@ class PLANET_API UProxyIcon :
 	GENERATED_BODY()
 
 public:
-
 	virtual void ResetToolUIByData(
 		const TSharedPtr<FBasicProxy>& BasicProxyPtr
-	);
+		);
 
 	virtual void ResetToolUIByData(
-		const FGameplayTag &InProxyType
-	);
+		const FGameplayTag& InProxyType
+		);
 
-	protected:
-	
-	 virtual void NativeOnMouseEnter( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
-	
-	 virtual void NativeOnMouseLeave( const FPointerEvent& InMouseEvent ) override;
-	
+protected:
+	virtual void NativeOnMouseEnter(
+		const FGeometry& InGeometry,
+		const FPointerEvent& InMouseEvent
+		) override;
+
+	virtual void NativeOnMouseLeave(
+		const FPointerEvent& InMouseEvent
+		) override;
+
 private:
 	virtual void SetItemType();
+
+	TSharedPtr<FBasicProxy> ProxySPtr = nullptr;
 
 	FGameplayTag ProxyType;
 
 	UPROPERTY(transient)
-	UItemDecription * ItemDecriptionPtr = nullptr;
+	UItemDecription* ItemDecriptionPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	bool bIsDisplayInfo = true;

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <map>
+
 #include "CoreMinimal.h"
 
 #include <GameplayTagContainer.h>
@@ -13,6 +15,7 @@
 #include "ItemProxy_Description.h"
 #include "ItemProxy_Interface.h"
 #include "Planet_ItemProxy.h"
+#include "PropertyEntrys.h"
 
 #include "ItemProxy_Skills.generated.h"
 
@@ -22,7 +25,7 @@ struct FTableRowProxy;
 struct FTableRowProxy_WeaponExtendInfo;
 struct FTableRowProxy_CharacterGrowthAttribute;
 struct FTableRowProxy_Consumable;
-struct FTableRowProxy_PropertyEntrys;
+struct FTableRowProxy_GeneratiblePropertyEntrys;
 struct FTableRowProxy_CharacterType;
 class UTexture2D;
 class AToolProxyBase;
@@ -142,12 +145,40 @@ struct TStructOpsTypeTraits<FSkillProxy> :
 #pragma endregion
 
 #pragma region 被动技能
+/**
+ * 角色成长属性变化
+ */
+USTRUCT(BlueprintType)
+struct PLANET_API FPassiveGrowthAttribute
+{
+	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 LevelExperience = 100;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<int32> GeneratiblePropertyEntryAry;
+
+};
+
 UCLASS()
 class PLANET_API UItemProxy_Description_PassiveSkill : public UItemProxy_Description_Skill
 {
 	GENERATED_BODY()
 
 public:
+	UItemProxy_Description_PassiveSkill(
+		const FObjectInitializer& ObjectInitializer
+		);
+
+	/**
+	 * 在这一级，可生成的词条级数
+	 * 1, {1，1，1}	意味着在1级生成3个一级词条
+	 * 5, {1，2，1}	意味着在5级生成2个一级词条，一个2级词条
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TMap<uint8, FPassiveGrowthAttribute> GrowthAttributeMap;
+
 };
 
 USTRUCT()
@@ -164,9 +195,17 @@ public:
 		const FGameplayTag& ProxyType
 		) override;
 
-	UItemProxy_Description_PassiveSkill* GetTableRowProxy_PassiveSkillExtendInfo() const;
+	void UpdateByRemote(
+		const TSharedPtr<FPassiveSkillProxy>& RemoteSPtr
+		);
 
-	FTableRowProxy_PropertyEntrys* GetMainPropertyEntry() const;
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		class UPackageMap* Map,
+		bool& bOutSuccess
+		) override;
+
+	UItemProxy_Description_PassiveSkill* GetTableRowProxy_PassiveSkillExtendInfo() const;
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass() const override;
 
@@ -193,14 +232,26 @@ public:
 	virtual void OffsetCooldownTime() override;
 #pragma endregion
 
-	// 元素词条
-	FGameplayTag ElementPropertyEntry;
+	void AddExperience(uint32 Value);
 
-	// 主词条
-	FGameplayTag MainPropertyEntry;
+	uint8 GetLevel()const;
+	
+	uint8 GetExperience()const;
+	
+	uint8 GetLevelExperience()const;
 
-	// 副词条
-	FGameplayTag SecondPropertyEntry;
+	/**
+	 * 已生成的词条信息
+	 * key 技能等级
+	 * Value 此等级生成的词条信息
+	 */
+	std::multimap<uint8, FGeneratedPropertyEntryInfo> GeneratedPropertyEntryAry;
+
+	TOnValueChangedCallbackContainer<uint8> LevelChangedDelegate;
+
+	TOnValueChangedCallbackContainer<uint8> ExperienceChangedDelegate;
+
+	TOnValueChangedCallbackContainer<uint8> LevelExperienceChangedDelegate;
 
 protected:
 	// 装备至插槽
@@ -208,6 +259,15 @@ protected:
 
 	// 从插槽移除
 	virtual void UnAllocation() override;
+private:
+	void GenerationPropertyEntry();
+	
+	// 当前等级
+	uint8 Level = 1;
+
+	// 当前经验
+	int32 Experience = 0;
+
 };
 #pragma endregion
 

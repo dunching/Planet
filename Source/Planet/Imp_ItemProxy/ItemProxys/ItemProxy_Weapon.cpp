@@ -30,6 +30,8 @@ void FWeaponProxy::UpdateByRemote(
 	)
 {
 	Super::UpdateByRemote(RemoteSPtr);
+	
+	ProxyPtr = this;
 	UpdateByRemote_Allocationble(RemoteSPtr);
 
 	MaxAttackDistance = RemoteSPtr->MaxAttackDistance;
@@ -130,12 +132,12 @@ void FWeaponProxy::UnAllocation()
 	RetractputWeapon();
 }
 
-FTableRowProxy_PropertyEntrys* FWeaponProxy::GetMainPropertyEntry() const
+FTableRowProxy_GeneratiblePropertyEntrys* FWeaponProxy::GetMainPropertyEntry() const
 {
 	auto SceneProxyExtendInfoMapPtr = UDataTableCollection::GetInstance();
 	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
 
-	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_PropertyEntrys>(
+	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_GeneratiblePropertyEntrys>(
 		 *GetTableRowProxy_WeaponExtendInfo()->PropertyEntry.ToString(),
 		 TEXT("GetProxy")
 		);
@@ -161,14 +163,6 @@ void FWeaponProxy::ActiveWeapon()
 			auto PropertyEntrysPtr = GetMainPropertyEntry();
 			if (PropertyEntrysPtr)
 			{
-				TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-
-				for (const auto& Iter : PropertyEntrysPtr->Map)
-				{
-					ModifyPropertyMap.Add(Iter);
-				}
-
-				auto AllocationCharacter = GetAllocationCharacter();
 			}
 
 			// 切换人物姿势

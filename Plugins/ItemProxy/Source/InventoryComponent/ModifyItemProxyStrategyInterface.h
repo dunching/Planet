@@ -159,6 +159,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategyBase<ItemProxyType>::Add
 {
 	auto NewResultSPtr = MakeShared<FItemProxyType>();
 
+	NewResultSPtr->SetInventoryComponentBase(InventoryComponentPtr);
 	NewResultSPtr->InitialProxy(InProxyType);
 
 	InventoryComponentPtr->AddToContainer(NewResultSPtr);
@@ -198,11 +199,11 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategyBase<ItemProxyType>::AddByRemote
 {
 	auto NewResultSPtr = MakeShared<FItemProxyType>();
 
-	NewResultSPtr->InitialProxy(InRemoteProxySPtr->GetProxyType());
+	NewResultSPtr->SetInventoryComponentBase(InventoryComponentPtr);
+	
+	NewResultSPtr->UpdateByRemote(DynamicCastSharedPtr<FItemProxyType>(InRemoteProxySPtr));
 
 	InventoryComponentPtr->AddToContainer(NewResultSPtr);
-
-	NewResultSPtr->UpdateByRemote(DynamicCastSharedPtr<FItemProxyType>(InRemoteProxySPtr));
 
 	return NewResultSPtr;
 }

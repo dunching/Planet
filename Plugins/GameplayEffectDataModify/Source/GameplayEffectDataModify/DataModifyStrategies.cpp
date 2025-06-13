@@ -84,3 +84,55 @@ TMap<FGameplayTag, int32> IGostModifyInterface::GetCost(
 {
 	return {};
 }
+
+IRangeModifyInterface::IRangeModifyInterface(
+	int32 InPriority
+	):
+	 IDataModifyInterface(InPriority)
+{
+}
+
+float IRangeModifyInterface::GetRangeMagnitude() const
+{
+	return 1.f;
+}
+
+IDurationModifyInterface::IDurationModifyInterface(
+	int32 InPriority
+	):
+	 IDataModifyInterface(InPriority)
+{
+}
+
+int32 IDurationModifyInterface::GetDuration(
+	int32 Duration
+	) const
+{
+	return Duration;
+}
+
+int32 ICooldownModifyInterface::GetCooldown(
+	int32 Cooldown
+	) const
+{
+	return Cooldown;
+}
+
+inline ICooldownModifyInterface::ICooldownModifyInterface(
+	int32 InPriority
+	):
+	 IDataModifyInterface(InPriority)
+{
+}
+
+IExtraEffectModifyInterface::IExtraEffectModifyInterface(
+	int32 InPriority
+	):
+	 IDataModifyInterface(InPriority)
+{
+}
+
+int32 IExtraEffectModifyInterface::GetExtraEffectCount() const
+{
+	return 1;
+}

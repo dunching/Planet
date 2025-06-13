@@ -8,7 +8,7 @@ public class EditTool : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		UndefinedIdentifierWarningLevel = WarningLevel.Error;
+		CppCompileWarningSettings.UndefinedIdentifierWarningLevel = WarningLevel.Error;
 		bWarningsAsErrors = true;
 		bEnableExceptions = true;
 
@@ -48,15 +48,18 @@ public class EditTool : ModuleRules
 			// 插件
 			"Common_UMG",
 			"CommonUser",
+			"GameplayEffectDataModify",
 			"Gravity",
+			"GroupManagger",
+			"ItemProxy",
+			"NetAbilitySystem",
+			"NPCGenerator",
+			"PropertyEntrySystem",
 			"QuestSystem",
+			"SceneActor",
 			"StateProcessor",
 			"Utils",
 			"Weather",
-			"NetAbilitySystem",
-			"GameplayEffectDataModify",
-			"ItemProxy",
-			"GroupManagger",
 			
 			// 其他模块
 			"AssetRef",

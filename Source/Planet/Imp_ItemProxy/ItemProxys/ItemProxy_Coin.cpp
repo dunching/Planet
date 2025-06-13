@@ -34,7 +34,10 @@ void FCoinProxy::UpdateByRemote(
 	)
 {
 	Super::UpdateByRemote(RemoteSPtr);
+	
+	ProxyPtr = this;
 	UpdateByRemote_Allocationble(RemoteSPtr);
+	
 	UpdateByRemote_Unique(RemoteSPtr);
 }
 
