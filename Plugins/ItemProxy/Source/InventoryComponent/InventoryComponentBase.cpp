@@ -20,6 +20,22 @@ UInventoryComponentBase::UInventoryComponentBase(
 	SetIsReplicatedByDefault(true);
 }
 
+void UInventoryComponentBase::ProcessProxyInteraction(
+	const FGuid& ProxyID,
+	EItemProxyInteractionType ItemProxyInteractionType
+	)
+{
+	if (GetOwnerRole() == ROLE_AutonomousProxy)
+	{
+		ProcessProxyInteraction_Server(ProxyID, ItemProxyInteractionType);
+	}
+	auto TargetProxySPtr = FindProxy(ProxyID);
+	if (TargetProxySPtr)
+	{
+		TargetProxySPtr->ProcessProxyInteraction(ItemProxyInteractionType);
+	}
+}
+
 void UInventoryComponentBase::UpdateID(
 	const FGuid& NewID,
 	const FGuid& OldID
@@ -30,6 +46,14 @@ void UInventoryComponentBase::UpdateID(
 		ProxysMap.Remove(OldID);
 		ProxysMap.Add(NewID, *Iter);
 	}
+}
+
+void UInventoryComponentBase::ProcessProxyInteraction_Server_Implementation(
+	const FGuid& ProxyID,
+	EItemProxyInteractionType ItemProxyInteractionType
+	)
+{
+	ProcessProxyInteraction(ProxyID, ItemProxyInteractionType);
 }
 
 void UInventoryComponentBase::InitializeComponent()
@@ -176,7 +200,7 @@ void UInventoryComponentBase::RemoveProxy_SyncHelper(
 			if (ProxyType.MatchesTag(Iter.Key))
 			{
 				Iter.Value->RemoveByRemote(this, ProxySPtr);
-				return ;
+				return;
 			}
 		}
 	}
@@ -335,11 +359,31 @@ TSharedPtr<FBasicProxy> UInventoryComponentBase::FindProxyType(
 	{
 		if (ProxyType.MatchesTag(Iter.Key))
 		{
-			return Iter.Value->FindByType(ProxyType, this);
+			const auto Ary = Iter.Value->FindByType(ProxyType, this);
+			if (Ary.IsValidIndex(0))
+			{
+				return Ary[0];
+			}
 		}
 	}
 
 	return nullptr;
+}
+
+TArray<TSharedPtr<FBasicProxy>> UInventoryComponentBase::FindAllProxyType(
+	const FGameplayTag& ProxyType
+	) const
+{
+	TArray<TSharedPtr<FBasicProxy>> Result;
+	for (const auto& Iter : ModifyItemProxyStrategiesMap)
+	{
+		if (ProxyType.MatchesTag(Iter.Key))
+		{
+			Result = Iter.Value->FindByType(ProxyType, this);
+		}
+	}
+
+	return Result;
 }
 
 TArray<TSharedPtr<FBasicProxy>> UInventoryComponentBase::GetProxys(

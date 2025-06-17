@@ -514,7 +514,7 @@ void FCharacterProxy::AddExperience(
 			                                           GASPtr->MakeEffectContext()
 			                                          );
 
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
 
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 			                                               UGameplayTagsLibrary::GEData_ModifyItem_HP,
@@ -593,7 +593,18 @@ uint8 FCharacterProxy::GetLevelExperience() const
 		return -1;
 	}
 
-	return CharacterGrowthAttributeAry[Level - 1].LevelExperience;
+	const auto TargetLevel = Level - 1;
+
+	if (CharacterGrowthAttributeAry.IsValidIndex(TargetLevel))
+	{
+		return CharacterGrowthAttributeAry[TargetLevel].LevelExperience;
+	}
+	else
+	{
+		checkNoEntry();
+	}
+
+	return 0;
 }
 
 const FCharacterTalent& FCharacterProxy::GetCharacterTalent() const
@@ -647,7 +658,7 @@ void FCharacterProxy::UpdateTalentSocket(
 				case ETalentType::kData:
 					{
 						SpecHandle.Data.Get()->AddDynamicAssetTag(
-						                                          UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data
+						                                          UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override
 						                                         );
 
 						SpecHandle.Data.Get()->SetSetByCallerMagnitude(
@@ -659,7 +670,7 @@ void FCharacterProxy::UpdateTalentSocket(
 				case ETalentType::kPercent:
 					{
 						SpecHandle.Data.Get()->AddDynamicAssetTag(
-						                                          UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent
+						                                          UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent_Override
 						                                         );
 
 						SpecHandle.Data.Get()->SetSetByCallerMagnitude(
@@ -697,14 +708,14 @@ void FCharacterProxy::UpdateTalentSocket(
 				case ETalentType::kData:
 					{
 						SpecHandle.Data.Get()->AddDynamicAssetTag(
-						                                          UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data
+						                                          UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override
 						                                         );
 					}
 					break;
 				case ETalentType::kPercent:
 					{
 						SpecHandle.Data.Get()->AddDynamicAssetTag(
-						                                          UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Percent
+						                                          UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent_Override
 						                                         );
 					}
 					break;

@@ -2,6 +2,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "InventoryComponentBase.h"
+#include "ItemProxyVisitorBase.h"
 #include "PAD_ItemProxyCollection.h"
 
 #include "ItemProxy_Description.h"
@@ -46,6 +47,17 @@ void FBasicProxy::UpdateByRemote(
 	ID = RemoteSPtr->ID;
 
 	ProxyType = RemoteSPtr->ProxyType;
+}
+
+void FBasicProxy::ProcessProxyInteraction(
+	EItemProxyInteractionType ItemProxyInteractionType
+	)
+{
+}
+
+TSet<EItemProxyInteractionType> FBasicProxy::GetInteractionsType() const
+{
+	return {};
 }
 
 bool FBasicProxy::CanActive() const
@@ -105,7 +117,7 @@ void FBasicProxy::UpdateData()
 #endif
 }
 
-TObjectPtr<UItemProxy_Description> FBasicProxy::GetItemProxy_Description() const
+TObjectPtr<FBasicProxy::FItemProxy_Description> FBasicProxy::GetItemProxy_Description() const
 {
 	auto TableRowPtr = GetTableRowProxy();
 

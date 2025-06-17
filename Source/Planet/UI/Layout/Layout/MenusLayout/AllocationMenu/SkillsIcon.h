@@ -28,20 +28,27 @@ class PLANET_API USkillsIcon : public UAllocationIconBase
 	GENERATED_BODY()
 
 public:
+	USkillsIcon(
+		const FObjectInitializer& ObjectInitializer
+		);
 
-	USkillsIcon(const FObjectInitializer& ObjectInitializer);
+	virtual void ResetToolUIByData(
+		const TSharedPtr<FBasicProxy>& BasicProxyPtr
+		) override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
+	virtual void EnableIcon(
+		bool bIsEnable
+		) override;
 
-	virtual void EnableIcon(bool bIsEnable)override;
-
-	virtual void OnDragIcon(bool bIsDragging, const TSharedPtr<IProxy_Allocationble>& ProxyPtr)override;
+	virtual void OnDragIcon(
+		bool bIsDragging,
+		const TSharedPtr<IProxy_Allocationble>& ProxyPtr
+		) override;
 
 protected:
+	virtual void NativeConstruct() override;
 
-	virtual void NativeConstruct()override;
-
-	virtual void NativeDestruct()override;
+	virtual void NativeDestruct() override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlaySkillIsReady();
@@ -49,5 +56,4 @@ protected:
 	void SetLevel();
 
 private:
-
 };

@@ -131,13 +131,13 @@ void UInteractionTransactionLayout::Enable()
 		                                                                        ->GetCurrentAction()
 		                                                                       );
 
-	auto CoinSPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))->
+	auto CoinAry = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))->
 	                GetInventoryComponent()->FindProxyType<FModifyItemProxyStrategy_Coin>(
 		                 UGameplayTagsLibrary::Proxy_Coin_Regular
 		                );
-	if (CoinSPtr)
+	if (CoinAry.IsValidIndex(0))
 	{
-		OnCoinChangedDelegateHandle = CoinSPtr->CallbackContainerHelper.AddOnValueChanged(
+		OnCoinChangedDelegateHandle = CoinAry[0]->CallbackContainerHelper.AddOnValueChanged(
 			 std::bind(&ThisClass::OnCoinChanged, this, std::placeholders::_1, std::placeholders::_2)
 			);
 	}
@@ -223,6 +223,23 @@ void UInteractionTransactionLayout::Enable()
 					           );
 			}
 		}
+		{
+			auto ModifyItemProxyStrategySPtr = InventoryComponentPtr->GetModifyItemProxyStrategy<
+				FModifyItemProxyStrategy_MaterialProxy>();
+			if (ModifyItemProxyStrategySPtr)
+			{
+				OnMaterialProxyChangedDelegateHandle = ModifyItemProxyStrategySPtr->OnProxyChanged.
+					AddCallback(
+					            std::bind(
+					                      &ThisClass::OnTraderMaterialProxyProxyChanged,
+					                      this,
+					                      std::placeholders::_1,
+					                      std::placeholders::_2,
+					                      std::placeholders::_3
+					                     )
+					           );
+			}
+		}
 
 		auto UIPtr = Cast<UTileView>(GetWidgetFromName(FTransactionLayout::Get().TileView));
 		if (UIPtr)
@@ -295,7 +312,8 @@ void UInteractionTransactionLayout::OnQuitClicked()
 {
 	auto CurrentActionSPtr =
 		DynamicCastSharedPtr<HumanProcessor::FHumanInteractionBaseProcessor>(
-		                                                                     UInputProcessorSubSystem_Imp::GetInstance()->
+		                                                                     UInputProcessorSubSystem_Imp::GetInstance()
+		                                                                     ->
 		                                                                     GetCurrentAction()
 		                                                                    );
 
@@ -585,6 +603,50 @@ void UInteractionTransactionLayout::OnTraderConsumableProxyChanged(
 	}
 }
 
+void UInteractionTransactionLayout::OnTraderMaterialProxyProxyChanged(
+	const TSharedPtr<FMaterialProxy>& ProxySPtr,
+	EProxyModifyType ProxyModifyType,
+	int32 Num
+	)
+{
+	if (ProxySPtr)
+	{
+		auto UIPtr = Cast<UTileView>(GetWidgetFromName(FTransactionLayout::Get().TileView));
+		if (UIPtr)
+		{
+			auto Items = UIPtr->GetDisplayedEntryWidgets();
+			for (auto Iter : Items)
+			{
+				auto GoodsItemPtr = Cast<UGoodsItem>(Iter);
+				if (GoodsItemPtr && GoodsItemPtr->BasicProxyPtr == ProxySPtr)
+				{
+					switch (ProxyModifyType)
+					{
+					case EProxyModifyType::kNumChanged:
+						{
+							// 刷新一下
+							const auto ProxyPtrNum = GetProxyNum(GoodsItemPtr->BasicProxyPtr);
+							GoodsItemPtr->SetNum(ProxyPtrNum);
+						}
+						break;
+					case EProxyModifyType::kRemove:
+						{
+							// 刷新一下
+							GoodsItemPtr->EnableIcon(false);
+							GoodsItemPtr->SetNum(0);
+						}
+						break;
+					case EProxyModifyType::kPropertyChange:
+						break;
+					}
+					UIPtr->RequestRefresh();
+					return;
+				}
+			}
+		}
+	}
+}
+
 inline void UInteractionTransactionLayout::NewNum(
 	int32 Num
 	)
@@ -600,10 +662,12 @@ inline void UInteractionTransactionLayout::NewNum(
 		TextPtr->SetText(FText::FromString(UKismetStringLibrary::Conv_IntToString(Cost)));
 	}
 
-	auto CoinSPtr = PCPtr->
-	                GetInventoryComponent()->FindProxyType<FModifyItemProxyStrategy_Coin>(UGameplayTagsLibrary::Proxy_Coin_Regular);
+	auto CoinSAry = PCPtr->
+	                GetInventoryComponent()->FindProxyType<FModifyItemProxyStrategy_Coin>(
+		                 UGameplayTagsLibrary::Proxy_Coin_Regular
+		                );
 
-	if (CoinSPtr && CurrentProxyPtr)
+	if (CoinSAry.IsValidIndex(0) && CurrentProxyPtr)
 	{
 		// 确认目标商人身上的存量是否足够
 		auto TargetProxyPtr = CharacterPtr->
@@ -613,7 +677,7 @@ inline void UInteractionTransactionLayout::NewNum(
 		if (UIPtr)
 		{
 			UIPtr->SetIsEnabled(
-			                    (Cost <= CoinSPtr->GetNum()) && TargetProxyPtr && (
+			                    (Cost <= CoinSAry[0]->GetNum()) && TargetProxyPtr && (
 				                    GetProxyNum(TargetProxyPtr) >= CurrentNum)
 			                   );
 		}

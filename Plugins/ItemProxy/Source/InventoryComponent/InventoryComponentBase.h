@@ -40,6 +40,11 @@ public:
 		const FObjectInitializer& ObjectInitializer
 		);
 
+	void ProcessProxyInteraction(
+		const FGuid& ProxyID,
+		EItemProxyInteractionType ItemProxyInteractionType
+		);
+
 #if UE_EDITOR || UE_CLIENT
 	TSharedPtr<FBasicProxy> AddProxy_SyncHelper(
 		const TSharedPtr<FBasicProxy>& CacheProxySPtr
@@ -55,7 +60,7 @@ public:
 		);
 #endif
 
-#pragma region Basic
+#pragma region 合并添加
 	void AddProxy_Pending(
 		FGameplayTag ProxyType,
 		int32 Num,
@@ -69,7 +74,7 @@ public:
 
 #if UE_EDITOR || UE_SERVER
 
-#pragma region Basic
+#pragma region 基础操作
 	TSharedPtr<FBasicProxy> FindProxy(
 		const IDType& ID
 		) const;
@@ -84,11 +89,15 @@ public:
 		const FGameplayTag& ProxyType
 		) const;
 
+	TArray<TSharedPtr<FBasicProxy>> FindAllProxyType(
+		const FGameplayTag& ProxyType
+		) const;
+
 	template <typename ModifyItemProxyStrategyType, bool bIsFullStrategy = false>
 	auto FindProxyType(
 		const FGameplayTag& ProxyType
-		) const -> std::conditional<bIsFullStrategy, TSharedPtr<ModifyItemProxyStrategyType>, TSharedPtr<typename
-			                            ModifyItemProxyStrategyType::FItemProxyType>>::type;
+		) const -> std::conditional<bIsFullStrategy, TSharedPtr<ModifyItemProxyStrategyType>, TArray<TSharedPtr<typename
+										ModifyItemProxyStrategyType::FItemProxyType>>>::type;
 
 	/**
 	 * 修改物品的数量
@@ -156,8 +165,20 @@ public:
 		const FGuid& NewID,
 		const FGuid& OldID
 		);
+
 private:
 
+#pragma region RPC
+	
+	UFUNCTION(Server, Reliable)
+	void ProcessProxyInteraction_Server(
+		const FGuid& ProxyID,
+		EItemProxyInteractionType ItemProxyInteractionType
+		);
+
+#pragma endregion
+	
+	
 protected:
 	virtual void InitializeComponent() override;
 
@@ -216,29 +237,42 @@ auto UInventoryComponentBase::FindProxy(
 template <typename ModifyItemProxyStrategyType, bool bIsFullStrategy>
 auto UInventoryComponentBase::FindProxyType(
 	const FGameplayTag& ProxyType
-	) const -> typename std::conditional<bIsFullStrategy, TSharedPtr<ModifyItemProxyStrategyType>, TSharedPtr<typename
-		                                     ModifyItemProxyStrategyType::FItemProxyType>>::type
+	) const -> typename std::conditional<bIsFullStrategy, TSharedPtr<ModifyItemProxyStrategyType>,  TArray<TSharedPtr<typename
+										ModifyItemProxyStrategyType::FItemProxyType>>>::type
 {
 	ModifyItemProxyStrategyType ModifyItemProxyStrategy;
 
-	if (ModifyItemProxyStrategiesMap.Contains(ModifyItemProxyStrategy.GetCanOperationType()))
+	if constexpr (bIsFullStrategy)
 	{
-		auto ResultSPtr = ModifyItemProxyStrategiesMap[ModifyItemProxyStrategy.GetCanOperationType()];
-
-		if constexpr (bIsFullStrategy)
+		if (ModifyItemProxyStrategiesMap.Contains(ModifyItemProxyStrategy.GetCanOperationType()))
 		{
+			auto ResultSPtr = ModifyItemProxyStrategiesMap[ModifyItemProxyStrategy.GetCanOperationType()];
+
 			ResultSPtr->FindByType(ProxyType, this);
+			
 			return ResultSPtr;
 		}
-		else
-		{
-			return DynamicCastSharedPtr<typename ModifyItemProxyStrategyType::FItemProxyType>(
-				 ResultSPtr->FindByType(ProxyType, this)
-				);
-		}
+		return nullptr;
 	}
+	else
+	{
+		if (ModifyItemProxyStrategiesMap.Contains(ModifyItemProxyStrategy.GetCanOperationType()))
+		{
+			auto ResultSPtr = ModifyItemProxyStrategiesMap[ModifyItemProxyStrategy.GetCanOperationType()];
 
-	return nullptr;
+			auto Ary = ResultSPtr->FindByType(ProxyType, this);
+			
+			TArray<TSharedPtr<typename ModifyItemProxyStrategyType::FItemProxyType>>Result;
+
+			for (auto Iter : Ary)
+			{
+				Result.Add(DynamicCastSharedPtr<typename ModifyItemProxyStrategyType::FItemProxyType>(Iter));
+			}
+			
+			return Result;
+		}
+		return {};
+	}
 }
 
 template <typename ModifyItemProxyStrategyType>
@@ -256,12 +290,11 @@ TSharedPtr<typename ModifyItemProxyStrategyType::FItemProxyType> UInventoryCompo
 
 		if (AddResultAry.IsEmpty())
 		{
-			
 		}
 		else
 		{
 			return DynamicCastSharedPtr<typename ModifyItemProxyStrategyType::FItemProxyType>(
-			AddResultAry[0]
+				 AddResultAry[0]
 				);
 		}
 	}

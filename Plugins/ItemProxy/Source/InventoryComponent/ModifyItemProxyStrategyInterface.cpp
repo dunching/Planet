@@ -11,6 +11,7 @@ FModifyItemProxyStrategyIterface::~FModifyItemProxyStrategyIterface()
 }
 
 TSharedPtr<FBasicProxy> FModifyItemProxyStrategyIterface::NetSerialize(
+	const FGameplayTag ProxyType,
 	FArchive& Ar,
 	class UPackageMap* Map,
 	bool& bOutSuccess
@@ -32,12 +33,12 @@ void FModifyItemProxyStrategyIterface::FindByID(
 {
 }
 
- TSharedPtr<FBasicProxy> FModifyItemProxyStrategyIterface::FindByType(
-		const FGameplayTag& ProxyType,
-		const TObjectPtr<const UInventoryComponentBase>& InventoryComponentPtr
-	)const
+TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategyIterface::FindByType(
+	const FGameplayTag& ProxyType,
+	const TObjectPtr<const UInventoryComponentBase>& InventoryComponentPtr
+	) const
 {
-	return nullptr;
+	return {};
 }
 
 TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategyIterface::Add(
@@ -54,13 +55,21 @@ void FModifyItemProxyStrategyIterface::Update(
 	const FGuid& InProxyID
 	)
 {
+	if (auto ProxySPtr = InventoryComponentPtr->FindProxy(InProxyID))
+	{
+		InventoryComponentPtr->UpdateInContainer(ProxySPtr);
+	}
 }
 
 void FModifyItemProxyStrategyIterface::RemoveItemProxy(
 	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
-		const FGuid& InProxyID
+	const FGuid& InProxyID
 	)
 {
+	if (auto ProxySPtr = InventoryComponentPtr->FindProxy(InProxyID))
+	{
+		InventoryComponentPtr->RemoveFromContainer(ProxySPtr);
+	}
 }
 
 TSharedPtr<FBasicProxy> FModifyItemProxyStrategyIterface::AddByRemote(
@@ -85,4 +94,5 @@ void FModifyItemProxyStrategyIterface::RemoveByRemote(
 	const TSharedPtr<FBasicProxy>& RemoteProxySPtr
 	)
 {
+	InventoryComponentPtr->RemoveFromContainer(RemoteProxySPtr);
 }

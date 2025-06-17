@@ -164,7 +164,7 @@ void USkill_Active_BYWD::ApplyCost(
 		FGameplayEffectSpecHandle SpecHandle =
 			MakeOutgoingGameplayEffectSpec(CostGE->GetClass(), GetAbilityLevel());
 		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 		                                               UGameplayTagsLibrary::GEData_ModifyItem_Mana,
 		                                               -ItemProxy_DescriptionPtr->Cost.PerLevelValue[0]
@@ -303,7 +303,7 @@ void USkill_Active_BYWD::MakeDamage()
 
 		FGameplayEffectSpecHandle SpecHandle =
 			MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->OnceGEClass, GetAbilityLevel());
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
 		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
 

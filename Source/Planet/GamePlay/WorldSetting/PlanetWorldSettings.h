@@ -29,7 +29,6 @@ UCLASS()
 class PLANET_API APlanetWorldSettings :
 	public AWorldSettings,
 	public IGetItemProxyCollectionInterface,
-	public IGetModifyItemProxyStrategies,
 	public IGetQuestSubSystemInterface,
 	public IGetPropertyEntrysDTInterface
 {
@@ -63,8 +62,6 @@ public:
 	TSubclassOf<AQuestChain_MainBase> ToBeContinueGuideThread;
 
 protected:
-
-	virtual void InitialModifyItemProxyStrategies() override;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSoftObjectPtr<UPAD_RewardsItems>TableRow_RewardsTDRef;

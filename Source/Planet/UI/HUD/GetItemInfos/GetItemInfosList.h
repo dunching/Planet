@@ -22,6 +22,8 @@ struct FSkillProxy;
 struct FCoinProxy;
 struct FConsumableProxy;
 struct FCharacterProxy;
+struct FMaterialProxy;
+struct FExperienceMaterialProxy;
 
 
 UCLASS()
@@ -66,6 +68,12 @@ public:
 		EProxyModifyType ProxyModifyType
 		);
 
+	void OnMaterialProxyChanged(
+		const TSharedPtr<FMaterialProxy>& ProxyPtr,
+		EProxyModifyType ProxyModifyType,
+		int32 Num
+		);
+
 protected:
 	void OnRemovedItem();
 
@@ -87,6 +95,8 @@ protected:
 	TArray<TTuple<TWeakPtr<FCoinProxy>, EProxyModifyType, int32>> CoinPendingAry;
 
 	TArray<TPair<TWeakPtr<FConsumableProxy>, EProxyModifyType>> ConsumablePendingAry;
+
+	TArray<TPair<TWeakPtr<FMaterialProxy>, EProxyModifyType>> MaterialProxyPendingAry;
 
 	TArray<TPair<TWeakPtr<FCharacterProxy>, EProxyModifyType>> CharacterPendingAry;
 };

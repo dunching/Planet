@@ -44,7 +44,7 @@ struct GAMEPLAYEFFECTDATAMODIFY_API FDataComposition
 	
 	/**
 	 * 数据的基础组成
-	 * 来源
+	 * 来源 FGameplayTag::EmptyTag为基础数据
 	 * 值
 	 */
 	TMap<FGameplayTag, float> DataMap;
@@ -57,6 +57,18 @@ struct GAMEPLAYEFFECTDATAMODIFY_API FDataComposition
 	TMap<FGameplayTag, float> MagnitudeMap;
 };
 
+enum class EUpdateValueType : uint8
+{
+	kPermanent_Addtive,
+	kPermanent_Override,
+	
+	kTemporary_Data_Addtive,
+	kTemporary_Data_Override,
+	
+	kTemporary_Percent_Addtive,
+	kTemporary_Percent_Override,
+};
+	
 class GAMEPLAYEFFECTDATAMODIFY_API IGameplayEffectDataModifyInterface
 {
 	GENERATED_BODY()
@@ -178,8 +190,47 @@ public:
 		);
 #pragma endregion
 
+	/**
+	 * 更新数据组成
+	 * @param Value 该属性之后的值
+	 * @param AllAssetTags 
+	 * @param GameplayAttributeDataPtr 
+	 */
+	void UpdateTemporaryValue(
+		const FGameplayTag& ModifyTypeTag,
+		float Value,
+		EUpdateValueType UpdateValueType,
+		const FGameplayAttributeData* GameplayAttributeDataPtr
+		);
+
 protected:
 	void UpdateValueMap();
+
+	/**
+	 * 更新数据组成
+	 * @param Tag 仅为 DataSource_Character
+	 * @param Value 
+	 * @param MinValue 仅GEData_ModifyType_BaseValue_Addtive、GEData_ModifyType_Immediate_Override 生效
+	 * @param MaxValue 仅GEData_ModifyType_BaseValue_Addtive、GEData_ModifyType_Immediate_Override 生效
+	 * @param Spec 
+	 * @param GameplayAttributeDataPtr 
+	 */
+	void UpdatePermanentValue(
+		float Value,
+		int32 MinValue,
+		int32 MaxValue,
+		EUpdateValueType UpdateValueType,
+		const FGameplayEffectSpec& Spec,
+		const FGameplayAttributeData* GameplayAttributeDataPtr
+		);
+
+	void UpdateTemporaryValue(
+		const FGameplayTag& Tag,
+		float Value,
+		EUpdateValueType UpdateValueType,
+		const FGameplayEffectSpec& Spec,
+		const FGameplayAttributeData* GameplayAttributeDataPtr
+		);
 
 	/**
 	 * 从小到大

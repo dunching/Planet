@@ -14,16 +14,16 @@
 #include "Engine/StreamableManager.h"
 #include "Engine/AssetManager.h"
 
-
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "ItemProxyDragDropOperation.h"
 #include "ItemProxyDragDropOperationWidget.h"
 #include "ItemProxy_Minimal.h"
 #include "GameplayTagsLibrary.h"
+#include "VisitorSubsystem.h"
 
 UBackpackSkillIcon::UBackpackSkillIcon(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+                                                                                    Super(ObjectInitializer)
 {
 
 }

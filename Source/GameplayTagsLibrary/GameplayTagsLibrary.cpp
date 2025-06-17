@@ -383,6 +383,12 @@ FGameplayTag UGameplayTagsLibrary::Proxy_Character_NPC_Functional_Dummy =
 FGameplayTag UGameplayTagsLibrary::Proxy_Character_NPC_Assistional =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Character.NPC.Assistional")));
 
+FGameplayTag UGameplayTagsLibrary::Proxy_Material =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Material")));
+
+FGameplayTag UGameplayTagsLibrary::Proxy_Material_PassiveSkill_Experience_Book =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Material.PassiveSkill.Experience.Book")));
+
 #pragma endregion
 
 // 人物身上自带的属性
@@ -441,23 +447,23 @@ FGameplayTag UGameplayTagsLibrary::GEData_Duration =
 
 // 数据被修改的方式
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.BaseValue.Addtive")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Permanent.Addtive")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.BaseValue.Override")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Permanent_Override =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Permanent.Override")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Temporary.Data")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Addtive =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Temporary.Data.Addtive")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Temporary.Percent")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Temporary.Data.Override")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.RemoveTemporary.Data")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent_Addtive =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Temporary.Percent.Addtive")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Percent =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.RemoveTemporary.Percent")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent_Override =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Temporary.Percent.Override")));
 
 
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Experience =

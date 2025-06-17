@@ -244,7 +244,7 @@ void USkill_Passive_ZMJZ::OnActiveGameplayEffectStackChange(
 			FGameplayEffectSpecHandle SpecHandle =
 				MakeOutgoingGameplayEffectSpec(GE_ZMJZImpClass, GetAbilityLevel());
 
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(SkillProxyPtr->GetProxyType(), NewStackCount * 10);
 
@@ -320,7 +320,7 @@ void USkill_Passive_ZMJZ::OnGameplayEffectRemoved_InfoDelegate(
 		FGameplayEffectSpecHandle SpecHandle =
 			MakeOutgoingGameplayEffectSpec(GE_ZMJZImpClass, GetAbilityLevel());
 
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override);
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed);
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(SkillProxyPtr->GetProxyType(), 0);
 

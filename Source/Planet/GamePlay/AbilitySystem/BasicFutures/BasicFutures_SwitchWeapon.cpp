@@ -96,7 +96,7 @@ void UBasicFutures_SwitchWeapon::ApplyCost(
 		FGameplayEffectSpecHandle SpecHandle =
 			MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::BaseFeature_SwitchWeapon);
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 			UGameplayTagsLibrary::GEData_ModifyItem_Mana,
 			Cost

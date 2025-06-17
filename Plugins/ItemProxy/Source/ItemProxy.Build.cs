@@ -25,6 +25,7 @@ public class ItemProxy : ModuleRules
 				Path.Combine(PluginDirectory, "Source/InventoryComponent"),
 				Path.Combine(PluginDirectory, "Source/ItemProxyCollection"),
 				Path.Combine(PluginDirectory, "Source/ItemDecription_UI"),
+				Path.Combine(PluginDirectory, "Source/Visitor"),
 			}
 		);
 

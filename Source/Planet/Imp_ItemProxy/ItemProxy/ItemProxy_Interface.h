@@ -85,17 +85,28 @@ public:
 
 	int32 GetOffsetNum()const;
 
+	int32 GetMaxNum()const;
+
 	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
 
 protected:
 
 	bool bIsRemoveWhenZero = true;
 private:
-	// 总数
+	/**
+	 * 总数
+	 */
 	int32 Num = 0;
 
-	// 这次的增量/减量
+	/**
+	 * 这次的增量/减量
+	 */
 	int32 OffsetNum = 0;
+	
+	/**
+	 * 最大堆叠
+	 */
+	int32 MaxNum = 99;
 };
 
 PLANET_API int32 GetProxyNum(const TSharedPtr<FBasicProxy>& ProxySPtr); 

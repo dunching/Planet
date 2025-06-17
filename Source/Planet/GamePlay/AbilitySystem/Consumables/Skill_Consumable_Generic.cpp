@@ -199,7 +199,7 @@ void USkill_Consumable_Generic::ExcuteTasks()
 			const auto Duration = ProxyPtr->GetTableRowProxy_Consumable()->Duration;
 			SpecHandle.Data.Get()->SetDuration(Duration, true);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(ProxyPtr->GetProxyType());
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration, Duration);
 

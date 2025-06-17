@@ -189,6 +189,55 @@ void UGetItemInfosItem::ResetToolUIByData(
 	ResetToolUIByData(ProxyPtr);
 }
 
+void UGetItemInfosItem::ResetToolUIByData(
+	const TSharedPtr<FMaterialProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
+{
+	SetTexutre(ProxyPtr->GetIcon());
+
+	switch (ProxyModifyType)
+	{
+	case EProxyModifyType::kNumChanged:
+		{
+			if (ProxyPtr->GetOffsetNum() > 0)
+			{
+				SetText(
+						FString::Printf(
+										TEXT("%s %dX%s"),
+										TEXT("Get"),
+										ProxyPtr->GetOffsetNum(),
+										*ProxyPtr->GetProxyName()
+									   )
+					   );
+			}
+			else
+			{
+				SetText(
+						FString::Printf(
+										TEXT("%s %dX%s"),
+										TEXT("Lose"),
+										ProxyPtr->GetOffsetNum(),
+										*ProxyPtr->GetProxyName()
+									   )
+					   );
+			}
+		}
+		break;
+	case EProxyModifyType::kPropertyChange:
+		break;
+	case EProxyModifyType::kRemove:
+		{
+			SetText(FString::Printf(TEXT("Lose:%dX%s"), ProxyPtr->GetNum(), *ProxyPtr->GetProxyName()));
+		}
+		break;
+	default:
+		break;
+	}
+
+	ResetToolUIByData(ProxyPtr);
+}
+
 void UGetItemInfosItem::SetTexutre(
 	const TSoftObjectPtr<UTexture2D>& TexturePtr
 	)

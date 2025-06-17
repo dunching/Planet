@@ -196,22 +196,26 @@ public:
 #pragma region ProxyTyp
 	static FGameplayTag Proxy;
 
+	
 	static FGameplayTag Proxy_Weapon;
 
 	static FGameplayTag Proxy_Weapon_Axe;
 
 	static FGameplayTag Proxy_Weapon_Test;
 
+	
 	static FGameplayTag Proxy_Tool;
 
 	static FGameplayTag Proxy_Tool_Axe;
 
+	
 	static FGameplayTag Proxy_Consumables;
 
 	static FGameplayTag Proxy_Consumables_HP;
 
 	static FGameplayTag Proxy_Consumables_PP;
 
+	
 	static FGameplayTag Proxy_Coin;
 
 	static FGameplayTag Proxy_Coin_Regular;
@@ -220,6 +224,7 @@ public:
 
 	static FGameplayTag Proxy_Coin_RaffleLimit;
 
+	
 	static FGameplayTag Proxy_Skill;
 
 	static FGameplayTag Proxy_Skill_Weapon;
@@ -266,6 +271,7 @@ public:
 
 	static FGameplayTag Proxy_Skill_Talent_YinYang;
 
+	
 	static FGameplayTag Proxy_Character;
 
 	static FGameplayTag Proxy_Character_Player;
@@ -275,6 +281,11 @@ public:
 	static FGameplayTag Proxy_Character_NPC_Functional_Dummy;
 
 	static FGameplayTag Proxy_Character_NPC_Assistional;
+	
+
+	static FGameplayTag Proxy_Material;
+
+	static FGameplayTag Proxy_Material_PassiveSkill_Experience_Book;
 
 #pragma endregion
 
@@ -319,15 +330,15 @@ public:
 
 	/**
 	*	直接增加
-	* 	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);		
+	* 	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);		
 	*	SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_ModifyItem_Stamina, -Consume);
 	*/
-	static FGameplayTag GEData_ModifyType_BaseValue_Addtive;
+	static FGameplayTag GEData_ModifyType_Permanent_Addtive;
 
 	/**
 	 * 覆盖
 	 */
-	static FGameplayTag GEData_ModifyType_BaseValue_Override;
+	static FGameplayTag GEData_ModifyType_Permanent_Override;
 
 	/**
 	* 添加临时值
@@ -339,23 +350,14 @@ public:
 	*													  TargetTalent.Value								// 值
 	*													  );
 	*/
-	static FGameplayTag GEData_ModifyType_Temporary_Data;
+	static FGameplayTag GEData_ModifyType_Temporary_Data_Addtive;
 	
-	static FGameplayTag GEData_ModifyType_Temporary_Percent;
+	static FGameplayTag GEData_ModifyType_Temporary_Data_Override;
 	
-	/**
-	* 移除临时值
-	* SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary);		
-	* SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed);			// 修改的属性
-	* SpecHandle.Data.Get()->SetSetByCallerMagnitude(														
-	*													  UGameplayTagsLibrary::DataSource_TalentModify,	// 来源
-	*													  0													// 值
-	*													  );
-	*/
-	static FGameplayTag GEData_ModifyType_RemoveTemporary_Data;
+	static FGameplayTag GEData_ModifyType_Temporary_Percent_Addtive;
 	
-	static FGameplayTag GEData_ModifyType_RemoveTemporary_Percent;
-
+	static FGameplayTag GEData_ModifyType_Temporary_Percent_Override;
+	
 
 	static FGameplayTag GEData_ModifyItem_Experience;
 

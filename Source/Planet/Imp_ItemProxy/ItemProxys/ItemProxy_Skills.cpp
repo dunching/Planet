@@ -19,11 +19,15 @@
 #include "Weapon_PickAxe.h"
 #include "InventoryComponent.h"
 #include "CharacterAbilitySystemComponent.h"
+#include "ItemProxyVisitorBase.h"
 #include "Skill_WeaponActive_Bow.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 #include "ItemProxy_Character.h"
+#include "MainHUDLayout.h"
+#include "ModifyItemProxyStrategy.h"
 #include "PropertyEntrySussystem.h"
 #include "Tools.h"
+#include "UIManagerSubSystem.h"
 
 FSkillProxy::FSkillProxy() :
                            Super()
@@ -54,6 +58,11 @@ void FSkillProxy::InitialProxy(
 	ProxyPtr = this;
 }
 
+TSet<EItemProxyInteractionType> FSkillProxy::GetInteractionsType() const
+{
+	return {EItemProxyInteractionType::kUpgrade};
+}
+
 void FSkillProxy::SetAllocationCharacterProxy(
 	const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr,
 	const FGameplayTag& InSocketTag
@@ -67,7 +76,7 @@ void FSkillProxy::UpdateByRemote(
 	)
 {
 	Super::UpdateByRemote(RemoteSPtr);
-	
+
 	ProxyPtr = this;
 	UpdateByRemote_Allocationble(RemoteSPtr);
 
@@ -458,12 +467,31 @@ UItemProxy_Description_PassiveSkill::UItemProxy_Description_PassiveSkill(
 {
 	GrowthAttributeMap =
 	{
-		{1, FPassiveGrowthAttribute{100, {1}}},
-		{5, FPassiveGrowthAttribute{200, {1, 2}}},
-		{10, FPassiveGrowthAttribute{300, {1, 2, 3}}},
-		{15, FPassiveGrowthAttribute{400, {1}}},
-		{20, FPassiveGrowthAttribute{500, {1, 2}}},
-		{25, FPassiveGrowthAttribute{600, {1, 2, 3}}},
+		{100, {1}},
+		{200,},
+		{300,},
+		{400,},
+		{500,},
+		{600, {1, 2}},
+		{700,},
+		{800,},
+		{900,},
+		{1000,},
+		{1100, {1, 2, 3}},
+		{1200,},
+		{1300,},
+		{1400,},
+		{1500,},
+		{1600, {1,}},
+		{1700,},
+		{1800,},
+		{1900,},
+		{2000,},
+		{2100, {1, 2,}},
+		{2200,},
+		{2300,},
+		{2400,},
+		{2500, {1, 2, 3}},
 	};
 }
 
@@ -505,12 +533,12 @@ bool FPassiveSkillProxy::NetSerialize(
 	{
 		int32 size = GeneratedPropertyEntryAry.size();
 		Ar << size;
-		
+
 		for (auto Iter : GeneratedPropertyEntryAry)
 		{
 			int32 Value = Iter.first;
 			Ar << Value;
-			
+
 			Iter.second.NetSerialize(Ar, Map, bOutSuccess);
 		}
 	}
@@ -520,7 +548,7 @@ bool FPassiveSkillProxy::NetSerialize(
 
 		int32 size = 0;
 		Ar << size;
-		
+
 		for (int32 Index = 0; Index < size; Index++)
 		{
 			int32 Value = 0;
@@ -528,7 +556,7 @@ bool FPassiveSkillProxy::NetSerialize(
 
 			FGeneratedPropertyEntryInfo GeneratedPropertyEntryInfo;
 			GeneratedPropertyEntryInfo.NetSerialize(Ar, Map, bOutSuccess);
-			
+
 			GeneratedPropertyEntryAry.emplace(Value, GeneratedPropertyEntryInfo);
 		}
 	}
@@ -537,6 +565,33 @@ bool FPassiveSkillProxy::NetSerialize(
 	Ar << Experience;
 
 	return true;
+}
+
+void FPassiveSkillProxy::ProcessProxyInteraction(
+	EItemProxyInteractionType ItemProxyInteractionType
+	)
+{
+	switch (ItemProxyInteractionType)
+	{
+	case EItemProxyInteractionType::kDiscard:
+		break;
+	case EItemProxyInteractionType::kBreakDown:
+		break;
+	case EItemProxyInteractionType::kUpgrade:
+		{
+			auto UIPtr = CreateWidget<UUpgradeBoder>(
+			                                         GEngine->GetFirstLocalPlayerController(GetWorldImp()),
+			                                         UAssetRefMap::GetInstance()->UpgradeBoderClass
+			                                        );
+
+			UIPtr->BindData(GetInventoryComponentBase()->FindProxy<FModifyItemProxyStrategy_PassveSkill>(GetID()));
+
+			UUIManagerSubSystem::GetInstance()->GetMainHUDLayout()->DisplayWidgetInOtherCanvas(
+				 UIPtr
+				);
+		}
+		break;
+	}
 }
 
 void FPassiveSkillProxy::Allocation()
@@ -551,7 +606,7 @@ void FPassiveSkillProxy::Allocation()
 		{
 			return;
 		}
-		
+
 		UPlanetAbilitySystemComponent* GASPtr = nullptr;
 		GASPtr = CharacterSPtr->GetAbilitySystemComponent();
 		if (!GASPtr)
@@ -562,20 +617,20 @@ void FPassiveSkillProxy::Allocation()
 		for (const auto& Iter : GeneratedPropertyEntryAry)
 		{
 			auto SpecHandle = GASPtr->MakeOutgoingSpec(
-													   UAssetRefMap::GetInstance()->OnceGEClass,
-													   1,
-													   GASPtr->MakeEffectContext()
-													  );
+			                                           UAssetRefMap::GetInstance()->OnceGEClass,
+			                                           1,
+			                                           GASPtr->MakeEffectContext()
+			                                          );
 
 			SpecHandle.Data.Get()->AddDynamicAssetTag(
-													  UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data
-													 );
+			                                          UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Addtive
+			                                         );
 
 			SpecHandle.Data.Get()->AddDynamicAssetTag(Iter.second.PropertyTag);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-														   GetProxyType(),
-														   Iter.second.Value
-														  );
+			                                               GetProxyType(),
+			                                               Iter.second.Value
+			                                              );
 
 			GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 		}
@@ -593,7 +648,7 @@ void FPassiveSkillProxy::UnAllocation()
 		{
 			return;
 		}
-		
+
 		UPlanetAbilitySystemComponent* GASPtr = nullptr;
 		GASPtr = CharacterSPtr->GetAbilitySystemComponent();
 		if (!GASPtr)
@@ -604,20 +659,20 @@ void FPassiveSkillProxy::UnAllocation()
 		for (const auto& Iter : GeneratedPropertyEntryAry)
 		{
 			auto SpecHandle = GASPtr->MakeOutgoingSpec(
-													   UAssetRefMap::GetInstance()->OnceGEClass,
-													   1,
-													   GASPtr->MakeEffectContext()
-													  );
+			                                           UAssetRefMap::GetInstance()->OnceGEClass,
+			                                           1,
+			                                           GASPtr->MakeEffectContext()
+			                                          );
 
 			SpecHandle.Data.Get()->AddDynamicAssetTag(
-													  UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data
-													 );
+			                                          UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override
+			                                         );
 
 			SpecHandle.Data.Get()->AddDynamicAssetTag(Iter.second.PropertyTag);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-														   GetProxyType(),
-														   0
-														  );
+			                                               GetProxyType(),
+			                                               0
+			                                              );
 
 			GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 		}
@@ -649,7 +704,7 @@ void FPassiveSkillProxy::GenerationPropertyEntry()
 
 	for (; NeedGenerationLevel <= Level; NeedGenerationLevel++)
 	{
-		if (!TableRowProxy_PassiveSkillExtendInfoPtr->GrowthAttributeMap.Contains(NeedGenerationLevel))
+		if (!TableRowProxy_PassiveSkillExtendInfoPtr->GrowthAttributeMap.IsValidIndex(NeedGenerationLevel))
 		{
 			continue;
 		}
@@ -852,12 +907,12 @@ uint8 FPassiveSkillProxy::GetLevel() const
 	return Level;
 }
 
-uint8 FPassiveSkillProxy::GetExperience() const
+int32 FPassiveSkillProxy::GetExperience() const
 {
 	return Experience;
 }
 
-uint8 FPassiveSkillProxy::GetLevelExperience() const
+int32 FPassiveSkillProxy::GetLevelExperience() const
 {
 	const auto CharacterGrowthAttributeAry = GetTableRowProxy_PassiveSkillExtendInfo()->GrowthAttributeMap;
 
@@ -866,7 +921,18 @@ uint8 FPassiveSkillProxy::GetLevelExperience() const
 		return -1;
 	}
 
-	return CharacterGrowthAttributeAry[Level - 1].LevelExperience;
+	const auto TargetLevel = Level - 1;
+
+	if (CharacterGrowthAttributeAry.IsValidIndex(TargetLevel))
+	{
+		return CharacterGrowthAttributeAry[TargetLevel].LevelExperience;
+	}
+	else
+	{
+		checkNoEntry();
+	}
+
+	return 0;
 }
 
 bool FWeaponSkillProxy::Active()

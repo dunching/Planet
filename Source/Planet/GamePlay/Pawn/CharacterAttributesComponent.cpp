@@ -192,7 +192,7 @@ void UCharacterAttributesComponent::BeginPlay()
 		{
 			auto SpecHandle = GASPtr->MakeOutgoingSpec(GE_CharacterReplyClass, 1, GASPtr->MakeEffectContext());
 
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::DataSource_Reply);
 
 			const auto GEHandle = GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());

@@ -1,6 +1,8 @@
 #include "BackpackIcon.h"
 
 #include <Kismet/GameplayStatics.h>
+
+#include "AllocationSkillsMenu.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Containers/UnrealString.h"
@@ -26,7 +28,7 @@
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
 #include "ItemProxy_Character.h"
-#include "Common/ProxyIcon.h"
+#include "ProxyIcon.h"
 
 struct FBackpackIcon : public TStructVariable<FBackpackIcon>
 {
@@ -39,23 +41,31 @@ struct FBackpackIcon : public TStructVariable<FBackpackIcon>
 	const FName AllocationCharacterProxy = TEXT("AllocationCharacterProxy");
 };
 
-UBackpackIcon::UBackpackIcon(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+UBackpackIcon::UBackpackIcon(
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
 }
 
-void UBackpackIcon::NativeOnListItemObjectSet(UObject* ListItemObject)
+void UBackpackIcon::NativeOnListItemObjectSet(
+	UObject* ListItemObject
+	)
 {
 	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
 
 	InvokeReset(Cast<ThisClass>(ListItemObject));
 }
 
-void UBackpackIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
+void UBackpackIcon::InvokeReset(
+	UUserWidget* BaseWidgetPtr
+	)
 {
 }
 
-void UBackpackIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
+void UBackpackIcon::ResetToolUIByData(
+	const TSharedPtr<FBasicProxy>& InBasicProxyPtr
+	)
 {
 	BasicProxyPtr = InBasicProxyPtr;
 
@@ -65,16 +75,23 @@ void UBackpackIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProx
 
 		if (auto AllocationbleProxySPtr = DynamicCastSharedPtr<IProxy_Allocationble>(InBasicProxyPtr))
 		{
-			OnAllocationCharacterProxyChangedHandle = AllocationbleProxySPtr->OnAllocationCharacterProxyChanged.AddCallback(
-				std::bind(&ThisClass::OnAllocationCharacterProxyChanged, this, std::placeholders::_1)
-			);
+			OnAllocationCharacterProxyChangedHandle = AllocationbleProxySPtr->OnAllocationCharacterProxyChanged.
+			                                                                  AddCallback(
+				                                                                   std::bind(
+					                                                                    &ThisClass::OnAllocationCharacterProxyChanged,
+					                                                                    this,
+					                                                                    std::placeholders::_1
+					                                                                   )
+				                                                                  );
 
 			OnAllocationCharacterProxyChanged(AllocationbleProxySPtr->GetAllocationCharacterProxy());
 		}
 	}
 }
 
-void UBackpackIcon::EnableIcon(bool bIsEnable)
+void UBackpackIcon::EnableIcon(
+	bool bIsEnable
+	)
 {
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FBackpackIcon::Get().Enable));
 	if (ImagePtr)
@@ -83,22 +100,39 @@ void UBackpackIcon::EnableIcon(bool bIsEnable)
 	}
 }
 
-FReply UBackpackIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+FReply UBackpackIcon::NativeOnMouseButtonDown(
+	const FGeometry& InGeometry,
+	const FPointerEvent& InMouseEvent
+	)
 {
 	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+
+	if (BasicProxyPtr)
+	{
+		if (BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve))
+		{
+			AllocationSkillsMenuPtr->OnSelectedProxy(BasicProxyPtr);
+		}
+	}
 
 	return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
 }
 
-void UBackpackIcon::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+void UBackpackIcon::NativeOnDragCancelled(
+	const FDragDropEvent& InDragDropEvent,
+	UDragDropOperation* InOperation
+	)
 {
 	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
 
-	OnDragDelegate.ExcuteCallback(false, nullptr);
+	AllocationSkillsMenuPtr->OnItemProxyDragIcon(false, nullptr);
 }
 
-void UBackpackIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent,
-                                         UDragDropOperation*& OutOperation)
+void UBackpackIcon::NativeOnDragDetected(
+	const FGeometry& InGeometry,
+	const FPointerEvent& InMouseEvent,
+	UDragDropOperation*& OutOperation
+	)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
@@ -117,7 +151,10 @@ void UBackpackIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPoi
 			DragWidgetPtr->ResetToolUIByData(DynamicCastSharedPtr<FBasicProxy>(AllocationbleProxySPtr));
 
 			auto WidgetDragPtr = Cast<UAllocationableProxyDragDropOperation>(
-				UWidgetBlueprintLibrary::CreateDragDropOperation(UAllocationableProxyDragDropOperation::StaticClass()));
+			                                                                 UWidgetBlueprintLibrary::CreateDragDropOperation(
+				                                                                  UAllocationableProxyDragDropOperation::StaticClass()
+				                                                                 )
+			                                                                );
 			if (WidgetDragPtr)
 			{
 				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
@@ -127,7 +164,7 @@ void UBackpackIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPoi
 
 				OutOperation = WidgetDragPtr;
 
-				OnDragDelegate.ExcuteCallback(true, BasicProxyPtr);
+				AllocationSkillsMenuPtr->OnItemProxyDragIcon(true, BasicProxyPtr);
 			}
 		}
 	}
@@ -146,7 +183,10 @@ void UBackpackIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPoi
 			DragWidgetPtr->ResetToolUIByData(BasicProxyPtr);
 
 			auto WidgetDragPtr = Cast<UItemProxyDragDropOperation>(
-				UWidgetBlueprintLibrary::CreateDragDropOperation(UItemProxyDragDropOperation::StaticClass()));
+			                                                       UWidgetBlueprintLibrary::CreateDragDropOperation(
+				                                                        UItemProxyDragDropOperation::StaticClass()
+				                                                       )
+			                                                      );
 			if (WidgetDragPtr)
 			{
 				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
@@ -156,18 +196,22 @@ void UBackpackIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPoi
 
 				OutOperation = WidgetDragPtr;
 
-				OnDragDelegate.ExcuteCallback(true, BasicProxyPtr);
+				AllocationSkillsMenuPtr->OnItemProxyDragIcon(true, BasicProxyPtr);
 			}
 		}
 	}
 }
 
-void UBackpackIcon::OnDroped(UDragDropOperation* Operation)
+void UBackpackIcon::OnDroped(
+	UDragDropOperation* Operation
+	)
 {
-	OnDragDelegate.ExcuteCallback(false, nullptr);
+	AllocationSkillsMenuPtr->OnItemProxyDragIcon(false, nullptr);
 }
 
-void UBackpackIcon::SetItemType(FBasicProxy* InBasicProxyPtr)
+void UBackpackIcon::SetItemType(
+	FBasicProxy* InBasicProxyPtr
+	)
 {
 	auto ProxyIconPtr = Cast<UProxyIcon>(GetWidgetFromName(FBackpackIcon::Get().ProxyIcon));
 	if (ProxyIconPtr)
@@ -176,7 +220,9 @@ void UBackpackIcon::SetItemType(FBasicProxy* InBasicProxyPtr)
 	}
 }
 
-void UBackpackIcon::OnAllocationCharacterProxyChanged(const TWeakPtr<FCharacterProxy>& AllocationCharacterProxyPtr)
+void UBackpackIcon::OnAllocationCharacterProxyChanged(
+	const TWeakPtr<FCharacterProxy>& AllocationCharacterProxyPtr
+	)
 {
 	if (AllocationCharacterProxyPtr.IsValid())
 	{

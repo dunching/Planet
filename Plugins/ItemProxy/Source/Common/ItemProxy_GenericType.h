@@ -8,9 +8,17 @@
 
 enum class EProxyModifyType
 {
-	kNumChanged,		// 新增
-	kRemove,			// 移除
-	kPropertyChange,	// 属性改变
+	kNumChanged, // 新增
+	kRemove, // 移除
+	kPropertyChange, // 属性改变
+};
+
+UENUM()
+enum class EItemProxyInteractionType : uint8
+{
+	kDiscard, // 丢弃
+	kBreakDown, // 分解
+	kUpgrade, // 升级
 };
 
 USTRUCT(BlueprintType)

@@ -205,6 +205,22 @@ URegularActionLayout* UMainHUDLayout::GetRegularActionLayout() const
 	return nullptr;
 }
 
+void UMainHUDLayout::DisplayWidgetInOtherCanvas(
+	UUserWidget* WidgetPtr
+	)
+{
+	auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FMainHUDLayout::Get().OtherWidgets));
+	if (UIPtr)
+	{
+		auto SlotPtr = Cast <UOverlaySlot>(UIPtr->AddChild(WidgetPtr));
+		if (SlotPtr)
+		{
+			SlotPtr->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill); 
+			SlotPtr->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill); 
+		}
+	}
+}
+
 UGetItemInfosList* UMainHUDLayout::GetItemInfos()
 {
 	auto UIPtr = Cast<UGetItemInfosList>(GetWidgetFromName(FMainHUDLayout::Get().GetItemInfosList));

@@ -70,6 +70,13 @@ void UInventoryComponent::InitializeComponent()
 		                                 ModifyItemProxyStrategySPtr
 		                                );
 	}
+	{
+		auto ModifyItemProxyStrategySPtr = MakeShared<FModifyItemProxyStrategy_MaterialProxy>();
+		ModifyItemProxyStrategiesMap.Add(
+		                                 ModifyItemProxyStrategySPtr->GetCanOperationType(),
+		                                 ModifyItemProxyStrategySPtr
+		                                );
+	}
 }
 
 void UInventoryComponent::BeginPlay()

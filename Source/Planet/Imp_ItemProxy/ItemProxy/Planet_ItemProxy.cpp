@@ -4,6 +4,7 @@
 #include "ItemProxy.h"
 #include "PlanetWorldSettings.h"
 #include "DataTableCollection.h"
+#include "ItemProxyVisitorBase.h"
 #include "Tools.h"
 
 inline void FPlanet_BasicProxy::SetInventoryComponent(

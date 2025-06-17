@@ -22,8 +22,6 @@ struct ITEMPROXY_API FModifyItemProxyStrategyIterface
 {
 	GENERATED_USTRUCT_BODY()
 
-	using FItemProxyType = FBasicProxy;
-
 	FModifyItemProxyStrategyIterface();
 
 	virtual ~FModifyItemProxyStrategyIterface();
@@ -36,7 +34,7 @@ struct ITEMPROXY_API FModifyItemProxyStrategyIterface
 		const TObjectPtr<const UInventoryComponentBase>& InventoryComponentPtr
 		);
 
-	virtual TSharedPtr<FBasicProxy> FindByType(
+	virtual TArray<TSharedPtr<FBasicProxy>> FindByType(
 		const FGameplayTag& ProxyType,
 		const TObjectPtr<const UInventoryComponentBase>& InventoryComponentPtr
 		) const;
@@ -74,6 +72,7 @@ struct ITEMPROXY_API FModifyItemProxyStrategyIterface
 		);
 
 	virtual TSharedPtr<FBasicProxy> NetSerialize(
+		const FGameplayTag ProxyType,
 		FArchive& Ar,
 		class UPackageMap* Map,
 		bool& bOutSuccess
@@ -99,16 +98,6 @@ struct FModifyItemProxyStrategyBase : public FModifyItemProxyStrategyIterface
 		int32 Num
 		) override;
 
-	virtual void Update(
-		const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
-		const FGuid& InProxyID
-		) override;
-
-	virtual void RemoveItemProxy(
-		const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
-		const FGuid& InProxyID
-		) override;
-
 	virtual TSharedPtr<FBasicProxy> AddByRemote(
 		const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
 		const TSharedPtr<FBasicProxy>& RemoteProxySPtr
@@ -120,18 +109,15 @@ struct FModifyItemProxyStrategyBase : public FModifyItemProxyStrategyIterface
 		const TSharedPtr<FBasicProxy>& RemoteProxySPtr
 		) override;
 
-	virtual void RemoveByRemote(
-		const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
-		const TSharedPtr<FBasicProxy>& RemoteProxySPtr
-		) override;
-
 	virtual TSharedPtr<FBasicProxy> NetSerialize(
+		const FGameplayTag ProxyType,
 		FArchive& Ar,
 		class UPackageMap* Map,
 		bool& bOutSuccess
 		) override;
 
 	TSharedPtr<FItemProxyType> ResultSPtr = nullptr;
+
 private:
 };
 
@@ -168,30 +154,6 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategyBase<ItemProxyType>::Add
 }
 
 template <typename ItemProxyType>
-void FModifyItemProxyStrategyBase<ItemProxyType>::Update(
-	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
-	const FGuid& InProxyID
-	)
-{
-	if (auto ProxySPtr = InventoryComponentPtr->FindProxy(InProxyID))
-	{
-		InventoryComponentPtr->UpdateInContainer(ProxySPtr);
-	}
-}
-
-template <typename ItemProxyType>
-void FModifyItemProxyStrategyBase<ItemProxyType>::RemoveItemProxy(
-	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
-		const FGuid& InProxyID
-	)
-{
-	if (auto ProxySPtr = InventoryComponentPtr->FindProxy(InProxyID))
-	{
-		InventoryComponentPtr->RemoveFromContainer(ProxySPtr);
-	}
-}
-
-template <typename ItemProxyType>
 TSharedPtr<FBasicProxy> FModifyItemProxyStrategyBase<ItemProxyType>::AddByRemote(
 	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
 	const TSharedPtr<FBasicProxy>& InRemoteProxySPtr
@@ -200,7 +162,7 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategyBase<ItemProxyType>::AddByRemote
 	auto NewResultSPtr = MakeShared<FItemProxyType>();
 
 	NewResultSPtr->SetInventoryComponentBase(InventoryComponentPtr);
-	
+
 	NewResultSPtr->UpdateByRemote(DynamicCastSharedPtr<FItemProxyType>(InRemoteProxySPtr));
 
 	InventoryComponentPtr->AddToContainer(NewResultSPtr);
@@ -225,16 +187,8 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategyBase<ItemProxyType>::UpdateByRem
 }
 
 template <typename ItemProxyType>
-void FModifyItemProxyStrategyBase<ItemProxyType>::RemoveByRemote(
-	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
-	const TSharedPtr<FBasicProxy>& RemoteProxySPtr
-	)
-{
-	InventoryComponentPtr->RemoveFromContainer(RemoteProxySPtr);
-}
-
-template <typename ItemProxyType>
 TSharedPtr<FBasicProxy> FModifyItemProxyStrategyBase<ItemProxyType>::NetSerialize(
+	const FGameplayTag ProxyType,
 	FArchive& Ar,
 	class UPackageMap* Map,
 	bool& bOutSuccess

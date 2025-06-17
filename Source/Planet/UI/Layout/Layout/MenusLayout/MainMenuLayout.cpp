@@ -1,7 +1,5 @@
 #include "MainMenuLayout.h"
 
-#include "GroupManagger.h"
-#include "LayoutCommon.h"
 #include "Components/WidgetSwitcher.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -11,6 +9,9 @@
 #include "PlanetControllerInterface.h"
 #include "TeamMatesHelperComponent.h"
 #include "TeamMatesHelperComponentBase.h"
+#include "AllocationSkillsMenu.h"
+#include "GroupManagger.h"
+#include "LayoutCommon.h"
 
 struct FMainMenuLayout : public TStructVariable<FMainMenuLayout>
 {
@@ -33,7 +34,7 @@ void UMainMenuLayout::NativeDestruct()
 void UMainMenuLayout::Enable()
 {
 	ILayoutInterfacetion::Enable();
-	
+
 	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainMenuLayout::Get().WidgetSwitcher));
 	if (UIPtr)
 	{
@@ -85,7 +86,7 @@ void UMainMenuLayout::SyncData()
 
 void UMainMenuLayout::SwitchViewer(
 	EMenuType MenuType
-)
+	)
 {
 	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainMenuLayout::Get().WidgetSwitcher));
 	if (UIPtr)
@@ -123,4 +124,21 @@ void UMainMenuLayout::SwitchViewer(
 			break;
 		}
 	}
+}
+
+UAllocationSkillsMenu* UMainMenuLayout::GetAllocationSkillsMenu() const
+{
+	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainMenuLayout::Get().WidgetSwitcher));
+	if (UIPtr)
+	{
+		{
+			auto MenuInterfacePtr = Cast<UAllocationSkillsMenu>(UIPtr->GetActiveWidget());
+			if (MenuInterfacePtr)
+			{
+				return MenuInterfacePtr;
+			}
+		}
+	}
+
+	return nullptr;
 }

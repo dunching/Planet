@@ -66,6 +66,11 @@ public:
 		EProxyModifyType ProxyModifyType
 		);
 
+	void ResetToolUIByData(
+		const TSharedPtr<FMaterialProxy>& ProxyPtr,
+		EProxyModifyType ProxyModifyType
+		);
+
 	FOnFinished OnFinished;
 
 protected:

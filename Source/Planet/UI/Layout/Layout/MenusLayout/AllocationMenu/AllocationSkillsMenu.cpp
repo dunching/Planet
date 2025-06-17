@@ -26,6 +26,7 @@
 #include "ItemProxy_Container.h"
 #include "PlanetPlayerController.h"
 #include "AllocationSkills.h"
+#include "ItemDetails.h"
 #include "ItemProxy_Character.h"
 #include "ItemProxy_Weapon.h"
 
@@ -125,6 +126,12 @@ void UAllocationSkillsMenu::EnableMenu()
 	InitialGroupmateList();
 
 	ResetUI(CharacterPtr->GetCharacterProxy());
+	
+	if (ItemDetails)
+	{
+		ItemDetails->Reset();
+	}
+	
 	ResetBackpack(CharacterPtr->GetCharacterProxy());
 }
 
@@ -556,19 +563,7 @@ void UAllocationSkillsMenu::ResetBackpack(
 		auto UIPtr = Cast<UBackpackMenu>(GetWidgetFromName(FAllocationSkillsMenu::Get().PlayerBackpack));
 
 		UIPtr->CurrentProxyPtr = PlayerCharacterProxyPtr;
-
-		{
-			auto Delegate =
-				UIPtr->OnDragIconDelegate.AddCallback(
-				                                      std::bind(
-				                                                &ThisClass::OnItemProxyDragIcon,
-				                                                this,
-				                                                std::placeholders::_1,
-				                                                std::placeholders::_2
-				                                               )
-				                                     );
-			Delegate->bIsAutoUnregister = false;
-		}
+		UIPtr->AllocationSkillsMenuPtr = this;
 
 		UIPtr->EnableMenu();
 	}
@@ -677,6 +672,16 @@ void UAllocationSkillsMenu::OnAllocationbableDragIcon(
 	}
 }
 
+void UAllocationSkillsMenu::OnSelectedProxy(
+	const TSharedPtr<FBasicProxy>& ProxyPtr
+	)
+{
+	if (ItemDetails)
+	{
+		ItemDetails->BindData(ProxyPtr);
+	}
+}
+
 void UAllocationSkillsMenu::OnSelectedCharacterProxy(
 	const TSharedPtr<FCharacterProxy>& ProxyPtr
 	)
@@ -751,7 +756,7 @@ void UAllocationSkillsMenu::OnSkillProxyChanged(
 			}
 		}
 	}
-	
+
 	UpdateAllocation(PreviousProxyPtr, NewProxyPtr, SocketTag);
 }
 
@@ -766,7 +771,7 @@ void UAllocationSkillsMenu::OnWeaponProxyChanged(
 		{FAllocationSkillsMenu::Get().WeaponSocket_1},
 		{FAllocationSkillsMenu::Get().WeaponSocket_2},
 	};
-	
+
 	for (const auto& Iter : Ary)
 	{
 		auto UIPtr = Cast<UWeaponsIcon>(GetWidgetFromName(Iter));
@@ -785,7 +790,7 @@ void UAllocationSkillsMenu::OnWeaponProxyChanged(
 			}
 		}
 	}
-	
+
 	UpdateAllocation(PreviousProxyPtr, NewProxyPtr, SocketTag);
 }
 
@@ -802,7 +807,7 @@ void UAllocationSkillsMenu::OnConsumableProxyChanged(
 		{FAllocationSkillsMenu::Get().Consumable3},
 		{FAllocationSkillsMenu::Get().Consumable4},
 	};
-	
+
 	for (const auto& Iter : Ary)
 	{
 		auto UIPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter));
@@ -813,7 +818,7 @@ void UAllocationSkillsMenu::OnConsumableProxyChanged(
 				UIPtr->bPaseInvokeOnResetProxyEvent = true;
 				UIPtr->ResetToolUIByData(DynamicCastSharedPtr<FBasicProxy>(PreviousProxyPtr));
 				UIPtr->bPaseInvokeOnResetProxyEvent = false;
-	
+
 				break;
 			}
 			else
@@ -821,14 +826,14 @@ void UAllocationSkillsMenu::OnConsumableProxyChanged(
 			}
 		}
 	}
-	
+
 	UpdateAllocation(PreviousProxyPtr, NewProxyPtr, SocketTag);
 }
 
 void UAllocationSkillsMenu::UpdateAllocation(
-		const TSharedPtr<IProxy_Allocationble>& PreviousProxyPtr,
-		const TSharedPtr<IProxy_Allocationble>& NewProxyPtr,
-		const FGameplayTag& SocketTag
+	const TSharedPtr<IProxy_Allocationble>& PreviousProxyPtr,
+	const TSharedPtr<IProxy_Allocationble>& NewProxyPtr,
+	const FGameplayTag& SocketTag
 	)
 {
 	if (NewProxyPtr)
@@ -841,14 +846,18 @@ void UAllocationSkillsMenu::UpdateAllocation(
 			if (PreviousProxyPtr)
 			{
 				// 互换的位置
-				SetAllocation(PreviousProxyPtr, NewProxyPtr->GetAllocationCharacterProxy(), NewProxyPtr->GetCurrentSocketTag());
+				SetAllocation(
+				              PreviousProxyPtr,
+				              NewProxyPtr->GetAllocationCharacterProxy(),
+				              NewProxyPtr->GetCurrentSocketTag()
+				             );
 			}
 			else
 			{
 				// 重置之前的位置
 				SetAllocation(nullptr, NewProxyPtr->GetAllocationCharacterProxy(), NewProxyPtr->GetCurrentSocketTag());
 			}
-			
+
 			// 设置新的位置
 			SetAllocation(NewProxyPtr, CurrentProxyPtr, SocketTag);
 		}

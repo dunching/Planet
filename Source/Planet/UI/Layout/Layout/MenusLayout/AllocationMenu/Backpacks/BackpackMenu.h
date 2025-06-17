@@ -12,10 +12,13 @@
 
 #include "BackpackMenu.generated.h"
 
-struct FSceneObjContainer;
-struct FSceneProxyContainer;
 class UBackpackConsumableIcon;
 class UBackpackToolIcon;
+class UAllocationSkillsMenu;
+class UButton;
+
+struct FSceneObjContainer;
+struct FSceneProxyContainer;
 struct FSkillProxy;
 struct FCharacterProxy;
 struct FWeaponProxy;
@@ -34,6 +37,8 @@ public:
 
 	using FOnDragIconDelegate = TCallbackHandleContainer<void(bool, const TSharedPtr<FBasicProxy>&)>;
 	
+	using FOnSelectedProxy = TCallbackHandleContainer<void(const TSharedPtr<FBasicProxy>&)>;
+	
 	virtual void NativeConstruct()override;
 
 	virtual void EnableMenu()override;
@@ -46,8 +51,8 @@ public:
 
 	TSharedPtr<FCharacterProxy> CurrentProxyPtr = nullptr;
 
-	FOnDragIconDelegate OnDragIconDelegate;
-
+	UAllocationSkillsMenu * AllocationSkillsMenuPtr= nullptr;
+	
 protected:
 
 	void BindEvent();
@@ -62,9 +67,15 @@ protected:
 	void OnConsumableBtnCliked();
 
 	UFUNCTION()
+	void OnMaterialBtnCliked();
+
+	UFUNCTION()
 	void OnShowAllBtnCliked();
 
 private:
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* MaterialBtn = nullptr;
 
 	TArray<TSharedPtr<FBasicProxy>>GetProxys()const;
 
@@ -76,4 +87,6 @@ private:
 
 	void ResetUIByData_All();
 
+	void ResetProxys(const TSet<FGameplayTag>&TargetProxyTypeTag);
+	
 };

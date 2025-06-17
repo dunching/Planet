@@ -46,7 +46,7 @@ void FSTT_SwitchWalkState::ExitState(
 		*this
 	);
 
-	InstanceData.CharacterPtr->GetCharacterAbilitySystemComponent()->SwitchWalkState(!InstanceData.bIsRun);
+	InstanceData.CharacterPtr->GetCharacterAbilitySystemComponent()->SwitchWalkState(false);
 
 	Super::ExitState(
 		Context,

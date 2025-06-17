@@ -3,12 +3,13 @@
 #include "Components/Image.h"
 #include "Engine/AssetManager.h"
 #include "Blueprint/SlateBlueprintLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "DataTableCollection.h"
 #include "ItemDecription.h"
 #include "ItemProxy_Description.h"
 #include "UICommon.h"
-#include "Kismet/GameplayStatics.h"
+#include "VisitorSubsystem.h"
 
 struct FProxyIcon : public TStructVariable<FProxyIcon>
 {
@@ -53,53 +54,11 @@ void UProxyIcon::NativeOnMouseEnter(
 	{
 		if (ProxySPtr)
 		{
-			auto ProxyDTSPtr = GetTableRowProxy(ProxySPtr->GetProxyType());
-			if (ProxyDTSPtr)
-			{
-				if (ItemDecriptionPtr)
-				{
-				}
-				else
-				{
-					if (!ProxyDTSPtr->ItemProxy_Description || !ProxyDTSPtr->ItemDecriptionClass)
-					{
-						return;
-					}
-
-					ItemDecriptionPtr = CreateWidget<UItemDecription>(this, ProxyDTSPtr->ItemDecriptionClass);
-				}
-				if (ItemDecriptionPtr)
-				{
-					ItemDecriptionPtr->BindData(ProxySPtr, ProxyDTSPtr->ItemProxy_Description);
-
-					ItemDecriptionPtr->AddToViewport(EUIOrder::kHoverDecription);
-				}
-			}
+			UVisitorSubsystem::GetInstance()->HoverInProxy(ProxySPtr);
 		}
 		else if (ProxyType.IsValid())
 		{
-			auto ProxyDTSPtr = GetTableRowProxy(ProxySPtr->GetProxyType());
-			if (ProxyDTSPtr)
-			{
-				if (ItemDecriptionPtr)
-				{
-				}
-				else
-				{
-					if (!ProxyDTSPtr->ItemProxy_Description || !ProxyDTSPtr->ItemDecriptionClass)
-					{
-						return;
-					}
-
-					ItemDecriptionPtr = CreateWidget<UItemDecription>(this, ProxyDTSPtr->ItemDecriptionClass);
-				}
-				if (ItemDecriptionPtr)
-				{
-					ItemDecriptionPtr->BindData(ProxySPtr, ProxyDTSPtr->ItemProxy_Description);
-
-					ItemDecriptionPtr->AddToViewport(EUIOrder::kHoverDecription);
-				}
-			}
+			UVisitorSubsystem::GetInstance()->HoverInProxy(ProxyType);
 		}
 	}
 }
@@ -108,11 +67,7 @@ void UProxyIcon::NativeOnMouseLeave(
 	const FPointerEvent& InMouseEvent
 	)
 {
-	if (ItemDecriptionPtr)
-	{
-		ItemDecriptionPtr->RemoveFromParent();
-	}
-	ItemDecriptionPtr = nullptr;
+	UVisitorSubsystem::GetInstance()->StopHoverInProxy();
 
 	Super::NativeOnMouseLeave(InMouseEvent);
 }

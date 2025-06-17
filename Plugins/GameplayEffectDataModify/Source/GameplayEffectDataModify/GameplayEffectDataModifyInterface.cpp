@@ -5,7 +5,7 @@
 
 float IGameplayEffectDataModifyInterface::GetBaseValueMaps(
 	const FGameplayAttributeData* GameplayAttributeDataPtr
-	)const
+	) const
 {
 	float Result = 0.f;
 
@@ -20,7 +20,7 @@ float IGameplayEffectDataModifyInterface::GetBaseValueMaps(
 		{
 			Value = (*Iter)->GetValue(GameplayAttributeDataMap, Value);
 		}
-		
+
 		Result = Value;
 	}
 	else
@@ -71,14 +71,14 @@ TMap<FGameplayTag, int32> IGameplayEffectDataModifyInterface::GetCost(
 	const TMap<FGameplayTag, int32>& CostMap
 	)
 {
-	TMap<FGameplayTag, int32>Result = CostMap;
-	
+	TMap<FGameplayTag, int32> Result = CostMap;
+
 	auto& ModifyStrategiesRef = CostModifysMap;
 
 	int32 Value = 0;
 	for (auto Iter = ModifyStrategiesRef.begin(); Iter != ModifyStrategiesRef.end(); Iter++)
 	{
-		Result = (*Iter)->GetCost(CostMap,Result);
+		Result = (*Iter)->GetCost(CostMap, Result);
 	}
 
 	return Result;
@@ -296,4 +296,283 @@ void IGameplayEffectDataModifyInterface::RemoveGostModify(
 			break;
 		}
 	}
+}
+
+void IGameplayEffectDataModifyInterface::UpdatePermanentValue(
+	float Value,
+	int32 MinValue,
+	int32 MaxValue,
+	EUpdateValueType UpdateValueType,
+	const FGameplayEffectSpec& Spec,
+	const FGameplayAttributeData* GameplayAttributeDataPtr
+	)
+{
+	if (ValueMap.Contains(GameplayAttributeDataPtr))
+	{
+	}
+	else
+	{
+		FDataComposition DataComposition;
+
+		DataComposition.DataMap = {
+			{
+				FGameplayTag::EmptyTag,
+				FMath::Clamp(GameplayAttributeDataPtr->GetCurrentValue(), MinValue, MaxValue)
+			}
+		};
+
+		ValueMap.Add(
+		             GameplayAttributeDataPtr,
+		             DataComposition
+		            );
+	}
+
+	switch (UpdateValueType)
+	{
+	case EUpdateValueType::kPermanent_Addtive:
+		{
+			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+
+			if (GameplayAttributeDataMap.DataMap.Contains(FGameplayTag::EmptyTag))
+			{
+				GameplayAttributeDataMap.DataMap[FGameplayTag::EmptyTag] += Value;
+			}
+			else
+			{
+				GameplayAttributeDataMap.DataMap.Add(FGameplayTag::EmptyTag, Value);
+			}
+
+			GameplayAttributeDataMap.DataMap[FGameplayTag::EmptyTag] =
+				FMath::Clamp(
+				             GameplayAttributeDataMap.DataMap[FGameplayTag::EmptyTag],
+				             MinValue,
+				             MaxValue
+				            );
+		}
+		break;
+	case EUpdateValueType::kPermanent_Override:
+		{
+			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+
+			if (GameplayAttributeDataMap.DataMap.Contains(FGameplayTag::EmptyTag))
+			{
+				GameplayAttributeDataMap.DataMap[FGameplayTag::EmptyTag] = Value;
+			}
+			else
+			{
+				GameplayAttributeDataMap.DataMap.Add(FGameplayTag::EmptyTag, Value);
+			}
+
+			GameplayAttributeDataMap.DataMap[FGameplayTag::EmptyTag] =
+				FMath::Clamp(
+				             GameplayAttributeDataMap.DataMap[FGameplayTag::EmptyTag],
+				             MinValue,
+				             MaxValue
+				            );
+		}
+		break;
+	}
+
+	UpdateValueMap();
+}
+
+void IGameplayEffectDataModifyInterface::UpdateTemporaryValue(
+	const FGameplayTag& Tag,
+	float Value,
+	EUpdateValueType UpdateValueType,
+	const FGameplayEffectSpec& Spec,
+	const FGameplayAttributeData* GameplayAttributeDataPtr
+	)
+{
+	FGameplayTagContainer AllAssetTags;
+	Spec.GetAllAssetTags(AllAssetTags);
+
+	switch (UpdateValueType)
+	{
+	case EUpdateValueType::kTemporary_Data_Addtive:
+		{
+			if (ValueMap.Contains(GameplayAttributeDataPtr))
+			{
+				auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+				if (GameplayAttributeDataMap.DataMap.Contains(Tag))
+				{
+					GameplayAttributeDataMap.DataMap[Tag] += Value;
+				}
+				else
+				{
+					GameplayAttributeDataMap.DataMap.Add(Tag, Value);
+				}
+			}
+			else
+			{
+				FDataComposition DataComposition;
+
+				DataComposition.DataMap = {
+					{
+						FGameplayTag::EmptyTag,
+						GameplayAttributeDataPtr->GetCurrentValue()
+					},
+					{
+						Tag, Value
+					}
+				};
+
+				ValueMap.Add(
+				             GameplayAttributeDataPtr,
+				             DataComposition
+				            );
+			}
+			return;
+		}
+		break;
+	case EUpdateValueType::kTemporary_Percent_Addtive:
+		{
+			if (ValueMap.Contains(GameplayAttributeDataPtr))
+			{
+				auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+				if (GameplayAttributeDataMap.MagnitudeMap.Contains(Tag))
+				{
+					GameplayAttributeDataMap.MagnitudeMap[Tag] += Value;
+				}
+				else
+				{
+					GameplayAttributeDataMap.MagnitudeMap.Add(Tag, Value);
+				}
+			}
+			else
+			{
+				FDataComposition DataComposition;
+
+				DataComposition.DataMap = {
+					{
+						FGameplayTag::EmptyTag,
+						GameplayAttributeDataPtr->GetCurrentValue()
+					}
+				};
+
+				DataComposition.MagnitudeMap = {
+					{
+						Tag, Value
+					}
+				};
+
+				ValueMap.Add(
+				             GameplayAttributeDataPtr,
+				             DataComposition
+				            );
+			}
+			return;
+		}
+		break;
+	case EUpdateValueType::kTemporary_Data_Override:
+		{
+			if (ValueMap.Contains(GameplayAttributeDataPtr))
+			{
+				auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+				GameplayAttributeDataMap.DataMap.Add(Tag, Value);
+			}
+			else
+			{
+				FDataComposition DataComposition;
+
+				DataComposition.DataMap = {
+					{
+						FGameplayTag::EmptyTag,
+						GameplayAttributeDataPtr->GetCurrentValue()
+					},
+					{
+						Tag,
+						Value
+					}
+				};
+
+				ValueMap.Add(
+				             GameplayAttributeDataPtr,
+				             DataComposition
+				            );
+			}
+
+			return;
+		}
+		break;
+	case EUpdateValueType::kTemporary_Percent_Override:
+		{
+			if (ValueMap.Contains(GameplayAttributeDataPtr))
+			{
+				auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+				GameplayAttributeDataMap.MagnitudeMap.Add(Tag);
+			}
+			else
+			{
+				FDataComposition DataComposition;
+
+				DataComposition.DataMap = {
+					{
+						FGameplayTag::EmptyTag,
+						GameplayAttributeDataPtr->GetCurrentValue()
+					}
+				};
+
+				DataComposition.MagnitudeMap = {
+					{
+						Tag,
+						Value
+					}
+				};
+
+				ValueMap.Add(
+				             GameplayAttributeDataPtr,
+				             DataComposition
+				            );
+			}
+
+			return;
+		}
+		break;
+	}
+}
+
+void IGameplayEffectDataModifyInterface::UpdateTemporaryValue(
+	const FGameplayTag& ModifyTypeTag,
+	float Value,
+	EUpdateValueType UpdateValueType,
+	const FGameplayAttributeData* GameplayAttributeDataPtr
+	)
+{
+	if (ValueMap.Contains(GameplayAttributeDataPtr))
+	{
+		switch (UpdateValueType)
+		{
+		case EUpdateValueType::kTemporary_Data_Addtive:
+			{
+				auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+				for (auto& Iter : GameplayAttributeDataMap.DataMap)
+				{
+					if (Value > Iter.Value)
+					{
+						Value -= Iter.Value;
+						if (Value <= 0)
+						{
+							break;
+						}
+					}
+					else
+					{
+						Iter.Value = Iter.Value
+						             + Value;
+						break;
+					}
+				}
+			}
+			break;
+		case EUpdateValueType::kTemporary_Data_Override:
+			{
+				auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+				GameplayAttributeDataMap.Empty();
+			}
+			break;
+		}
+	}
+
+	UpdateValueMap();
 }

@@ -16,10 +16,13 @@ struct FStreamableHandle;
 struct FBasicProxy;
 struct IProxy_Allocationble;
 struct FToolProxy;
+
 class UBackpackConsumableIcon;
 class UBackpackToolIcon;
 class UBackpackSkillIcon;
 class UBackpackWeaponIcon;
+class UBackpackMaterialIcon;
+class UAllocationSkillsMenu;
 
 /**
  *
@@ -34,8 +37,6 @@ class PLANET_API UBackpackIconWrapper :
 
 public:
 
-	using FOnDragIconDelegate = TCallbackHandleContainer<void(bool, const TSharedPtr<FBasicProxy>&)>;
-
 	UBackpackIconWrapper(const FObjectInitializer& ObjectInitializer);
 
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject)override;
@@ -48,8 +49,8 @@ public:
 
 	TSharedPtr<FBasicProxy> TargetBasicProxyPtr = nullptr;
 
-	FOnDragIconDelegate OnDragIconDelegate;
-
+	UAllocationSkillsMenu * AllocationSkillsMenuPtr= nullptr;
+	
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Icon Class")
@@ -63,5 +64,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Icon Class")
 	TSubclassOf<UBackpackWeaponIcon> BackpackWeaponIconClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Icon Class")
+	TSubclassOf<UBackpackMaterialIcon> BackpackMaterialIconClass;
 
 };

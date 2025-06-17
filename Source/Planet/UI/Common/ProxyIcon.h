@@ -49,9 +49,6 @@ private:
 
 	FGameplayTag ProxyType;
 
-	UPROPERTY(transient)
-	UItemDecription* ItemDecriptionPtr = nullptr;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true))
 	bool bIsDisplayInfo = true;
 };

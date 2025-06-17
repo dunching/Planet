@@ -7,6 +7,7 @@
 #include "ItemProxy_Consumable.h"
 #include "ItemProxy_Coin.h"
 #include "ItemProxy_Weapon.h"
+#include "ItemProxy_Material.h"
 
 FGameplayTag FModifyItemProxyStrategy_Character::GetCanOperationType() const
 {
@@ -199,17 +200,18 @@ FGameplayTag FModifyItemProxyStrategy_Coin::GetCanOperationType() const
 	return UGameplayTagsLibrary::Proxy_Coin;
 }
 
-TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_Coin::FindByType(
+TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Coin::FindByType(
 	const FGameplayTag& ProxyType,
 	const TObjectPtr<const UInventoryComponentBase>& InventoryComponentPtr
 	) const
 {
+	TArray<TSharedPtr<FBasicProxy>> Result;
 	if (ProxyTypeMap.Contains(ProxyType))
 	{
-		return ProxyTypeMap[ProxyType];
+		Result.Append(ProxyTypeMap[ProxyType]);
 	}
 
-	return nullptr;
+	return Result;
 }
 
 TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Coin::Add(
@@ -237,11 +239,11 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Coin::Add(
 		NewResultSPtr->SetInventoryComponentBase(InventoryComponentPtr);
 		NewResultSPtr->InitialProxy(InProxyType);
 
-		InventoryComponentPtr->AddToContainer(NewResultSPtr);
-
 		NewResultSPtr->ModifyNum(Num);
 
-		ProxyTypeMap.Add(InProxyType, NewResultSPtr);
+		InventoryComponentPtr->AddToContainer(NewResultSPtr);
+
+		ProxyTypeMap.Add(InProxyType, {NewResultSPtr});
 
 		OnCoinProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged, Num);
 
@@ -261,7 +263,7 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_Coin::AddByRemote(
 		                                                          )
 	                                                         );
 
-	ProxyTypeMap.Add(NewResultSPtr->GetProxyType(), NewResultSPtr);
+	ProxyTypeMap.Add(NewResultSPtr->GetProxyType(), {NewResultSPtr});
 
 	OnCoinProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged, NewResultSPtr->GetNum());
 
@@ -295,17 +297,17 @@ void FModifyItemProxyStrategy_Coin::RemoveByRemote(
 {
 	FModifyItemProxyStrategyBase<
 		FItemProxyType>::RemoveByRemote(
-										InventoryComponentPtr,
-										RemoteProxySPtr
-									   );
+		                                InventoryComponentPtr,
+		                                RemoteProxySPtr
+		                               );
 
 	ProxyTypeMap.Remove(RemoteProxySPtr->GetProxyType());
-	
+
 	OnCoinProxyChanged.ExcuteCallback(
-											DynamicCastSharedPtr<FItemProxyType>(RemoteProxySPtr),
-											EProxyModifyType::kRemove,
-											0
-										   );
+	                                  DynamicCastSharedPtr<FItemProxyType>(RemoteProxySPtr),
+	                                  EProxyModifyType::kRemove,
+	                                  0
+	                                 );
 }
 
 FGameplayTag FModifyItemProxyStrategy_Consumable::GetCanOperationType() const
@@ -313,17 +315,18 @@ FGameplayTag FModifyItemProxyStrategy_Consumable::GetCanOperationType() const
 	return UGameplayTagsLibrary::Proxy_Consumables;
 }
 
-TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_Consumable::FindByType(
+TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Consumable::FindByType(
 	const FGameplayTag& ProxyType,
 	const TObjectPtr<const UInventoryComponentBase>& InventoryComponentPtr
 	) const
 {
+	TArray<TSharedPtr<FBasicProxy>> Result;
 	if (ProxyTypeMap.Contains(ProxyType))
 	{
-		return ProxyTypeMap[ProxyType];
+		Result.Append(ProxyTypeMap[ProxyType]);
 	}
 
-	return nullptr;
+	return Result;
 }
 
 TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Consumable::Add(
@@ -356,11 +359,11 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Consumable::Add(
 		NewResultSPtr->SetInventoryComponentBase(InventoryComponentPtr);
 		NewResultSPtr->InitialProxy(InProxyType);
 
-		InventoryComponentPtr->AddToContainer(NewResultSPtr);
-
 		NewResultSPtr->ModifyNum(Num);
 
-		ProxyTypeMap.Add(InProxyType, NewResultSPtr);
+		InventoryComponentPtr->AddToContainer(NewResultSPtr);
+
+		ProxyTypeMap.Add(InProxyType, {NewResultSPtr});
 
 		OnConsumableProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged, Num);
 
@@ -380,7 +383,7 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_Consumable::AddByRemote(
 		                                                          )
 	                                                         );
 
-	ProxyTypeMap.Add(NewResultSPtr->GetProxyType(), NewResultSPtr);
+	ProxyTypeMap.Add(NewResultSPtr->GetProxyType(), {NewResultSPtr});
 
 	OnConsumableProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged, NewResultSPtr->GetNum());
 
@@ -419,10 +422,119 @@ void FModifyItemProxyStrategy_Consumable::RemoveByRemote(
 		                               );
 
 	ProxyTypeMap.Remove(RemoteProxySPtr->GetProxyType());
-	
+
 	OnConsumableProxyChanged.ExcuteCallback(
 	                                        DynamicCastSharedPtr<FItemProxyType>(RemoteProxySPtr),
 	                                        EProxyModifyType::kRemove,
 	                                        0
 	                                       );
+}
+
+FGameplayTag FModifyItemProxyStrategy_MaterialProxy::GetCanOperationType() const
+{
+	return UGameplayTagsLibrary::Proxy_Material;
+}
+
+TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_MaterialProxy::FindByType(
+	const FGameplayTag& ProxyType,
+	const TObjectPtr<const UInventoryComponentBase>& InventoryComponentPtr
+	) const
+{
+	TArray<TSharedPtr<FBasicProxy>> Result;
+	
+	for (const auto& Iter : ProxyTypeMap)
+	{
+		if (Iter.Key.MatchesTag(ProxyType))
+		{
+			Result.Append(Iter.Value);
+		}
+	}
+
+	return Result;
+}
+
+TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_MaterialProxy::Add(
+	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
+	const FGameplayTag& InProxyType,
+	int32 Num
+	)
+{
+	if (InProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Material_PassiveSkill_Experience_Book))
+	{
+		return AddImp<FExperienceMaterialProxy>(InventoryComponentPtr, InProxyType, Num);
+	}
+
+	return {};
+}
+
+void FModifyItemProxyStrategy_MaterialProxy::Update(
+	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
+	const FGuid& InProxyID
+	)
+{
+	if (auto ProxySPtr = InventoryComponentPtr->FindProxy(InProxyID))
+	{
+		InventoryComponentPtr->UpdateInContainer(ProxySPtr);
+	}
+}
+
+void FModifyItemProxyStrategy_MaterialProxy::RemoveItemProxy(
+	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
+	const FGuid& InProxyID
+	)
+{
+	if (auto ProxySPtr = InventoryComponentPtr->FindProxy(InProxyID))
+	{
+		InventoryComponentPtr->RemoveFromContainer(ProxySPtr);
+	}
+}
+
+TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_MaterialProxy::AddByRemote(
+	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
+	const TSharedPtr<FBasicProxy>& InRemoteProxySPtr
+	)
+{
+	if (InRemoteProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Material_PassiveSkill_Experience_Book))
+	{
+		return AddByRemoteImp<FExperienceMaterialProxy>(InventoryComponentPtr, InRemoteProxySPtr);
+	}
+
+	return nullptr;
+}
+
+TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_MaterialProxy::UpdateByRemote(
+	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
+	const TSharedPtr<FBasicProxy>& LocalProxySPtr,
+	const TSharedPtr<FBasicProxy>& InRemoteProxySPtr
+	)
+{
+	if (InRemoteProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Material_PassiveSkill_Experience_Book))
+	{
+		return UpdateByRemoteImp<FExperienceMaterialProxy>(InventoryComponentPtr, LocalProxySPtr, InRemoteProxySPtr);
+	}
+
+	return nullptr;
+}
+
+void FModifyItemProxyStrategy_MaterialProxy::RemoveByRemote(
+	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
+	const TSharedPtr<FBasicProxy>& RemoteProxySPtr
+	)
+{
+	FModifyItemProxyStrategyIterface::RemoveByRemote(InventoryComponentPtr, RemoteProxySPtr);
+}
+
+TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_MaterialProxy::NetSerialize(
+	const FGameplayTag ProxyType,
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+	)
+{
+	if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Material_PassiveSkill_Experience_Book))
+	{
+		return NetSerializeImp<FExperienceMaterialProxy>(Ar, Map, bOutSuccess);
+	}
+
+	return nullptr;
 }

@@ -15,13 +15,18 @@
 
 class UGroupmateIcon;
 class UAllocationIconBase;
+class UItemDetails;
 struct FWeaponProxy;
 struct IProxy_Allocationble;
 struct FCharacterProxy;
 struct FCharacterProxy;
 
 /**
+ * 分配菜单
+ * 中介者
  *
+ * 我们为什么要设计两套Icon？
+ * 因为在背包里面的Icon可能具备一些额外的功能或者显示
  */
 UCLASS()
 class PLANET_API UAllocationSkillsMenu :
@@ -50,6 +55,15 @@ public:
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
+
+	void OnSelectedProxy(
+		const TSharedPtr<FBasicProxy>& ProxyPtr
+		);
+
+	void OnItemProxyDragIcon(
+		bool bIsDragging,
+		const TSharedPtr<FBasicProxy>& ProxyPtr
+		);
 
 protected:
 	virtual void EnableMenu() override;
@@ -80,11 +94,6 @@ protected:
 
 	void ResetUIByData_Consumable(
 		const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr
-		);
-
-	void OnItemProxyDragIcon(
-		bool bIsDragging,
-		const TSharedPtr<FBasicProxy>& ProxyPtr
 		);
 
 	void OnAllocationbableDragIcon(
@@ -148,6 +157,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UGroupmateIcon> GroupmateIconClass;
+
+	UPROPERTY(meta = (BindWidget))
+	UItemDetails* ItemDetails = nullptr;
 
 private:
 	TSharedPtr<FCharacterProxy> CurrentProxyPtr = nullptr;

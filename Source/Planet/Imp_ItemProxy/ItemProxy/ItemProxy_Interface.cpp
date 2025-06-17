@@ -53,6 +53,11 @@ int32 IProxy_Unique::GetOffsetNum() const
 	return OffsetNum;
 }
 
+int32 IProxy_Unique::GetMaxNum() const
+{
+	return MaxNum;
+}
+
 int32 IProxy_Unique::GetNum() const
 {
 	return Num;

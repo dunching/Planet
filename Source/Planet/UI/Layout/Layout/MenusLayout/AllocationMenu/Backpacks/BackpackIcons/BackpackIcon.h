@@ -13,6 +13,8 @@
 
 #include "BackpackIcon.generated.h"
 
+class UAllocationSkillsMenu;
+
 struct FStreamableHandle;
 
 struct FBasicProxy;
@@ -32,8 +34,6 @@ class PLANET_API UBackpackIcon :
 
 public:
 
-	using FOnDragDelegate = TCallbackHandleContainer<void(bool, const TSharedPtr<FBasicProxy>&)>;
-
 	using FOnAllocationCharacterProxyChangedHandle = TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)>::FCallbackHandleSPtr;
 
 	UBackpackIcon(const FObjectInitializer& ObjectInitializer);
@@ -46,8 +46,8 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 	
-	FOnDragDelegate OnDragDelegate;
-
+	UAllocationSkillsMenu * AllocationSkillsMenuPtr= nullptr;
+	
 protected:
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;

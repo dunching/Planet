@@ -257,43 +257,28 @@ public:
 		ACharacterBase* TriggerCharacterPtr
 		);
 
-	/**
-	 * 更新数据组成
-	 * @param Tag 仅为 DataSource_Character
-	 * @param Value 
-	 * @param MinValue 仅GEData_ModifyType_BaseValue_Addtive、GEData_ModifyType_Immediate_Override 生效
-	 * @param MaxValue 仅GEData_ModifyType_BaseValue_Addtive、GEData_ModifyType_Immediate_Override 生效
-	 * @param Spec 
-	 * @param GameplayAttributeDataPtr 
-	 */
-	void UpdateMapBaseValue(
-		const FGameplayTag& Tag,
-		float Value,
-		int32 MinValue,
-		int32 MaxValue,
-		const FGameplayEffectSpec& Spec,
-		const FGameplayAttributeData* GameplayAttributeDataPtr
+	void ModifyType_Permanent(
+		FOnEffectedTargetCallback &ReceivedEventModifyDataCallback,
+		EUpdateValueType UpdateValueType,
+		const FGameplayTagContainer & AllAssetTags,
+		TSet<FGameplayTag>& NeedModifySet,
+		const TMap<FGameplayTag, float>& CustomMagnitudes,
+		const TSet<EAdditionalModify>& AdditionalModifyAry,
+		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 		);
-
-	void UpdateMapTemporary(
-		const FGameplayTag& Tag,
-		float Value,
-		const FGameplayEffectSpec& Spec,
-		const FGameplayAttributeData* GameplayAttributeDataPtr
+	
+	void ModifyType_Temporary(
+		FOnEffectedTargetCallback &ReceivedEventModifyDataCallback,
+		EUpdateValueType UpdateValueType,
+		const FGameplayTagContainer & AllAssetTags,
+		TSet<FGameplayTag>& NeedModifySet,
+		const TMap<FGameplayTag, float>& CustomMagnitudes,
+		const TSet<EAdditionalModify>& AdditionalModifyAry,
+		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 		);
-
-	/**
-	 * 更新数据组成
-	 * @param Value 该属性之后的值
-	 * @param AllAssetTags 
-	 * @param GameplayAttributeDataPtr 
-	 */
-	void UpdateMapTemporary(
-		const FGameplayTag& ModifyTypeTag,
-		float Value,
-		const FGameplayAttributeData* GameplayAttributeDataPtr
-		);
-
+	
 #pragma region 基础GA
 	/**
 	 * 基础GA

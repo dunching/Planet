@@ -281,9 +281,10 @@ bool IInputData_Shield_ModifyInterface::Modify(
 			const auto Offset = Iter.Value - ShieldValue;
 			if (Offset > 0)
 			{
-				TargetCharacterPtr->GetCharacterAbilitySystemComponent()->UpdateMapTemporary(
-					 UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override,
+				TargetCharacterPtr->GetCharacterAbilitySystemComponent()->UpdateTemporaryValue(
+					 UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override,
 					 0,
+					 EUpdateValueType::kTemporary_Data_Override,
 					 UAS_Character::GetShieldAttribute().GetGameplayAttributeData(
 						  TargetCharacterAttributesPtr
 						 )
@@ -292,9 +293,10 @@ bool IInputData_Shield_ModifyInterface::Modify(
 			}
 			else
 			{
-				TargetCharacterPtr->GetCharacterAbilitySystemComponent()->UpdateMapTemporary(
-					 UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive,
+				TargetCharacterPtr->GetCharacterAbilitySystemComponent()->UpdateTemporaryValue(
+					 UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override,
 					 -Iter.Value,
+					 EUpdateValueType::kTemporary_Data_Addtive,
 					 UAS_Character::GetShieldAttribute().GetGameplayAttributeData(
 						  TargetCharacterAttributesPtr
 						 )

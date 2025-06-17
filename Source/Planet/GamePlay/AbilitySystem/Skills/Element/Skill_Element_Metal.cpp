@@ -77,7 +77,7 @@ void USkill_Element_Metal::OnValueChanged(
 														   GASPtr->MakeEffectContext()
 														  );
 
-				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override);
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalHitRate);
 
 				if (!ItemProxy_DescriptionPtr->PerLevel_CriticalHitRate.PerLevelValue.IsValidIndex(Value - 1))
@@ -99,7 +99,7 @@ void USkill_Element_Metal::OnValueChanged(
 														   GASPtr->MakeEffectContext()
 														  );
 
-				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override);
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalDamage);
 
 				if (!ItemProxy_DescriptionPtr->PerLevel_CriticalDamage.PerLevelValue.IsValidIndex(Value - 1))
@@ -126,7 +126,7 @@ void USkill_Element_Metal::OnValueChanged(
 														   GASPtr->MakeEffectContext()
 														  );
 
-				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override);
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalHitRate);
 
 				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
@@ -142,7 +142,7 @@ void USkill_Element_Metal::OnValueChanged(
 														   GASPtr->MakeEffectContext()
 														  );
 
-				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override);
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalDamage);
 
 				SpecHandle.Data.Get()->SetSetByCallerMagnitude(

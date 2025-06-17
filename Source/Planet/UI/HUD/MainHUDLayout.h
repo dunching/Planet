@@ -10,6 +10,7 @@
 #include "LayoutCommon.h"
 #include "LayoutInterfacetion.h"
 #include "TemplateHelper.h"
+#include "UpgradeBoder/UpgradeBoder.h"
 
 #include "MainHUDLayout.generated.h"
 
@@ -47,6 +48,8 @@ public:
 
 	URegularActionLayout* GetRegularActionLayout() const;
 
+	void DisplayWidgetInOtherCanvas(UUserWidget*WidgetPtr);
+	
 	// 获取物品的提示
 	UGetItemInfosList* GetItemInfos();
 
@@ -57,10 +60,13 @@ public:
 		);
 
 	void SwitchIsLowerHP(
-		bool bIsLowerHP
+		bool bIsLowerHP 
 		);
-
+	
 	// UInteractionList* GetInteractionList();
 
 	FOnLayoutChanged OnLayoutChanged;
+
+protected:
+	
 };

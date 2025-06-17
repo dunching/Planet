@@ -51,6 +51,9 @@ struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
 struct IProxy_Allocationble;
 
+struct FItemProxyVisitor_Hover_Base;
+struct FItemProxyVisitor_InAllocation_Base;
+
 enum struct ECharacterPropertyType : uint8;
 
 /**
@@ -113,9 +116,12 @@ public:
 	using FOnAllocationCharacterProxyChanged =
 	TCallbackHandleContainer<void(
 		const TWeakPtr<FCharacterProxy>&
+
 		
 		)>;
 
+	using FItemProxy_Description = UItemProxy_Description;
+	
 	using IDType = FGuid;
 
 	FBasicProxy();
@@ -141,6 +147,12 @@ public:
 	void UpdateByRemote(
 		const TSharedPtr<FBasicProxy>& RemoteSPtr
 		);
+
+	virtual void ProcessProxyInteraction(
+		EItemProxyInteractionType ItemProxyInteractionType
+		);
+
+	virtual TSet<EItemProxyInteractionType> GetInteractionsType() const;
 
 	// 装备至插槽
 	virtual void Allocation();
@@ -169,7 +181,7 @@ public:
 	// 
 	FString GetProxyName() const;
 
-	TObjectPtr<UItemProxy_Description> GetItemProxy_Description() const;
+	TObjectPtr<FItemProxy_Description> GetItemProxy_Description() const;
 
 	void SetInventoryComponentBase(
 		const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr

@@ -96,6 +96,9 @@ public class Planet : ModuleRules
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/AllocationMenu");
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/AllocationMenu/Backpacks");
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/AllocationMenu/Backpacks/BackpackIcons");
+		PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/AllocationMenu/InteractionList");
+		PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/AllocationMenu/ItemDetails");
+		PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/AllocationMenu/UpgradeBoder");
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/TalentAllocation");
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/RaffleMenu");
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/ViewMap");
@@ -135,6 +138,7 @@ public class Planet : ModuleRules
 		PublicIncludePaths.Add("Planet/Imp_ItemProxy/InventoryComponent");
 		PublicIncludePaths.Add("Planet/Imp_ItemProxy/ItemProxys");
 		PublicIncludePaths.Add("Planet/Imp_ItemProxy/ItemProxy");
+		PublicIncludePaths.Add("Planet/Imp_ItemProxy/Visitor");
 
 		PublicIncludePaths.Add("Planet/Imp_InputProcessor");
 		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputActions");

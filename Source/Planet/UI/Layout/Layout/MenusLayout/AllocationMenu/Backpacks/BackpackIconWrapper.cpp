@@ -23,6 +23,7 @@
 #include "ItemProxy_Minimal.h"
 #include "BackpackToolIcon.h"
 #include "BackpackConsumableIcon.h"
+#include "BackpackMaterialIcon.h"
 #include "GameplayTagsLibrary.h"
 #include "BackpackSkillIcon.h"
 #include "BackpackWeaponIcon.h"
@@ -52,7 +53,7 @@ void UBackpackIconWrapper::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
-			OnDragIconDelegate = NewPtr->OnDragIconDelegate;
+			AllocationSkillsMenuPtr = NewPtr->AllocationSkillsMenuPtr;
 			ResetToolUIByData(NewPtr->TargetBasicProxyPtr);
 		}
 	}
@@ -75,7 +76,7 @@ void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Basi
 			{
 				UIPtr->AddChild(WidgetPtr);
 
-				WidgetPtr->OnDragDelegate = OnDragIconDelegate;
+				WidgetPtr->AllocationSkillsMenuPtr = AllocationSkillsMenuPtr;
 				WidgetPtr->ResetToolUIByData(BasicProxyPtr);
 			}
 		}
@@ -92,7 +93,7 @@ void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Basi
 			{
 				UIPtr->AddChild(WidgetPtr);
 
-				WidgetPtr->OnDragDelegate = OnDragIconDelegate;
+				WidgetPtr->AllocationSkillsMenuPtr = AllocationSkillsMenuPtr;
 				WidgetPtr->ResetToolUIByData(BasicProxyPtr);
 			}
 		}
@@ -109,7 +110,7 @@ void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Basi
 			{
 				UIPtr->AddChild(WidgetPtr);
 
-				WidgetPtr->OnDragDelegate = OnDragIconDelegate;
+				WidgetPtr->AllocationSkillsMenuPtr = AllocationSkillsMenuPtr;
 				WidgetPtr->ResetToolUIByData(BasicProxyPtr);
 			}
 		}
@@ -126,7 +127,24 @@ void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Basi
 			{
 				UIPtr->AddChild(WidgetPtr);
 
-				WidgetPtr->OnDragDelegate = OnDragIconDelegate;
+				WidgetPtr->AllocationSkillsMenuPtr = AllocationSkillsMenuPtr;
+				WidgetPtr->ResetToolUIByData(BasicProxyPtr);
+			}
+		}
+		else if (BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Material))
+		{
+			auto UIPtr = Cast<UBorder>(GetWidgetFromName(BackpackIconWrapper::Border));
+			if (UIPtr)
+			{
+				UIPtr->ClearChildren();
+			}
+
+			auto WidgetPtr = CreateWidget<UBackpackMaterialIcon>(this, BackpackMaterialIconClass);
+			if (WidgetPtr)
+			{
+				UIPtr->AddChild(WidgetPtr);
+
+				WidgetPtr->AllocationSkillsMenuPtr = AllocationSkillsMenuPtr;
 				WidgetPtr->ResetToolUIByData(BasicProxyPtr);
 			}
 		}

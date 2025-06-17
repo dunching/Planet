@@ -41,12 +41,12 @@ void UCoinInfo::Enable()
 		auto ProxyIconPtr = Cast<UProxyIcon>(GetWidgetFromName(FCoinInfo::Get().ProxyIcon));
 		if (ProxyIconPtr)
 		{
-			auto CoinProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxyType<
+			auto CoinProxyAry = CharacterPtr->GetInventoryComponent()->FindProxyType<
 				FModifyItemProxyStrategy_Coin>(CoinType);
-			if (CoinProxySPtr)
+			if (CoinProxyAry.IsValidIndex(0))
 			{
-				SetNum(CoinProxySPtr->GetNum());
-				ProxyIconPtr->ResetToolUIByData(CoinProxySPtr);
+				SetNum(CoinProxyAry[0]->GetNum());
+				ProxyIconPtr->ResetToolUIByData(CoinProxyAry[0]);
 			}
 			else
 			{

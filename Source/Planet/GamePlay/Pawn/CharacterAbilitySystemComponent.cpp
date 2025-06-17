@@ -857,251 +857,305 @@ EAffectedDirection UCharacterAbilitySystemComponent::GetAffectedDirection(
 	return EAffectedDirection::kForward;
 }
 
-void UCharacterAbilitySystemComponent::UpdateMapBaseValue(
-	const FGameplayTag& Tag,
-	float Value,
-	int32 MinValue,
-	int32 MaxValue,
-	const FGameplayEffectSpec& Spec,
-	const FGameplayAttributeData* GameplayAttributeDataPtr
+void UCharacterAbilitySystemComponent::ModifyType_Permanent(
+	FOnEffectedTargetCallback& ReceivedEventModifyDataCallback,
+	EUpdateValueType UpdateValueType,
+	const FGameplayTagContainer& AllAssetTags,
+	TSet<FGameplayTag>& NeedModifySet,
+	const TMap<FGameplayTag, float>& CustomMagnitudes,
+	const TSet<EAdditionalModify>& AdditionalModifyAry,
+	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 	)
 {
-	FGameplayTagContainer AllAssetTags;
-	Spec.GetAllAssetTags(AllAssetTags);
+	// 获得对应GE对象
+	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	FGameplayEffectContextHandle Context = Spec.GetContext();
 
-	if (ValueMap.Contains(GameplayAttributeDataPtr))
+	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
+
+	// 获得目标AttributeSet
+	const auto TargetSet = Cast<UAS_Character>(
+	                                           ExecutionParams.GetTargetAbilitySystemComponent()->GetAttributeSet(
+		                                            UAS_Character::StaticClass()
+		                                           )
+	                                          );
+
+	auto Lambda = [&ReceivedEventModifyDataCallback, &NeedModifySet, this, TargetSet, &Spec](
+		const TPair<FGameplayTag, float>& Iter,
+		const float MaxValue,
+		EUpdateValueType UpdateValueType,
+		const FGameplayAttribute& Attribute
+		)
 	{
-	}
-	else
+		NeedModifySet.Add(Iter.Key);
+		UpdatePermanentValue(
+		                     Iter.Value,
+		                     0.f,
+		                     MaxValue,
+		                     UpdateValueType,
+		                     Spec,
+		                     Attribute.GetGameplayAttributeData(TargetSet)
+		                    );
+
+		ReceivedEventModifyDataCallback.TherapeuticalDose = Iter.Value;
+	};
+
+	for (const auto& Iter : CustomMagnitudes)
 	{
-		FDataComposition DataComposition;
-
-		DataComposition.DataMap = {
-			{
-				UGameplayTagsLibrary::DataSource_Character,
-				FMath::Clamp(GameplayAttributeDataPtr->GetCurrentValue(), MinValue, MaxValue)
-			}
-		};
-
-		ValueMap.Add(
-		             GameplayAttributeDataPtr,
-		             DataComposition
-		            );
-	}
-
-	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive))
-	{
-		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-
-		if (GameplayAttributeDataMap.DataMap.Contains(UGameplayTagsLibrary::DataSource_Character))
+		if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
 		{
-			GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character] += Value;
+			Lambda(
+			       Iter,
+			       TargetSet->GetMax_HP(),
+			       UpdateValueType,
+			       UAS_Character::GetHPAttribute()
+			      );
 		}
-		else
+		else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina))
 		{
-			GameplayAttributeDataMap.DataMap.Add(UGameplayTagsLibrary::DataSource_Character, Value);
+			Lambda(
+			       Iter,
+			       TargetSet->GetMax_Stamina(),
+			       UpdateValueType,
+			       UAS_Character::GetStaminaAttribute()
+			      );
 		}
-
-		GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character] =
-			FMath::Clamp(
-			             GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character],
-			             MinValue,
-			             MaxValue
-			            );
-	}
-	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override))
-	{
-		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-
-		if (GameplayAttributeDataMap.DataMap.Contains(UGameplayTagsLibrary::DataSource_Character))
+		else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
 		{
-			GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character] = Value;
+			Lambda(
+			       Iter,
+			       TargetSet->GetMax_Mana(),
+			       UpdateValueType,
+			       UAS_Character::GetManaAttribute()
+			      );
 		}
-		else
-		{
-			GameplayAttributeDataMap.DataMap.Add(UGameplayTagsLibrary::DataSource_Character, Value);
-		}
-
-		GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character] =
-			FMath::Clamp(
-			             GameplayAttributeDataMap.DataMap[UGameplayTagsLibrary::DataSource_Character],
-			             MinValue,
-			             MaxValue
-			            );
 	}
 }
 
-void UCharacterAbilitySystemComponent::UpdateMapTemporary(
-	const FGameplayTag& Tag,
-	float Value,
-	const FGameplayEffectSpec& Spec,
-	const FGameplayAttributeData* GameplayAttributeDataPtr
+void UCharacterAbilitySystemComponent::ModifyType_Temporary(
+	FOnEffectedTargetCallback& ReceivedEventModifyDataCallback,
+	EUpdateValueType UpdateValueType,
+	const FGameplayTagContainer& AllAssetTags,
+	TSet<FGameplayTag>& NeedModifySet,
+	const TMap<FGameplayTag, float>& CustomMagnitudes,
+	const TSet<EAdditionalModify>& AdditionalModifyAry,
+	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 	)
 {
-	FGameplayTagContainer AllAssetTags;
-	Spec.GetAllAssetTags(AllAssetTags);
+	// 获得对应GE对象
+	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	FGameplayEffectContextHandle Context = Spec.GetContext();
 
-	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data))
+	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
+
+	// 获得目标AttributeSet
+	const auto TargetSet = Cast<UAS_Character>(
+	                                           ExecutionParams.GetTargetAbilitySystemComponent()->GetAttributeSet(
+		                                            UAS_Character::StaticClass()
+		                                           )
+	                                          );
+
+	auto Lambda = [&NeedModifySet, this, TargetSet, &Spec, &CustomMagnitudes, UpdateValueType](
+		const FGameplayTag& ModifyItemTag,
+		const FGameplayAttribute& Attribute
+		)
 	{
-		if (ValueMap.Contains(GameplayAttributeDataPtr))
+		NeedModifySet.Add(ModifyItemTag);
+		for (const auto& Iter : CustomMagnitudes)
 		{
-			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-			GameplayAttributeDataMap.DataMap.Add(Tag, Value);
+			UpdateTemporaryValue(
+			                     Iter.Key,
+			                     Iter.Value,
+			                     UpdateValueType,
+			                     Spec,
+			                     Attribute.GetGameplayAttributeData(TargetSet)
+			                    );
 		}
-		else
-		{
-			FDataComposition DataComposition;
-
-			DataComposition.DataMap = {
-				{
-					UGameplayTagsLibrary::DataSource_Character,
-					GameplayAttributeDataPtr->GetCurrentValue()
-				},
-				{
-					Tag, Value
-				}
-			};
-
-			ValueMap.Add(
-			             GameplayAttributeDataPtr,
-			             DataComposition
-			            );
-		}
-
-		return;
+	};
+	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
+	{
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed, UAS_Character::GetMoveSpeedAttribute());
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed))
+	{
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed, UAS_Character::GetPerformSpeedAttribute());
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield))
+	{
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Shield, UAS_Character::GetShieldAttribute());
 	}
 
-	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data))
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalDamage))
 	{
-		if (ValueMap.Contains(GameplayAttributeDataPtr))
-		{
-			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-			if (GameplayAttributeDataMap.DataMap.Contains(Tag))
-			{
-				GameplayAttributeDataMap.DataMap.Remove(Tag);
-			}
-		}
-		else
-		{
-			FDataComposition DataComposition;
-
-			DataComposition.DataMap = {
-				{
-					UGameplayTagsLibrary::DataSource_Character,
-					GameplayAttributeDataPtr->GetCurrentValue()
-				}
-			};
-
-			ValueMap.Add(
-			             GameplayAttributeDataPtr,
-			             DataComposition
-			            );
-		}
-
-		return;
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_CriticalDamage, UAS_Character::GetCriticalDamageAttribute());
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalHitRate))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_CriticalHitRate,
+		       UAS_Character::GetCriticalHitRateAttribute()
+		      );
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_HitRate))
+	{
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_HitRate, UAS_Character::GetHitRateAttribute());
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_EvadeRate))
+	{
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_EvadeRate, UAS_Character::GetEvadeRateAttribute());
 	}
 
-	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent))
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value))
 	{
-		if (ValueMap.Contains(GameplayAttributeDataPtr))
-		{
-			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-			GameplayAttributeDataMap.MagnitudeMap.Add(Tag, Value);
-		}
-		else
-		{
-			FDataComposition DataComposition;
-
-			DataComposition.DataMap = {
-				{
-					UGameplayTagsLibrary::DataSource_Character,
-					GameplayAttributeDataPtr->GetCurrentValue()
-				}
-			};
-
-			DataComposition.MagnitudeMap = {
-				{
-					Tag, Value
-				}
-			};
-
-			ValueMap.Add(
-			             GameplayAttributeDataPtr,
-			             DataComposition
-			            );
-		}
-
-		return;
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value, UAS_Character::GetMetalValueAttribute());
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level))
+	{
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level, UAS_Character::GetMetalLevelAttribute());
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration,
+		       UAS_Character::GetMetalPenetrationAttribute()
+		      );
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration,
+		       UAS_Character::GetMetalPercentPenetrationAttribute()
+		      );
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance,
+		       UAS_Character::GetMetalResistanceAttribute()
+		      );
 	}
 
-	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Percent))
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Value))
 	{
-		if (ValueMap.Contains(GameplayAttributeDataPtr))
-		{
-			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-			if (GameplayAttributeDataMap.MagnitudeMap.Contains(Tag))
-			{
-				GameplayAttributeDataMap.MagnitudeMap.Remove(Tag);
-			}
-		}
-		else
-		{
-			FDataComposition DataComposition;
-
-			DataComposition.DataMap = {
-				{
-					UGameplayTagsLibrary::DataSource_Character,
-					GameplayAttributeDataPtr->GetCurrentValue()
-				}
-			};
-
-			ValueMap.Add(
-			             GameplayAttributeDataPtr,
-			             DataComposition
-			            );
-		}
-
-		return;
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Value, UAS_Character::GetWoodValueAttribute());
 	}
-}
-
-void UCharacterAbilitySystemComponent::UpdateMapTemporary(
-	const FGameplayTag& ModifyTypeTag,
-	float Value,
-	const FGameplayAttributeData* GameplayAttributeDataPtr
-	)
-{
-	if (ValueMap.Contains(GameplayAttributeDataPtr))
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Level))
 	{
-		if (ModifyTypeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive))
-		{
-			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-			for (auto& Iter : GameplayAttributeDataMap.DataMap)
-			{
-				if (Value > Iter.Value)
-				{
-					Value -= Iter.Value;
-					if (Value <= 0)
-					{
-						break;
-					}
-				}
-				else
-				{
-					Iter.Value = Iter.Value
-					             + Value;
-					break;
-				}
-			}
-		}
-		else if (ModifyTypeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override))
-		{
-			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-			GameplayAttributeDataMap.Empty();
-		}
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Level, UAS_Character::GetWoodLevelAttribute());
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Penetration))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Wood_Penetration,
+		       UAS_Character::GetWoodPenetrationAttribute()
+		      );
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_PercentPenetration))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Wood_PercentPenetration,
+		       UAS_Character::GetWoodPercentPenetrationAttribute()
+		      );
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Resistance))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Wood_Resistance,
+		       UAS_Character::GetWoodResistanceAttribute()
+		      );
 	}
 
-	UpdateValueMap();
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Value))
+	{
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Water_Value, UAS_Character::GetWaterValueAttribute());
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Level))
+	{
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Water_Level, UAS_Character::GetWaterLevelAttribute());
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Penetration))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Water_Penetration,
+		       UAS_Character::GetWaterPenetrationAttribute()
+		      );
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_PercentPenetration))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Water_PercentPenetration,
+		       UAS_Character::GetWaterPercentPenetrationAttribute()
+		      );
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Resistance))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Water_Resistance,
+		       UAS_Character::GetWaterResistanceAttribute()
+		      );
+	}
+
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Value))
+	{
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Value, UAS_Character::GetFireValueAttribute());
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Level))
+	{
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Level, UAS_Character::GetFireLevelAttribute());
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Penetration))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Fire_Penetration,
+		       UAS_Character::GetFirePenetrationAttribute()
+		      );
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_PercentPenetration))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Fire_PercentPenetration,
+		       UAS_Character::GetFirePercentPenetrationAttribute()
+		      );
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Resistance))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Fire_Resistance,
+		       UAS_Character::GetFireResistanceAttribute()
+		      );
+	}
+
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Value))
+	{
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Value, UAS_Character::GetEarthValueAttribute());
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Level))
+	{
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Level, UAS_Character::GetEarthLevelAttribute());
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Penetration))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Earth_Penetration,
+		       UAS_Character::GetEarthPenetrationAttribute()
+		      );
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_PercentPenetration))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Earth_PercentPenetration,
+		       UAS_Character::GetEarthPercentPenetrationAttribute()
+		      );
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Resistance))
+	{
+		Lambda(
+		       UGameplayTagsLibrary::GEData_ModifyItem_Earth_Resistance,
+		       UAS_Character::GetEarthResistanceAttribute()
+		      );
+	}
 }
 
 TMap<ECharacterPropertyType, FBaseProperty> GetAllData()
@@ -1237,425 +1291,94 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 
 #pragma region 确认最终要应用的值
 	// 如果是此类，数据在 SetByCallerTagMagnitudes
-	if (
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive) ||
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override)
+	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive))
+	{
+		ModifyType_Permanent(
+		                     ReceivedEventModifyDataCallback,
+		                     EUpdateValueType::kPermanent_Addtive,
+		                     AllAssetTags,
+		                     NeedModifySet,
+		                     CustomMagnitudes,
+		                     AdditionalModifyAry,
+		                     ExecutionParams,
+		                     OutExecutionOutput
+		                    );
+	}
+	else if (
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Override)
 	)
 	{
-		auto Lambda = [&ReceivedEventModifyDataCallback, &NeedModifySet, this, TargetSet, &Spec](
-			const TPair<FGameplayTag, float>& Iter,
-			const float MaxValue,
-			const FGameplayAttribute& Attribute
-			)
-		{
-			NeedModifySet.Add(Iter.Key);
-			UpdateMapBaseValue(
-			                   UGameplayTagsLibrary::DataSource_Character,
-			                   Iter.Value,
-			                   0.f,
-			                   MaxValue,
-			                   Spec,
-			                   Attribute.GetGameplayAttributeData(TargetSet)
-			                  );
-
-			ReceivedEventModifyDataCallback.TherapeuticalDose = Iter.Value;
-		};
-		for (const auto& Iter : CustomMagnitudes)
-		{
-			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
-			{
-				Lambda(Iter, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina))
-			{
-				Lambda(Iter, TargetSet->GetMax_Stamina(), UAS_Character::GetStaminaAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
-			{
-				Lambda(Iter, TargetSet->GetMax_Mana(), UAS_Character::GetManaAttribute());
-			}
-
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxHP))
-			{
-				Lambda(Iter, TargetSet->Max_Max_HP, UAS_Character::GetMax_HPAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxStamina))
-			{
-				Lambda(Iter, TargetSet->Max_Max_Stamina, UAS_Character::GetMax_StaminaAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxMana))
-			{
-				Lambda(Iter, TargetSet->Max_Max_Mana, UAS_Character::GetMax_ManaAttribute());
-			}
-
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value))
-			{
-				Lambda(Iter, TargetSet->MaxElementalValue, UAS_Character::GetMetalValueAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level))
-			{
-				Lambda(Iter, TargetSet->MaxElementalLevel, UAS_Character::GetMetalLevelAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration))
-			{
-				Lambda(Iter, TargetSet->MaxElementalPenetration, UAS_Character::GetMetalPenetrationAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration))
-			{
-				Lambda(
-				       Iter,
-				       TargetSet->MaxElementalPercentPenetration,
-				       UAS_Character::GetMetalPercentPenetrationAttribute()
-				      );
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance))
-			{
-				Lambda(Iter, TargetSet->MaxElementalResistance, UAS_Character::GetMetalResistanceAttribute());
-			}
-
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Value))
-			{
-				Lambda(Iter, TargetSet->MaxElementalValue, UAS_Character::GetWoodValueAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Level))
-			{
-				Lambda(Iter, TargetSet->MaxElementalLevel, UAS_Character::GetWoodLevelAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Penetration))
-			{
-				Lambda(Iter, TargetSet->MaxElementalPenetration, UAS_Character::GetWoodPenetrationAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_PercentPenetration))
-			{
-				Lambda(
-				       Iter,
-				       TargetSet->MaxElementalPercentPenetration,
-				       UAS_Character::GetWoodPercentPenetrationAttribute()
-				      );
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Resistance))
-			{
-				Lambda(Iter, TargetSet->MaxElementalResistance, UAS_Character::GetWoodResistanceAttribute());
-			}
-
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Value))
-			{
-				Lambda(Iter, TargetSet->MaxElementalValue, UAS_Character::GetWaterValueAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Level))
-			{
-				Lambda(Iter, TargetSet->MaxElementalLevel, UAS_Character::GetWaterLevelAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Penetration))
-			{
-				Lambda(Iter, TargetSet->MaxElementalPenetration, UAS_Character::GetWaterPenetrationAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_PercentPenetration))
-			{
-				Lambda(
-				       Iter,
-				       TargetSet->MaxElementalPercentPenetration,
-				       UAS_Character::GetWaterPercentPenetrationAttribute()
-				      );
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Resistance))
-			{
-				Lambda(Iter, TargetSet->MaxElementalResistance, UAS_Character::GetWaterResistanceAttribute());
-			}
-
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Value))
-			{
-				Lambda(Iter, TargetSet->MaxElementalValue, UAS_Character::GetFireValueAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Level))
-			{
-				Lambda(Iter, TargetSet->MaxElementalLevel, UAS_Character::GetFireLevelAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Penetration))
-			{
-				Lambda(Iter, TargetSet->MaxElementalPenetration, UAS_Character::GetFirePenetrationAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_PercentPenetration))
-			{
-				Lambda(
-				       Iter,
-				       TargetSet->MaxElementalPercentPenetration,
-				       UAS_Character::GetFirePercentPenetrationAttribute()
-				      );
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Resistance))
-			{
-				Lambda(Iter, TargetSet->MaxElementalResistance, UAS_Character::GetFireResistanceAttribute());
-			}
-
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Value))
-			{
-				Lambda(Iter, TargetSet->MaxElementalValue, UAS_Character::GetEarthValueAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Level))
-			{
-				Lambda(Iter, TargetSet->MaxElementalLevel, UAS_Character::GetEarthLevelAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Penetration))
-			{
-				Lambda(Iter, TargetSet->MaxElementalPenetration, UAS_Character::GetEarthPenetrationAttribute());
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_PercentPenetration))
-			{
-				Lambda(
-				       Iter,
-				       TargetSet->MaxElementalPercentPenetration,
-				       UAS_Character::GetEarthPercentPenetrationAttribute()
-				      );
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Resistance))
-			{
-				Lambda(Iter, TargetSet->MaxElementalResistance, UAS_Character::GetEarthResistanceAttribute());
-			}
-
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
-			{
-				auto Temp = Iter;
-				Temp.Value = 0 - Iter.Value;
-				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
-				ReceivedEventModifyDataCallback.Damage = Iter.Value;
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood))
-			{
-				auto Temp = Iter;
-				Temp.Value = 0 - Iter.Value;
-				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
-				ReceivedEventModifyDataCallback.Damage = Iter.Value;
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Water))
-			{
-				auto Temp = Iter;
-				Temp.Value = 0 - Iter.Value;
-				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
-				ReceivedEventModifyDataCallback.Damage = Iter.Value;
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Fire))
-			{
-				auto Temp = Iter;
-				Temp.Value = 0 - Iter.Value;
-				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
-				ReceivedEventModifyDataCallback.Damage = Iter.Value;
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth))
-			{
-				auto Temp = Iter;
-				Temp.Value = 0 - Iter.Value;
-				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
-				ReceivedEventModifyDataCallback.Damage = Iter.Value;
-			}
-		}
+		ModifyType_Permanent(
+		                     ReceivedEventModifyDataCallback,
+		                     EUpdateValueType::kPermanent_Override,
+		                     AllAssetTags,
+		                     NeedModifySet,
+		                     CustomMagnitudes,
+		                     AdditionalModifyAry,
+		                     ExecutionParams,
+		                     OutExecutionOutput
+		                    );
 	}
 	// 如果是此类 SetByCallerTagMagnitudes 仅为一条，且Key为数据的组成
 	else if (
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data) ||
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent) ||
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data) ||
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Percent)
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Addtive)
 	)
 	{
-		auto Lambda = [&NeedModifySet, this, TargetSet, &Spec, &CustomMagnitudes](
-			const FGameplayTag& ModifyItemTag,
-			const FGameplayAttribute& Attribute
-			)
-		{
-			NeedModifySet.Add(ModifyItemTag);
-			for (const auto& Iter : CustomMagnitudes)
-			{
-				UpdateMapTemporary(
-				                   Iter.Key,
-				                   Iter.Value,
-				                   Spec,
-				                   Attribute.GetGameplayAttributeData(TargetSet)
-				                  );
-			}
-		};
-		if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed, UAS_Character::GetMoveSpeedAttribute());
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed, UAS_Character::GetPerformSpeedAttribute());
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Shield, UAS_Character::GetShieldAttribute());
-		}
-
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalDamage))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_CriticalDamage, UAS_Character::GetCriticalDamageAttribute());
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalHitRate))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_CriticalHitRate,
-			       UAS_Character::GetCriticalHitRateAttribute()
-			      );
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_HitRate))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_HitRate, UAS_Character::GetHitRateAttribute());
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_EvadeRate))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_EvadeRate, UAS_Character::GetEvadeRateAttribute());
-		}
-
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value, UAS_Character::GetMetalValueAttribute());
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level, UAS_Character::GetMetalLevelAttribute());
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration,
-			       UAS_Character::GetMetalPenetrationAttribute()
-			      );
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration,
-			       UAS_Character::GetMetalPercentPenetrationAttribute()
-			      );
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance,
-			       UAS_Character::GetMetalResistanceAttribute()
-			      );
-		}
-
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Value))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Value, UAS_Character::GetWoodValueAttribute());
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Level))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Level, UAS_Character::GetWoodLevelAttribute());
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Penetration))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Wood_Penetration,
-			       UAS_Character::GetWoodPenetrationAttribute()
-			      );
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_PercentPenetration))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Wood_PercentPenetration,
-			       UAS_Character::GetWoodPercentPenetrationAttribute()
-			      );
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Wood_Resistance))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Wood_Resistance,
-			       UAS_Character::GetWoodResistanceAttribute()
-			      );
-		}
-
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Value))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Water_Value, UAS_Character::GetWaterValueAttribute());
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Level))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Water_Level, UAS_Character::GetWaterLevelAttribute());
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Penetration))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Water_Penetration,
-			       UAS_Character::GetWaterPenetrationAttribute()
-			      );
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_PercentPenetration))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Water_PercentPenetration,
-			       UAS_Character::GetWaterPercentPenetrationAttribute()
-			      );
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Water_Resistance))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Water_Resistance,
-			       UAS_Character::GetWaterResistanceAttribute()
-			      );
-		}
-
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Value))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Value, UAS_Character::GetFireValueAttribute());
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Level))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Level, UAS_Character::GetFireLevelAttribute());
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Penetration))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Fire_Penetration,
-			       UAS_Character::GetFirePenetrationAttribute()
-			      );
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_PercentPenetration))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Fire_PercentPenetration,
-			       UAS_Character::GetFirePercentPenetrationAttribute()
-			      );
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Fire_Resistance))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Fire_Resistance,
-			       UAS_Character::GetFireResistanceAttribute()
-			      );
-		}
-
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Value))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Value, UAS_Character::GetEarthValueAttribute());
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Level))
-		{
-			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Level, UAS_Character::GetEarthLevelAttribute());
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Penetration))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Earth_Penetration,
-			       UAS_Character::GetEarthPenetrationAttribute()
-			      );
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_PercentPenetration))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Earth_PercentPenetration,
-			       UAS_Character::GetEarthPercentPenetrationAttribute()
-			      );
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Earth_Resistance))
-		{
-			Lambda(
-			       UGameplayTagsLibrary::GEData_ModifyItem_Earth_Resistance,
-			       UAS_Character::GetEarthResistanceAttribute()
-			      );
-		}
+		ModifyType_Temporary(
+		                     ReceivedEventModifyDataCallback,
+		                     EUpdateValueType::kTemporary_Data_Addtive,
+		                     AllAssetTags,
+		                     NeedModifySet,
+		                     CustomMagnitudes,
+		                     AdditionalModifyAry,
+		                     ExecutionParams,
+		                     OutExecutionOutput
+		                    );
+	}
+	else if (
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override)
+	)
+	{
+		ModifyType_Temporary(
+		                     ReceivedEventModifyDataCallback,
+		                     EUpdateValueType::kTemporary_Data_Override,
+		                     AllAssetTags,
+		                     NeedModifySet,
+		                     CustomMagnitudes,
+		                     AdditionalModifyAry,
+		                     ExecutionParams,
+		                     OutExecutionOutput
+		                    );
+	}
+	else if (
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent_Addtive)
+	)
+	{
+		ModifyType_Temporary(
+		                     ReceivedEventModifyDataCallback,
+		                     EUpdateValueType::kTemporary_Percent_Addtive,
+		                     AllAssetTags,
+		                     NeedModifySet,
+		                     CustomMagnitudes,
+		                     AdditionalModifyAry,
+		                     ExecutionParams,
+		                     OutExecutionOutput
+		                    );
+	}
+	else if (
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Percent_Override)
+	)
+	{
+		ModifyType_Temporary(
+		                     ReceivedEventModifyDataCallback,
+		                     EUpdateValueType::kTemporary_Percent_Override,
+		                     AllAssetTags,
+		                     NeedModifySet,
+		                     CustomMagnitudes,
+		                     AdditionalModifyAry,
+		                     ExecutionParams,
+		                     OutExecutionOutput
+		                    );
 	}
 #pragma endregion
 

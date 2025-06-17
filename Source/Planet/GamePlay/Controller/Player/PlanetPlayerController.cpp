@@ -275,8 +275,8 @@ void APlanetPlayerController::BuyProxys_Implementation(
 		return;
 	}
 
-	auto CoinProxySPtr = InventoryComponentPtr->FindProxyType<FModifyItemProxyStrategy_Coin>(CostProxyType);
-	if (!(CoinProxySPtr && Cost <= CoinProxySPtr->GetNum()))
+	auto CoinProxyAry = InventoryComponentPtr->FindProxyType<FModifyItemProxyStrategy_Coin>(CostProxyType);
+	if (!(CoinProxyAry.IsValidIndex(0) && Cost <= CoinProxyAry[0]->GetNum()))
 	{
 		return;
 	}
@@ -301,7 +301,7 @@ void APlanetPlayerController::BuyProxys_Implementation(
 
 	InventoryComponentPtr->AddProxyNum(BuyProxyTag, Num);
 
-	CoinProxySPtr->ModifyNum(-Cost);
+	CoinProxyAry[0]->ModifyNum(-Cost);
 
 	if (auto IProxy_UniquePtr = DynamicCastSharedPtr<IProxy_Unique>(TargetProxySPtr))
 	{
@@ -750,7 +750,7 @@ void APlanetPlayerController::SetCharacterAttributeValue_Implementation(
 	                                           GASPtr->MakeEffectContext()
 	                                          );
 
-	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override);
+	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Override);
 
 	SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 	                                               FGameplayTag::RequestGameplayTag(*Args[0]),
@@ -807,7 +807,7 @@ void APlanetPlayerController::ModifyElementalDataToTarget_Implementation(
 			                                           GASPtr->MakeEffectContext()
 			                                          );
 
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Override);
 
 			if (TEXT("Metal") == Args[0])
 			{
@@ -888,7 +888,7 @@ void APlanetPlayerController::ModifyElementalData_Implementation(
 		                                           GASPtr->MakeEffectContext()
 		                                          );
 
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Override);
 
 		if (TEXT("Metal") == Args[0])
 		{
@@ -996,7 +996,7 @@ void APlanetPlayerController::AddShieldToTarget_Implementation(
 				                                           GASPtr->MakeEffectContext()
 				                                          );
 
-				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override);
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield);
 				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 				                                               UGameplayTagsLibrary::DataSource_Character,
@@ -1024,7 +1024,7 @@ void APlanetPlayerController::AddShieldToTarget_Implementation(
 						                                                        );
 
 					                                                        SpecHandle.Data.Get()->AddDynamicAssetTag(
-						                                                         UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data
+						                                                         UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override
 						                                                        );
 					                                                        SpecHandle.Data.Get()->AddDynamicAssetTag(
 						                                                         UGameplayTagsLibrary::GEData_ModifyItem_Shield
@@ -1100,7 +1100,7 @@ void APlanetPlayerController::ReplyStamina_Implementation(
 				                        ICPtr->MakeEffectContext()
 				                       );
 
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
 
 			int32 Damege = 0;
 			LexFromString(Damege, *Args[0]);
@@ -1137,7 +1137,7 @@ void APlanetPlayerController::AddShield_Implementation(
 		                                           GASPtr->MakeEffectContext()
 		                                          );
 
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override);
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield);
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 		                                               UGameplayTagsLibrary::DataSource_Character,
@@ -1164,7 +1164,7 @@ void APlanetPlayerController::AddShield_Implementation(
 				                                                        );
 
 			                                                        SpecHandle.Data.Get()->AddDynamicAssetTag(
-				                                                         UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Data
+				                                                         UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override
 				                                                        );
 			                                                        SpecHandle.Data.Get()->AddDynamicAssetTag(
 				                                                         UGameplayTagsLibrary::GEData_ModifyItem_Shield
@@ -1283,7 +1283,7 @@ void APlanetPlayerController::MakeTrueDamege_Implementation(
 				                        ICPtr->MakeEffectContext()
 				                       );
 
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::Proxy_Weapon_Test);
 
@@ -1348,7 +1348,7 @@ void APlanetPlayerController::MakeTrueDamegeInArea_Implementation(
 					                        ICPtr->MakeEffectContext()
 					                       );
 
-				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::Proxy_Weapon_Test);
 
@@ -1409,7 +1409,7 @@ void APlanetPlayerController::MakeTherapy_Implementation(
 				                        ICPtr->MakeEffectContext()
 				                       );
 
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::Proxy_Weapon_Test);
 

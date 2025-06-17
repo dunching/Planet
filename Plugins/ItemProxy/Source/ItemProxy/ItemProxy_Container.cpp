@@ -37,36 +37,49 @@ bool FProxy_FASI::NetSerialize(
 {
 	if (Ar.IsSaving())
 	{
+		auto InventoryComponentPtr = ProxySPtr->GetInventoryComponentBase();
+		Ar << InventoryComponentPtr;
+
 		auto ProxyType = ProxySPtr->GetProxyType();
 		Ar << ProxyType;
 
 		ProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+		
+		return true;
 	}
 	else if (Ar.IsLoading())
 	{
+		TObjectPtr<UInventoryComponentBase> InventoryComponentPtr = nullptr;
+
+		Ar << InventoryComponentPtr;
+
 		FGameplayTag ProxyType = FGameplayTag::EmptyTag;
 		Ar << ProxyType;
 
 		if (CacheProxySPtr)
 		{
 			CacheProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			return true;
 		}
 		else
 		{
-			auto GetModifyItemProxyStrategiesPtr = Cast<IGetModifyItemProxyStrategies>(GetWorldImp()->GetWorldSettings());
-			const auto ModifyItemProxyStrategiesMap = GetModifyItemProxyStrategiesPtr->GetModifyItemProxyStrategies();
-			
+			const auto ModifyItemProxyStrategiesMap = InventoryComponentPtr->GetModifyItemProxyStrategies();
+
 			for (const auto& Iter : ModifyItemProxyStrategiesMap)
 			{
 				if (ProxyType.MatchesTag(Iter.Key))
 				{
-					CacheProxySPtr = Iter.Value->NetSerialize(Ar, Map, bOutSuccess);
+					CacheProxySPtr = Iter.Value->NetSerialize(ProxyType, Ar, Map, bOutSuccess);
+
+					return true;
 				}
 			}
 		}
 	}
 
-	return true;
+	checkNoEntry();
+	return false;
 }
 
 bool FProxy_FASI::operator==(

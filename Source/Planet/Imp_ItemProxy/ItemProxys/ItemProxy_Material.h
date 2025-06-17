@@ -9,7 +9,7 @@
 #include "ItemProxy_Interface.h"
 #include "Planet_ItemProxy.h"
 
-#include "ItemProxy_Companion.generated.h"
+#include "ItemProxy_Material.generated.h"
 
 struct FGameplayAbilityTargetData_RegisterParam;
 struct FTableRowProxy_CommonCooldownInfo;
@@ -36,7 +36,7 @@ class UInventoryComponent;
 class UItemProxy_Description_Consumable;
 
 UCLASS()
-class PLANET_API UItemProxy_Description_Companion : public UItemProxy_Description
+class PLANET_API UItemProxy_Description_Material : public UItemProxy_Description
 {
 	GENERATED_BODY()
 
@@ -44,14 +44,17 @@ public:
 };
 
 /**
+ * 原材料，
+ * 如
  * 伙伴道具
  * 用于伙伴类FCharacterProxy强化的道具
  * 如【射雕】里面的【侠士经略】
+ * 或者 逆水寒的心法升级材料
+ * 与消耗品的区别为：无法主动使用
  */
 USTRUCT()
-struct PLANET_API FCompanionProxy :
+struct PLANET_API FMaterialProxy :
 	public FPlanet_BasicProxy,
-	public IProxy_SkillState,
 	public IProxy_Unique
 {
 	GENERATED_USTRUCT_BODY()
@@ -61,7 +64,7 @@ public:
 	friend FProxy_FASI_Container;
 	friend UInventoryComponent;
 
-	FCompanionProxy();
+	FMaterialProxy();
 
 	virtual bool NetSerialize(
 		FArchive& Ar,
@@ -74,12 +77,12 @@ public:
 		) override;
 
 	void UpdateByRemote(
-		const TSharedPtr<FCompanionProxy>& RemoteSPtr
+		const TSharedPtr<FMaterialProxy>& RemoteSPtr
 		);
 
-	virtual bool Active() override;
+	virtual bool Active() override final;
 
-	UItemProxy_Description_Consumable* GetTableRowProxy_Consumable() const;
+	UItemProxy_Description_Material* GetTableRowProxy_Material() const;
 
 	virtual void UpdateData() override;
 
@@ -87,33 +90,62 @@ public:
 	virtual void ModifyNum(int32 Value) override;
 #pragma endregion
 
-#pragma region Cooldown interface
-	virtual int32 GetCount() const override;
-
-	virtual bool GetRemainingCooldown(
-		float& RemainingCooldown,
-		float& RemainingCooldownPercent
-		) const override;
-
-	virtual bool CheckNotInCooldown() const override;
-
-	virtual void AddCooldownConsumeTime(
-		float NewTime
-		) override;
-
-	virtual void FreshUniqueCooldownTime() override;
-
-	virtual void ApplyCooldown() override;
-
-	virtual void OffsetCooldownTime() override;
-#pragma endregion
-
 protected:
 };
 
 template <>
-struct TStructOpsTypeTraits<FCompanionProxy> :
-	public TStructOpsTypeTraitsBase2<FCompanionProxy>
+struct TStructOpsTypeTraits<FMaterialProxy> :
+	public TStructOpsTypeTraitsBase2<FMaterialProxy>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
+};
+
+UCLASS()
+class PLANET_API UItemProxy_Description_ExperienceMaterial : public UItemProxy_Description_Material
+{
+	GENERATED_BODY()
+
+public:
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	int32 ExperienceValue = 50;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	int32 Level = 1;
+
+};
+
+USTRUCT()
+struct PLANET_API FExperienceMaterialProxy :
+	public FMaterialProxy
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	using FItemProxy_Description = UItemProxy_Description_ExperienceMaterial;
+	
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		class UPackageMap* Map,
+		bool& bOutSuccess
+		) override;
+
+	TObjectPtr<FItemProxy_Description> GetTableRowProxy_ExperienceMaterial() const;
+
+	/**
+	 * 返回提供的经验值
+	 * @return 
+	 */
+	int32 GetExperienceValue() const;
+	
+};
+
+template <>
+struct TStructOpsTypeTraits<FExperienceMaterialProxy> :
+	public TStructOpsTypeTraitsBase2<FExperienceMaterialProxy>
 {
 	enum
 	{

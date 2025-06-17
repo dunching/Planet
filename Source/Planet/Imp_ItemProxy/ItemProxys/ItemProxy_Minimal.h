@@ -7,3 +7,4 @@
 #include "ItemProxy_Weapon.h"
 #include "ItemProxy_Coin.h"
 #include "ItemProxy_Consumable.h"
+#include "ItemProxy_Material.h"

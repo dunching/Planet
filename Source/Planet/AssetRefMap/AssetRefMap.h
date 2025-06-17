@@ -39,6 +39,7 @@ class URegionPromt;
 class UUpgradePromt;
 class UFocusIcon;
 class UMarkPoints;
+class UUpgradeBoder;
 class UCharacterRisingTips;
 class UInteractionList;
 class AHumanCharacter;
@@ -102,6 +103,9 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
 	TSubclassOf<URegionPromt>RegionPromtClass;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUpgradeBoder>UpgradeBoderClass;
 #pragma endregion MenusUI
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)

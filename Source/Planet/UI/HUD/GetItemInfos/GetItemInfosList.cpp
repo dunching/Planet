@@ -15,6 +15,7 @@
 #include "ItemProxy_Coin.h"
 #include "ItemProxy_Consumable.h"
 #include "ItemProxy_Skills.h"
+#include "ItemProxy_Material.h"
 
 struct FGetItemInfosList : public TStructVariable<FGetItemInfosList>
 {
@@ -164,6 +165,24 @@ void UGetItemInfosList::SetPlayerCharacter(
 							   this,
 							   std::placeholders::_1,
 							   std::placeholders::_2
+							  )
+					);
+			Handle->bIsAutoUnregister = false;
+		}
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_MaterialProxy>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnProxyChanged.AddCallback(
+					 std::bind(
+							   &UGetItemInfosList::OnMaterialProxyChanged,
+							   this,
+							   std::placeholders::_1,
+							   std::placeholders::_2,
+							   std::placeholders::_3
 							  )
 					);
 			Handle->bIsAutoUnregister = false;
@@ -378,6 +397,47 @@ void UGetItemInfosList::OnGourpmateProxyChanged(
 		{
 			OrderAry.Add(ProxyPtr);
 			CharacterPendingAry.Add({ProxyPtr, ProxyModifyType});
+		}
+		else
+		{
+			auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
+			if (WidgetPtr)
+			{
+				WidgetPtr->OnFinished.BindUObject(this, &ThisClass::OnRemovedItem);
+				WidgetPtr->ResetToolUIByData(ProxyPtr, ProxyModifyType);
+
+				UIPtr->AddChild(WidgetPtr);
+			}
+		}
+	}
+}
+
+void UGetItemInfosList::OnMaterialProxyChanged(
+	const TSharedPtr<FMaterialProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType,
+	int32 Num
+	)
+{
+	switch (ProxyModifyType)
+	{
+	case EProxyModifyType::kNumChanged:
+		{
+		}
+		break;
+	default:
+		{
+			return;
+		};
+	}
+
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
+	if (UIPtr)
+	{
+		const auto ChildNum = UIPtr->GetChildrenCount();
+		if (ChildNum >= MaxDisplayNum)
+		{
+			OrderAry.Add(ProxyPtr);
+			MaterialProxyPendingAry.Add({ProxyPtr, ProxyModifyType});
 		}
 		else
 		{

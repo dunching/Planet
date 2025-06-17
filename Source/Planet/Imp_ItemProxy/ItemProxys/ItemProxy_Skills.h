@@ -45,6 +45,8 @@ class ACharacterBase;
 class AHumanCharacter_AI;
 class AHumanCharacter;
 class UInventoryComponent;
+class UItemInteractionList;
+
 struct FCharacterProxy;
 
 struct FAllocationSkills;
@@ -95,6 +97,8 @@ public:
 	virtual void InitialProxy(
 		const FGameplayTag& InProxyType
 		) override;
+
+	virtual TSet<EItemProxyInteractionType> GetInteractionsType() const override;
 
 	virtual void SetAllocationCharacterProxy(
 		const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr,
@@ -153,6 +157,9 @@ struct PLANET_API FPassiveGrowthAttribute
 {
 	GENERATED_USTRUCT_BODY()
 	
+	/**
+	 * 到下一级所需的经验
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 LevelExperience = 100;
 	
@@ -173,11 +180,12 @@ public:
 
 	/**
 	 * 在这一级，可生成的词条级数
+	 * Index 为等级，注意 [0]意味着是1级的信息，
 	 * 1, {1，1，1}	意味着在1级生成3个一级词条
 	 * 5, {1，2，1}	意味着在5级生成2个一级词条，一个2级词条
 	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TMap<uint8, FPassiveGrowthAttribute> GrowthAttributeMap;
+	TArray<FPassiveGrowthAttribute> GrowthAttributeMap;
 
 };
 
@@ -203,6 +211,10 @@ public:
 		FArchive& Ar,
 		class UPackageMap* Map,
 		bool& bOutSuccess
+		) override;
+
+	virtual void ProcessProxyInteraction(
+		EItemProxyInteractionType ItemProxyInteractionType
 		) override;
 
 	UItemProxy_Description_PassiveSkill* GetTableRowProxy_PassiveSkillExtendInfo() const;
@@ -236,9 +248,9 @@ public:
 
 	uint8 GetLevel()const;
 	
-	uint8 GetExperience()const;
+	int32 GetExperience()const;
 	
-	uint8 GetLevelExperience()const;
+	int32 GetLevelExperience()const;
 
 	/**
 	 * 已生成的词条信息

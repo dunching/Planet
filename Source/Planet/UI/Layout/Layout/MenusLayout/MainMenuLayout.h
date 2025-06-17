@@ -44,6 +44,8 @@ public:
 	
 	void SwitchViewer(EMenuType MenuType);
 
+	UAllocationSkillsMenu* GetAllocationSkillsMenu()const;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<URaffleMenu>RaffleMenuClass;
 

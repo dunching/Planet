@@ -3,6 +3,8 @@
 #include "Components/RichTextBlock.h"
 #include "Components/TextBlock.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Blueprint/WidgetLayoutLibrary.h"
 
 #include "ItemProxy_Description.h"
 #include "TemplateHelper.h"
@@ -68,6 +70,9 @@ void UItemDecriptionBaseWidget::UpdatePosstion()
 {
 	FVector2D ScreenSpacePosition;
 	GetWorld()->GetGameViewport()->GetMousePosition(ScreenSpacePosition);
+
+	// const auto ScreenSpacePosition = UWidgetLayoutLibrary::GetMousePositionOnViewport(this);
+	
 	SetPositionInViewport(ScreenSpacePosition);
 }
 
@@ -97,17 +102,7 @@ void UItemDecriptionBaseWidget::SetUIStyle()
 	auto ItemProxy_DescriptionPtr = ItemProxy_Description.LoadSynchronous();
 	if (ItemProxy_DescriptionPtr && !ItemProxy_DescriptionPtr->DecriptionText.IsEmpty())
 	{
-		FString Text = ItemProxy_DescriptionPtr->DecriptionText[0];
-		for (const auto& Iter : ItemProxy_DescriptionPtr->Values)
-		{
-			if (Iter.Value.PerLevelValue.IsEmpty())
-			{
-				continue;
-			}
-
-			Text = Text.Replace(*Iter.Key, *UKismetStringLibrary::Conv_IntToString(Iter.Value.PerLevelValue[0]));
-		}
-
+		const FString Text = ItemProxy_DescriptionPtr->Summary;
 		auto WidgetPtr = Cast<URichTextBlock>(GetWidgetFromName(FItemDecriptionBaseWidget::Get().Text));
 		if (WidgetPtr)
 		{

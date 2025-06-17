@@ -91,6 +91,13 @@ private:
 		int32 Num
 		);
 
+	void OnTraderMaterialProxyProxyChanged(
+		const TSharedPtr<
+			FMaterialProxy>& ProxySPtr,
+		EProxyModifyType ProxyModifyType,
+		int32 Num
+		);
+
 	void NewNum(
 		int32 Num
 		);
@@ -116,6 +123,9 @@ private:
 
 	FModifyItemProxyStrategy_Consumable::FOnConsumableProxyChanged::FCallbackHandleSPtr
 	OnConsumableProxyChangedDelegateHandle;
+
+	FModifyItemProxyStrategy_MaterialProxy::FOnProxyChanged::FCallbackHandleSPtr
+	OnMaterialProxyChangedDelegateHandle;
 
 	TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr OnCoinChangedDelegateHandle;
 };
