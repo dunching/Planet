@@ -1,6 +1,10 @@
 #include "ItemProxy_Skills.h"
 
 #include "AbilitySystemComponent.h"
+#include "Components/TextBlock.h"
+#include "Components/VerticalBox.h"
+#include "Components/RichTextBlock.h"
+#include "Kismet/KismetStringLibrary.h"
 
 #include "CharacterBase.h"
 #include "DataTableCollection.h"
@@ -8,7 +12,6 @@
 #include "CharacterAttibutes.h"
 #include "AllocationSkills.h"
 #include "AssetRefMap.h"
-#include "TeamMatesHelperComponent.h"
 #include "PropertyEntrys.h"
 #include "Skill_Base.h"
 #include "Skill_Active_Base.h"
@@ -16,10 +19,9 @@
 #include "Skill_WeaponActive_Base.h"
 #include "Skill_WeaponActive_PickAxe.h"
 #include "Weapon_HandProtection.h"
-#include "Weapon_PickAxe.h"
 #include "InventoryComponent.h"
 #include "CharacterAbilitySystemComponent.h"
-#include "ItemProxyVisitorBase.h"
+#include "PropertyEntryDescription.h"
 #include "Skill_WeaponActive_Bow.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 #include "ItemProxy_Character.h"
@@ -491,7 +493,7 @@ UItemProxy_Description_PassiveSkill::UItemProxy_Description_PassiveSkill(
 		{2200,},
 		{2300,},
 		{2400,},
-		{2500, {1, 2, 3}},
+		{0, {1, 2, 3}},
 	};
 }
 
@@ -516,7 +518,17 @@ void FPassiveSkillProxy::UpdateByRemote(
 	UpdateByRemote_Allocationble(RemoteSPtr);
 
 	GeneratedPropertyEntryAry = RemoteSPtr->GeneratedPropertyEntryAry;
+	
+	if (Level != RemoteSPtr->Level)
+	{
+		LevelChangedDelegate.ValueChanged(Level, RemoteSPtr->Level);
+	}
 	Level = RemoteSPtr->Level;
+
+	if (Experience != RemoteSPtr->Experience)
+	{
+		ExperienceChangedDelegate.ValueChanged(Experience, RemoteSPtr->Experience);
+	}
 	Experience = RemoteSPtr->Experience;
 }
 
@@ -723,6 +735,54 @@ void FPassiveSkillProxy::GenerationPropertyEntry()
 	}
 }
 
+void UItemDecription_Skill_PassiveSkill::SetUIStyle()
+{
+	if (ProxySPtr)
+	{
+		{
+			if (Title)
+			{
+				Title->SetText(FText::FromString(ProxySPtr->GetProxyName()));
+			}
+		}
+		auto SkillProxySPtr = DynamicCastSharedPtr<FSkillProxyType>(ProxySPtr);
+		if (!SkillProxySPtr)
+		{
+			return;
+		}
+	}
+	else if (ProxyType.IsValid())
+	{
+		{
+			if (Title)
+			{
+				Title->SetText(FText::FromString(ItemProxy_Description->ProxyName));
+			}
+		}
+	}
+	
+	
+	auto ItemProxy_DescriptionPtr = ItemProxy_Description.LoadSynchronous();
+	if (ItemProxy_DescriptionPtr && !ItemProxy_DescriptionPtr->DecriptionText.IsEmpty())
+	{
+		FString Text = ItemProxy_DescriptionPtr->DecriptionText[0];
+		for (const auto& Iter : ItemProxy_DescriptionPtr->Values)
+		{
+			if (Iter.Value.PerLevelValue.IsEmpty())
+			{
+				continue;
+			}
+
+			Text = Text.Replace(*Iter.Key, *UKismetStringLibrary::Conv_IntToString(Iter.Value.PerLevelValue[0]));
+		}
+
+		if (DescriptionText)
+		{
+			DescriptionText->SetText(FText::FromString(Text));
+		}
+	}
+}
+
 UItemProxy_Description_PassiveSkill* FPassiveSkillProxy::GetTableRowProxy_PassiveSkillExtendInfo() const
 {
 	auto TableRowPtr = GetTableRowProxy();
@@ -907,12 +967,26 @@ uint8 FPassiveSkillProxy::GetLevel() const
 	return Level;
 }
 
-int32 FPassiveSkillProxy::GetExperience() const
+uint8 FPassiveSkillProxy::GetMaxLevel() const
+{
+	const auto CharacterGrowthAttributeAry = GetTableRowProxy_PassiveSkillExtendInfo()->GrowthAttributeMap;
+
+	return CharacterGrowthAttributeAry.Num();
+}
+
+int32 FPassiveSkillProxy::GetCurrentExperience() const
 {
 	return Experience;
 }
 
-int32 FPassiveSkillProxy::GetLevelExperience() const
+int32 FPassiveSkillProxy::GetCurrentLevelExperience() const
+{
+	return GetLevelExperience(Level);
+}
+
+int32 FPassiveSkillProxy::GetLevelExperience(
+	int32 InLevel
+	) const
 {
 	const auto CharacterGrowthAttributeAry = GetTableRowProxy_PassiveSkillExtendInfo()->GrowthAttributeMap;
 
@@ -921,7 +995,7 @@ int32 FPassiveSkillProxy::GetLevelExperience() const
 		return -1;
 	}
 
-	const auto TargetLevel = Level - 1;
+	const auto TargetLevel = InLevel - 1;
 
 	if (CharacterGrowthAttributeAry.IsValidIndex(TargetLevel))
 	{

@@ -1,13 +1,15 @@
-
 #include "ItemDetails.h"
 
+#include "GameplayTagsLibrary.h"
 #include "Components/VerticalBox.h"
 #include "Components/RichTextBlock.h"
 #include "Components/TextBlock.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "Components/WidgetSwitcher.h"
+#include "Components/ScrollBox.h"
 
 #include "ItemInteractionItem.h"
-#include "Components/WidgetSwitcher.h"
+#include "PropertyEntryDescription.h"
 
 void UItemDetails::Reset()
 {
@@ -32,7 +34,7 @@ void UItemDetails::BindData(
 		{
 			WidgetSwitcher->SetActiveWidgetIndex(1);
 		}
-		
+
 		if (NameText)
 		{
 			NameText->SetText(FText::FromString(ProxySPtr->GetProxyName()));
@@ -51,7 +53,10 @@ void UItemDetails::BindData(
 						continue;
 					}
 
-					Text = Text.Replace(*Iter.Key, *UKismetStringLibrary::Conv_IntToString(Iter.Value.PerLevelValue[0]));
+					Text = Text.Replace(
+					                    *Iter.Key,
+					                    *UKismetStringLibrary::Conv_IntToString(Iter.Value.PerLevelValue[0])
+					                   );
 				}
 
 				DescriptionText->SetText(FText::FromString(Text));
@@ -71,9 +76,41 @@ void UItemDetails::BindData(
 				if (InteractionItemPtr)
 				{
 					InteractionItemPtr->SetData(ProxySPtr, Iter);
-					
+
 					InteractionVerticalBox->AddChild(InteractionItemPtr);
 				}
+			}
+		}
+
+		// 如果是被动机能的话，需要特殊显示的内容
+		// 这里是否要扩展？
+		if (PropertyEntrysBox)
+		{
+			PropertyEntrysBox->SetVisibility(ESlateVisibility::Hidden);
+		}
+		if (ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve))
+		{
+			auto SkillProxySPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(ProxySPtr);
+			if (SkillProxySPtr)
+			{
+				if (PropertyEntrysBox)
+				{
+					PropertyEntrysBox->SetVisibility(ESlateVisibility::Visible);
+					PropertyEntrysBox->ClearChildren();
+
+					for (const auto& Iter : SkillProxySPtr->GeneratedPropertyEntryAry)
+					{
+						auto UIPtr = CreateWidget<UPropertyEntryDescription>(this, PropertyEntryDescriptionClass);
+						if (UIPtr)
+						{
+							UIPtr->SetDta(Iter.second);
+							PropertyEntrysBox->AddChild(UIPtr);
+						}
+					}
+				}
+			}
+			else
+			{
 			}
 		}
 	}

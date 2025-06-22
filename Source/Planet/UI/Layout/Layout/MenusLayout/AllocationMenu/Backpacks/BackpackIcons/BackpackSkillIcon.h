@@ -8,6 +8,8 @@
 
 #include "BackpackSkillIcon.generated.h"
 
+class UTextBlock;
+
 struct FStreamableHandle;
 
 struct FBasicProxy;
@@ -26,6 +28,8 @@ public:
 
 	UBackpackSkillIcon(const FObjectInitializer& ObjectInitializer);
 
+	virtual void NativeDestruct()override;
+
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
 	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
@@ -38,12 +42,22 @@ protected:
 
 	void SetValue(int32 Value);
 
+	/**
+	 * < 0 不显示
+	 * @param InLevel 
+	 */
+	void SetLevel(int32 InLevel);
+
 	void ResetSize(const FVector2D& Size);
 
 	virtual void NativeConstruct()override;
 
 private:
 
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* LevelText = nullptr;
+
 	TSharedPtr < FSkillProxy> ProxyPtr = nullptr;
 
+	TOnValueChangedCallbackContainer<uint8>::FCallbackHandleSPtr DelageteHandle;
 };

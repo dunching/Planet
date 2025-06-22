@@ -1,34 +1,37 @@
-
 #include "BackpackSkillIcon.h"
 
-#include <Kismet/GameplayStatics.h>
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Containers/UnrealString.h"
 #include "Components/SizeBox.h"
-#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Engine/Texture2D.h"
 #include "ToolsLibrary.h"
 #include "Components/CanvasPanel.h"
 #include "Components/ProgressBar.h"
-#include "Engine/StreamableManager.h"
-#include "Engine/AssetManager.h"
 
 #include "StateTagExtendInfo.h"
-#include "AssetRefMap.h"
 #include "ItemProxyDragDropOperation.h"
 #include "ItemProxyDragDropOperationWidget.h"
 #include "ItemProxy_Minimal.h"
 #include "GameplayTagsLibrary.h"
-#include "VisitorSubsystem.h"
 
-UBackpackSkillIcon::UBackpackSkillIcon(const FObjectInitializer& ObjectInitializer) :
-                                                                                    Super(ObjectInitializer)
+UBackpackSkillIcon::UBackpackSkillIcon(
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
-
 }
 
-void UBackpackSkillIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
+void UBackpackSkillIcon::NativeDestruct()
+{
+	DelageteHandle.Reset();
+	
+	Super::NativeDestruct();
+}
+
+void UBackpackSkillIcon::InvokeReset(
+	UUserWidget* BaseWidgetPtr
+	)
 {
 	if (BaseWidgetPtr)
 	{
@@ -40,28 +43,51 @@ void UBackpackSkillIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UBackpackSkillIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
+void UBackpackSkillIcon::ResetToolUIByData(
+	const TSharedPtr<FBasicProxy>& InBasicProxyPtr
+	)
 {
 	Super::ResetToolUIByData(InBasicProxyPtr);
 
 	if (InBasicProxyPtr)
 	{
 		if (
-			InBasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active) ||
-			InBasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve)
-			)
+			InBasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active)
+		)
 		{
 			ProxyPtr = DynamicCastSharedPtr<FSkillProxy>(InBasicProxyPtr);
+			
+			SetLevel(-1);
+
+			return;
+		}
+		
+		if (
+			InBasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve)
+		)
+		{
+			auto TempProxyPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(InBasicProxyPtr);
+
+			DelageteHandle = TempProxyPtr->LevelChangedDelegate.AddOnValueChanged(
+				 std::bind(&ThisClass::SetLevel, this, std::placeholders::_2)
+				);
+			SetLevel(TempProxyPtr->GetLevel());
+
+			ProxyPtr = TempProxyPtr;
+			return;
 		}
 	}
 }
 
-void UBackpackSkillIcon::EnableIcon(bool bIsEnable)
+void UBackpackSkillIcon::EnableIcon(
+	bool bIsEnable
+	)
 {
-
 }
 
-void UBackpackSkillIcon::SetNum(int32 NewNum)
+void UBackpackSkillIcon::SetNum(
+	int32 NewNum
+	)
 {
 	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(TEXT("Number")));
 	if (!NumTextPtr)
@@ -80,7 +106,9 @@ void UBackpackSkillIcon::SetNum(int32 NewNum)
 	}
 }
 
-void UBackpackSkillIcon::SetValue(int32 Value)
+void UBackpackSkillIcon::SetValue(
+	int32 Value
+	)
 {
 	auto ProgressBarPtr = Cast<UProgressBar>(GetWidgetFromName(TEXT("ProgressBar")));
 	if (!ProgressBarPtr)
@@ -89,7 +117,27 @@ void UBackpackSkillIcon::SetValue(int32 Value)
 	}
 }
 
-void UBackpackSkillIcon::ResetSize(const FVector2D& Size)
+void UBackpackSkillIcon::SetLevel(
+	int32 InLevel
+	)
+{
+	if (LevelText)
+	{
+		if (InLevel>0)
+		{
+			LevelText->SetVisibility(ESlateVisibility::Visible);
+			LevelText->SetText(FText::FromString(FString::Printf(TEXT("%d"), InLevel)));
+		}
+		else
+		{
+			LevelText->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+}
+
+void UBackpackSkillIcon::ResetSize(
+	const FVector2D& Size
+	)
 {
 	auto SizeBoxPtr = Cast<USizeBox>(GetWidgetFromName(TEXT("IconSize")));
 	if (SizeBoxPtr)

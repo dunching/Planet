@@ -247,7 +247,14 @@ public:
 		int32 NewLevel
 		);
 
-#pragma region
+	UFUNCTION(Server, Reliable)
+	void UpgradeSkill(
+		const FGuid& SkillID,
+		const TArray<FGuid>& CosumeProxysIDS,
+		const TArray<uint32>& CosumeProxyNums
+		);
+
+#pragma endregion
 
 protected:
 	virtual void GetLifetimeReplicatedProps(
@@ -315,14 +322,18 @@ protected:
 		AActor* Actor
 		);
 
-	void OnPossessCharacterMakedDamage(const FOnEffectedTargetCallback&OnEffectedTargetCallback);
+	void OnPossessCharacterMakedDamage(
+		const FOnEffectedTargetCallback& OnEffectedTargetCallback
+		);
 
 	using FMakedDamageDelegate = TCallbackHandleContainer<void(
 		const FOnEffectedTargetCallback&
+
+		
 		)>;
 
 	FMakedDamageDelegate::FCallbackHandleSPtr MakedDamageDelegateHandle;
-	
+
 	UPROPERTY(ReplicatedUsing = OnRep_GroupManagger)
 	TObjectPtr<AGroupManagger> GroupManaggerPtr = nullptr;
 

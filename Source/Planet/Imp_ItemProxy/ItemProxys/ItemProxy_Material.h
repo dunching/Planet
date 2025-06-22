@@ -111,7 +111,7 @@ class PLANET_API UItemProxy_Description_ExperienceMaterial : public UItemProxy_D
 public:
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	int32 ExperienceValue = 50;
+	int32 ExperienceValue = 5000;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	int32 Level = 1;

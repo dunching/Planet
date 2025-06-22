@@ -12,11 +12,14 @@
 
 #include "ItemDetails.generated.h"
 
-class UItemInteractionItem;
 class UTextBlock;
 class URichTextBlock;
 class UVerticalBox;
 class UWidgetSwitcher;
+class UScrollBox;
+
+class UItemInteractionItem;
+class UPropertyEntryDescription;
 
 UCLASS()
 class PLANET_API UItemDetails :
@@ -51,6 +54,12 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UItemInteractionItem> InteractionItemClass;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UPropertyEntryDescription>PropertyEntryDescriptionClass;
+	
+	UPROPERTY(meta = (BindWidget))
+	UScrollBox* PropertyEntrysBox = nullptr;
 	
 	TSharedPtr<FBasicProxy> PreviousProxySPtr = nullptr;
 };

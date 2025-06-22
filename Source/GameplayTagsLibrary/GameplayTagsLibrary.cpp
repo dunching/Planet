@@ -668,70 +668,70 @@ FString UGameplayTagsLibrary::GetModifyItemTagName(
 	
 	else if (Tag == GEData_ModifyItem_Wood_Value)
 	{
-		return TEXT("金元素强度");
+		return TEXT("木元素强度");
 	}
 	else if (Tag == GEData_ModifyItem_Wood_Penetration)
 	{
-		return TEXT("金元素穿透");
+		return TEXT("木元素穿透");
 	}
 	else if (Tag == GEData_ModifyItem_Wood_PercentPenetration)
 	{
-		return TEXT("金元素百分比穿透");
+		return TEXT("木元素百分比穿透");
 	}
 	else if (Tag == GEData_ModifyItem_Wood_Resistance)
 	{
-		return TEXT("金元素抗性");
+		return TEXT("木元素抗性");
 	}
 	
 	else if (Tag == GEData_ModifyItem_Water_Value)
 	{
-		return TEXT("金元素强度");
+		return TEXT("水元素强度");
 	}
 	else if (Tag == GEData_ModifyItem_Water_Penetration)
 	{
-		return TEXT("金元素穿透");
+		return TEXT("水元素穿透");
 	}
 	else if (Tag == GEData_ModifyItem_Water_PercentPenetration)
 	{
-		return TEXT("金元素百分比穿透");
+		return TEXT("水元素百分比穿透");
 	}
 	else if (Tag == GEData_ModifyItem_Water_Resistance)
 	{
-		return TEXT("金元素抗性");
+		return TEXT("水元素抗性");
 	}
 	
 	else if (Tag == GEData_ModifyItem_Fire_Value)
 	{
-		return TEXT("金元素强度");
+		return TEXT("火元素强度");
 	}
 	else if (Tag == GEData_ModifyItem_Fire_Penetration)
 	{
-		return TEXT("金元素穿透");
+		return TEXT("火元素穿透");
 	}
 	else if (Tag == GEData_ModifyItem_Fire_PercentPenetration)
 	{
-		return TEXT("金元素百分比穿透");
+		return TEXT("火元素百分比穿透");
 	}
 	else if (Tag == GEData_ModifyItem_Fire_Resistance)
 	{
-		return TEXT("金元素抗性");
+		return TEXT("火元素抗性");
 	}
 	
 	else if (Tag == GEData_ModifyItem_Earth_Value)
 	{
-		return TEXT("金元素强度");
+		return TEXT("土元素强度");
 	}
 	else if (Tag == GEData_ModifyItem_Earth_Penetration)
 	{
-		return TEXT("金元素穿透");
+		return TEXT("土元素穿透");
 	}
 	else if (Tag == GEData_ModifyItem_Earth_PercentPenetration)
 	{
-		return TEXT("金元素百分比穿透");
+		return TEXT("土元素百分比穿透");
 	}
 	else if (Tag == GEData_ModifyItem_Earth_Resistance)
 	{
-		return TEXT("金元素抗性");
+		return TEXT("土元素抗性");
 	}
 	
 	return TEXT("");

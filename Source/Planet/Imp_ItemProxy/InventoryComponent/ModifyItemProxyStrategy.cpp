@@ -435,6 +435,20 @@ FGameplayTag FModifyItemProxyStrategy_MaterialProxy::GetCanOperationType() const
 	return UGameplayTagsLibrary::Proxy_Material;
 }
 
+void FModifyItemProxyStrategy_MaterialProxy::FindByID(
+	const FGuid& ID,
+	const TSharedPtr<FBasicProxy>& FindResultSPtr,
+	const TObjectPtr<const UInventoryComponentBase>& InventoryComponentPtr
+	)
+{
+	ResultSPtr = nullptr;
+
+	if (FindResultSPtr)
+	{
+		ResultSPtr = DynamicCastSharedPtr<FItemProxyType>(FindResultSPtr);
+	}
+}
+
 TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_MaterialProxy::FindByType(
 	const FGameplayTag& ProxyType,
 	const TObjectPtr<const UInventoryComponentBase>& InventoryComponentPtr

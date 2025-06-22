@@ -61,11 +61,11 @@
 #include "WeatherSystem.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
-                                                                                 TEXT("PlanetPlayerController.DrawControllerRotation"),
-                                                                                 0,
-                                                                                 TEXT("")
-                                                                                 TEXT(" default: 0")
-                                                                                );
+	 TEXT("PlanetPlayerController.DrawControllerRotation"),
+	 0,
+	 TEXT("")
+	 TEXT(" default: 0")
+	);
 
 APlanetPlayerController::APlanetPlayerController(
 	const FObjectInitializer& ObjectInitializer
@@ -405,6 +405,63 @@ void APlanetPlayerController::UpdateCharacterTalent_Implementation(
 	{
 		TargetCharacterProxySPtr->UpdateTalentSocket(TalentSocket, NewLevel);
 	}
+}
+
+void APlanetPlayerController::UpgradeSkill_Implementation(
+	const FGuid& SkillID,
+	const TArray<FGuid>& CosumeProxysIDS,
+	const TArray<uint32>& CosumeProxyNums
+	)
+{
+	auto InventoryComponentPtr = GetInventoryComponent();
+	if (!InventoryComponentPtr)
+	{
+	}
+
+	if (CosumeProxysIDS.Num() != CosumeProxyNums.Num())
+	{
+		return;
+	}
+
+	int32 Experience = 0;
+	for (int32 Index = 0; Index < CosumeProxyNums.Num(); Index++)
+	{
+		auto MaterialProxySPtr = InventoryComponentPtr->FindProxy<FModifyItemProxyStrategy_MaterialProxy>(
+			 CosumeProxysIDS[Index]
+			);
+		if (!MaterialProxySPtr)
+		{
+			continue;
+		}
+
+		auto ExperienceMaterialProxySPtr = DynamicCastSharedPtr<FExperienceMaterialProxy>(MaterialProxySPtr);
+		if (!ExperienceMaterialProxySPtr)
+		{
+			continue;
+		}
+
+		const int32 OffsetNum = CosumeProxyNums[Index];
+		if (ExperienceMaterialProxySPtr->GetNum() > OffsetNum)
+		{
+			ExperienceMaterialProxySPtr->ModifyNum(-OffsetNum);
+		}
+		else
+		{
+			InventoryComponentPtr->RemoveProxy(CosumeProxysIDS[Index]);
+		}
+
+		Experience += ExperienceMaterialProxySPtr->GetExperienceValue() * OffsetNum;
+	}
+
+	auto SkillProxySPtr = InventoryComponentPtr->FindProxy<FModifyItemProxyStrategy_PassveSkill>(
+		 SkillID
+		);
+	if (!SkillProxySPtr)
+	{
+		return;
+	}
+
+	SkillProxySPtr->AddExperience(Experience);
 }
 
 void APlanetPlayerController::GetLifetimeReplicatedProps(
@@ -996,7 +1053,9 @@ void APlanetPlayerController::AddShieldToTarget_Implementation(
 				                                           GASPtr->MakeEffectContext()
 				                                          );
 
-				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(
+				                                          UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override
+				                                         );
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield);
 				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 				                                               UGameplayTagsLibrary::DataSource_Character,

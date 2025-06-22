@@ -56,6 +56,32 @@ namespace HumanProcessor
 		Super::QuitAction();
 	}
 
+	bool FHumanViewAlloctionSkillsProcessor::InputKey(
+		const FInputKeyEventArgs& EventArgs
+		)
+	{
+		switch (EventArgs.Event)
+		{
+		case IE_Pressed:
+			{
+			}
+			break;
+		case IE_Released:
+			{
+				auto GameOptionsPtr = UGameOptions::GetInstance();
+
+				if (EventArgs.Key == GameOptionsPtr->Return)
+				{
+					// 这个菜单下不要处理这个事件，因为我们“可能”需要【右键】去【移除】分配
+					return true;
+				}
+			}
+			break;
+		}
+
+		return Super::InputKey(EventArgs);
+	}
+
 	void FHumanViewAlloctionSkillsProcessor::CheckInteraction()
 	{
 	}

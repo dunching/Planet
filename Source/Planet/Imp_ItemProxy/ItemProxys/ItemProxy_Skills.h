@@ -10,6 +10,7 @@
 
 #include "GameplayAbilitySpecHandle.h"
 #include "GenerateTypes.h"
+#include "ItemDecription.h"
 
 #include "ItemProxy.h"
 #include "ItemProxy_Description.h"
@@ -27,6 +28,10 @@ struct FTableRowProxy_CharacterGrowthAttribute;
 struct FTableRowProxy_Consumable;
 struct FTableRowProxy_GeneratiblePropertyEntrys;
 struct FTableRowProxy_CharacterType;
+
+class UTextBlock;
+class URichTextBlock;
+class UVerticalBox;
 class UTexture2D;
 class AToolProxyBase;
 class APlanetWeapon_Base;
@@ -46,6 +51,7 @@ class AHumanCharacter_AI;
 class AHumanCharacter;
 class UInventoryComponent;
 class UItemInteractionList;
+class UPropertyEntryDescription;
 
 struct FCharacterProxy;
 
@@ -183,6 +189,8 @@ public:
 	 * Index 为等级，注意 [0]意味着是1级的信息，
 	 * 1, {1，1，1}	意味着在1级生成3个一级词条
 	 * 5, {1，2，1}	意味着在5级生成2个一级词条，一个2级词条
+	 *
+	 * 最大等级的经验是不需要的
 	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TArray<FPassiveGrowthAttribute> GrowthAttributeMap;
@@ -248,9 +256,13 @@ public:
 
 	uint8 GetLevel()const;
 	
-	int32 GetExperience()const;
+	uint8 GetMaxLevel()const;
 	
-	int32 GetLevelExperience()const;
+	int32 GetCurrentExperience()const;
+	
+	int32 GetCurrentLevelExperience()const;
+
+	int32 GetLevelExperience(int32 InLevel)const;
 
 	/**
 	 * 已生成的词条信息
@@ -281,6 +293,29 @@ private:
 	int32 Experience = 0;
 
 };
+
+UCLASS()
+class PLANET_API UItemDecription_Skill_PassiveSkill : public UItemDecription
+{
+	GENERATED_BODY()
+
+public:
+	using FSkillProxyType = FPassiveSkillProxy;
+
+	using FItemProxy_DescriptionType = UItemProxy_Description_PassiveSkill;
+
+private:
+	virtual void SetUIStyle() override;
+
+protected:
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* Title = nullptr;
+	
+	UPROPERTY(meta = (BindWidget))
+	URichTextBlock* DescriptionText = nullptr;
+	
+};
+
 #pragma endregion
 
 #pragma region 主动技能

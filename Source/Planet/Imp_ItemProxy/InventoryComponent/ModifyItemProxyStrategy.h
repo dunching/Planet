@@ -256,6 +256,12 @@ struct PLANET_API FModifyItemProxyStrategy_MaterialProxy : public FModifyItemPro
 
 	virtual FGameplayTag GetCanOperationType() const override;
 
+	virtual void FindByID(
+		const FGuid& ID,
+		const TSharedPtr<FBasicProxy>& FindResultSPtr,
+		const TObjectPtr<const UInventoryComponentBase>& InventoryComponentPtr
+		) override;
+
 	virtual TArray<TSharedPtr<FBasicProxy>> FindByType(
 		const FGameplayTag& ProxyType,
 		const TObjectPtr<const UInventoryComponentBase>& InventoryComponentPtr
@@ -301,6 +307,8 @@ struct PLANET_API FModifyItemProxyStrategy_MaterialProxy : public FModifyItemPro
 		) override;
 
 	FOnProxyChanged OnProxyChanged;
+
+	TSharedPtr<FItemProxyType> ResultSPtr = nullptr;
 
 private:
 	template <typename MaterialProxyType>

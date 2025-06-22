@@ -109,10 +109,7 @@ FReply UBackpackIcon::NativeOnMouseButtonDown(
 
 	if (BasicProxyPtr)
 	{
-		if (BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve))
-		{
-			AllocationSkillsMenuPtr->OnSelectedProxy(BasicProxyPtr);
-		}
+		AllocationSkillsMenuPtr->OnSelectedProxy(BasicProxyPtr);
 	}
 
 	return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;

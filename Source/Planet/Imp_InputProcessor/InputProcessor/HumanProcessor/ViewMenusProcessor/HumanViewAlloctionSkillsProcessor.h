@@ -24,6 +24,10 @@ namespace HumanProcessor
 
 		virtual void QuitAction()override;
 
+		virtual bool InputKey(
+			const FInputKeyEventArgs& EventArgs
+		) override;
+
 	protected:
 
 	private:

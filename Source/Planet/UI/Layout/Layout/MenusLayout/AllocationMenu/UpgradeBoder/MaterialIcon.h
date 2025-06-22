@@ -16,6 +16,10 @@ class UProxyIcon;
 class UTextBlock;
 class UButton;
 
+class UUpgradeBoder;
+
+struct FMaterialProxy;
+
 UCLASS()
 class PLANET_API UMaterialIcon :
 	public UUserWidget_Override
@@ -24,20 +28,38 @@ class PLANET_API UMaterialIcon :
 
 public:
 
+using FDelegateHandle=  TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr ;
+	
 	virtual void NativeConstruct() override;
+
+	virtual void NativeDestruct() override;
 	
 	void BindData(
-		const TSharedPtr<FBasicProxy>& ProxySPtr
+		const TSharedPtr<FMaterialProxy>& ProxySPtr
 		);
 
+	UUpgradeBoder*UpgradeBoderPtr = nullptr;
+
+	TSharedPtr<FMaterialProxy> ProxySPtr = nullptr;
+	
 protected:
+	void OnValueChanged(int32 OldValue, int32 NewValue);
+	
+	UFUNCTION()
+	void OnClickedAddAllBtn();
+	
 	UFUNCTION()
 	void OnClickedAddBtn();
 	
 	UFUNCTION()
 	void OnClickedSubBtn();
+
+	void Update();
 	
-	uint32 CurrentNum = 1;
+	int32 CurrentNum = 0;
+	
+	UPROPERTY(meta = (BindWidget))
+	UButton* AddAllBtn = nullptr;
 	
 	UPROPERTY(meta = (BindWidget))
 	UButton* AddBtn = nullptr;
@@ -51,5 +73,6 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UProxyIcon* ProxyIcon = nullptr;
 
+	FDelegateHandle DelegateHandle = nullptr;
 };
 
