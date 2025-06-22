@@ -178,7 +178,7 @@ void TestCommand::RemoveProxy(
 	)
 {
 #if WITH_EDITOR
-	if (!Args.IsValidIndex(1))
+	if (!Args.IsValidIndex(0))
 	{
 		return;
 	}
@@ -186,10 +186,9 @@ void TestCommand::RemoveProxy(
 	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
 	if (PCPtr)
 	{
-		auto InventoryComponentPtr = PCPtr->GetGroupManagger()->GetInventoryComponent();
-		if (InventoryComponentPtr)
-		{
-		}
+		PCPtr->RemoveProxy(
+						FGameplayTag::RequestGameplayTag(*Args[0])
+					   );
 	}
 #endif
 }

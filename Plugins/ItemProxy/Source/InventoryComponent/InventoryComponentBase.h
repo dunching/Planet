@@ -177,8 +177,7 @@ private:
 		);
 
 #pragma endregion
-	
-	
+
 protected:
 	virtual void InitializeComponent() override;
 

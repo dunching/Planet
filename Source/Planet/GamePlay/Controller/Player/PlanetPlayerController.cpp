@@ -1615,3 +1615,20 @@ inline void APlanetPlayerController::AddProxy_Implementation(
 		                                  );
 	}
 }
+
+void APlanetPlayerController::RemoveProxy_Implementation(
+	const FGameplayTag& ProxyType
+	)
+{
+	auto InventoryComponentPtr = GetGroupManagger()->GetInventoryComponent();
+	if (InventoryComponentPtr)
+	{
+		auto Ary = InventoryComponentPtr->FindAllProxyType(ProxyType);
+		for (const auto& Iter : Ary)
+		{
+			InventoryComponentPtr->RemoveProxy(
+			                                   Iter->GetID()
+			                                  );
+		}
+	}
+}

@@ -203,6 +203,11 @@ public:
 		);
 
 	UFUNCTION(Server, Reliable)
+	void RemoveProxy(
+		const FGameplayTag& ProxyType
+		);
+
+	UFUNCTION(Server, Reliable)
 	void SwitchPlayerInput(
 		const TArray<FString>& Args
 		);

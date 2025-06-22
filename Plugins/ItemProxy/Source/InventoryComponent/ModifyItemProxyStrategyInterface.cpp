@@ -94,5 +94,5 @@ void FModifyItemProxyStrategyIterface::RemoveByRemote(
 	const TSharedPtr<FBasicProxy>& RemoteProxySPtr
 	)
 {
-	InventoryComponentPtr->RemoveFromContainer(RemoteProxySPtr);
+	RemoveItemProxy(InventoryComponentPtr, RemoteProxySPtr->GetID());
 }

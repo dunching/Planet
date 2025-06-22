@@ -415,6 +415,8 @@ void FModifyItemProxyStrategy_Consumable::RemoveByRemote(
 	const TSharedPtr<FBasicProxy>& RemoteProxySPtr
 	)
 {
+	FModifyItemProxyStrategyBase<FConsumableProxy>::RemoveByRemote(InventoryComponentPtr, RemoteProxySPtr);
+	
 	FModifyItemProxyStrategyBase<
 		FItemProxyType>::RemoveByRemote(
 		                                InventoryComponentPtr,
@@ -501,6 +503,18 @@ void FModifyItemProxyStrategy_MaterialProxy::RemoveItemProxy(
 	{
 		InventoryComponentPtr->RemoveFromContainer(ProxySPtr);
 	}
+
+	for (auto & Iter : ProxyTypeMap)
+	{
+		for (int32 Index = 0;Index < Iter.Value.Num(); Index++)
+		{
+			if (InProxyID == Iter.Value[Index]->GetID())
+			{
+				Iter.Value.RemoveAt(Index);
+				return;
+			}
+		}
+	}
 }
 
 TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_MaterialProxy::AddByRemote(
@@ -536,6 +550,8 @@ void FModifyItemProxyStrategy_MaterialProxy::RemoveByRemote(
 	)
 {
 	FModifyItemProxyStrategyIterface::RemoveByRemote(InventoryComponentPtr, RemoteProxySPtr);
+	
+	OnProxyChanged.ExcuteCallback(DynamicCastSharedPtr<FMaterialProxy>(RemoteProxySPtr), EProxyModifyType::kRemove, 0);
 }
 
 TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_MaterialProxy::NetSerialize(

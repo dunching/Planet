@@ -21,6 +21,8 @@
 #include "CharacterBase.h"
 #include "CoinList.h"
 #include "ItemProxy_Character.h"
+#include "ModifyItemProxyStrategy.h"
+#include "PlanetPlayerController.h"
 
 struct FBackpackMenu : public TStructVariable<FBackpackMenu>
 {
@@ -46,6 +48,85 @@ void UBackpackMenu::NativeConstruct()
 
 void UBackpackMenu::EnableMenu()
 {
+	auto PCPtr = Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
+	auto InventoryComponentPtr = PCPtr->GetInventoryComponent();
+	{
+		auto ModifyItemProxyStrategySPtr = InventoryComponentPtr->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_Weapon>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			OnWeaponProxyChangedDelagateHandle =
+				ModifyItemProxyStrategySPtr->OnWeaponProxyChanged.AddCallback(
+				                                                              std::bind(
+					                                                               &ThisClass::AddProxy,
+					                                                               this,
+					                                                               std::placeholders::_1
+					                                                              )
+				                                                             );
+		}
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = InventoryComponentPtr->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_Consumable>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			OnConsumableProxyChangedDelagateHandle =
+				ModifyItemProxyStrategySPtr->OnConsumableProxyChanged.AddCallback(
+					 std::bind(
+					           &ThisClass::AddConsumableProxy,
+					           this,
+					           std::placeholders::_1
+					          )
+					);
+		}
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = InventoryComponentPtr->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_ActiveSkill>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			OnActiveSkillProxyChangedDelagateHandle =
+				ModifyItemProxyStrategySPtr->OnSkillProxyChanged.AddCallback(
+				                                                             std::bind(
+					                                                              &ThisClass::AddSkillProxy,
+					                                                              this,
+					                                                              std::placeholders::_1
+					                                                             )
+				                                                            );
+		}
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = InventoryComponentPtr->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_PassveSkill>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			OnPassiveSkillProxyChangedDelagateHandle =
+				ModifyItemProxyStrategySPtr->OnSkillProxyChanged.AddCallback(
+				                                                             std::bind(
+					                                                              &ThisClass::AddSkillProxy,
+					                                                              this,
+					                                                              std::placeholders::_1
+					                                                             )
+				                                                            );
+		}
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = InventoryComponentPtr->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_MaterialProxy>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			OnMaterialProxyChangedDelagateHandle =
+				ModifyItemProxyStrategySPtr->OnProxyChanged.AddCallback(
+				                                                        std::bind(
+					                                                         &ThisClass::AddMaterialProxy,
+					                                                         this,
+					                                                         std::placeholders::_1,
+					                                                         std::placeholders::_2
+					                                                        )
+				                                                       );
+		}
+	}
+
 	ResetUIByData_All();
 
 	auto UIPtr = Cast<UCoinList>(GetWidgetFromName(FBackpackMenu::Get().CoinList));
@@ -58,6 +139,12 @@ void UBackpackMenu::EnableMenu()
 
 void UBackpackMenu::DisEnableMenu()
 {
+	OnWeaponProxyChangedDelagateHandle.Reset();
+	OnMaterialProxyChangedDelagateHandle.Reset();
+	OnConsumableProxyChangedDelagateHandle.Reset();
+	OnActiveSkillProxyChangedDelagateHandle.Reset();
+	OnPassiveSkillProxyChangedDelagateHandle.Reset();
+
 	auto UIPtr = Cast<UCoinList>(GetWidgetFromName(FBackpackMenu::Get().CoinList));
 	if (!UIPtr)
 	{
@@ -104,19 +191,26 @@ void UBackpackMenu::ResetUIByData_Skill()
 			Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve)
 		)
 		{
-			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
-			if (WidgetPtr)
-			{
-				WidgetPtr->TargetBasicProxyPtr = Iter;
-				WidgetPtr->AllocationSkillsMenuPtr = AllocationSkillsMenuPtr;
-				TileViewPtr->AddItem(WidgetPtr);
-			}
+			AddProxy(Iter);
 		}
+	}
+}
+
+void UBackpackMenu::AddSkillProxy(
+	const TSharedPtr<FSkillProxy>& ProxySPtr
+	)
+{
+	if (BackpackViewFilterFlags.test(EBackpackViewFilter::kSkill))
+	{
+		AddProxy(ProxySPtr);
 	}
 }
 
 void UBackpackMenu::ResetUIByData_Weapon()
 {
+	BackpackViewFilterFlags.reset();
+	BackpackViewFilterFlags.set(EBackpackViewFilter::kWeapon);
+
 	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(FBackpackMenu::Get().BackpackTile));
 	if (!TileViewPtr)
 	{
@@ -124,7 +218,6 @@ void UBackpackMenu::ResetUIByData_Weapon()
 	}
 
 	TileViewPtr->ClearListItems();
-	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
 	auto ItemAryRef = GetProxys();
 	for (const auto& Iter : ItemAryRef)
 	{
@@ -136,14 +229,18 @@ void UBackpackMenu::ResetUIByData_Weapon()
 			Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Weapon)
 		)
 		{
-			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
-			if (WidgetPtr)
-			{
-				WidgetPtr->TargetBasicProxyPtr = Iter;
-				WidgetPtr->AllocationSkillsMenuPtr = AllocationSkillsMenuPtr;
-				TileViewPtr->AddItem(WidgetPtr);
-			}
+			AddWeaponProxy(DynamicCastSharedPtr<FWeaponProxy>(Iter));
 		}
+	}
+}
+
+void UBackpackMenu::AddWeaponProxy(
+	const TSharedPtr<FWeaponProxy>& ProxySPtr
+	)
+{
+	if (BackpackViewFilterFlags.test(EBackpackViewFilter::kWeapon))
+	{
+		AddProxy(ProxySPtr);
 	}
 }
 
@@ -168,19 +265,77 @@ void UBackpackMenu::ResetUIByData_Consumable()
 			Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables)
 		)
 		{
-			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
-			if (WidgetPtr)
+			AddProxy(Iter);
+		}
+	}
+}
+
+void UBackpackMenu::AddConsumableProxy(
+	const TSharedPtr<FConsumableProxy>& ProxySPtr
+	)
+{
+	if (BackpackViewFilterFlags.test(EBackpackViewFilter::kConsumable))
+	{
+		AddProxy(ProxySPtr);
+	}
+}
+
+void UBackpackMenu::ResetUIByData_Material()
+{
+	BackpackViewFilterFlags.reset();
+	BackpackViewFilterFlags.set(EBackpackViewFilter::kMaterial);
+
+	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(FBackpackMenu::Get().BackpackTile));
+	if (!TileViewPtr)
+	{
+		return;
+	}
+
+	TileViewPtr->ClearListItems();
+	auto ItemAryRef = GetProxys();
+	for (const auto& Iter : ItemAryRef)
+	{
+		if (!Iter)
+		{
+			continue;
+		}
+		if (
+			Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Material)
+		)
+		{
+			AddProxy(Iter);
+		}
+	}
+}
+
+void UBackpackMenu::AddMaterialProxy(
+	const TSharedPtr<FMaterialProxy>& ProxySPtr,
+	EProxyModifyType ProxyModifyType
+	)
+{
+	if (BackpackViewFilterFlags.test(EBackpackViewFilter::kMaterial))
+	{
+		switch (ProxyModifyType)
+		{
+		case EProxyModifyType::kPropertyChange:
+		case EProxyModifyType::kNumChanged:
 			{
-				WidgetPtr->TargetBasicProxyPtr = Iter;
-				WidgetPtr->AllocationSkillsMenuPtr = AllocationSkillsMenuPtr;
-				TileViewPtr->AddItem(WidgetPtr);
+				AddProxy(ProxySPtr);
 			}
+			break;
+		case EProxyModifyType::kRemove:
+			{
+				RemoveProxy(ProxySPtr);
+			}
+			break;
 		}
 	}
 }
 
 void UBackpackMenu::ResetUIByData_All()
 {
+	BackpackViewFilterFlags.set();
+
 	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(FBackpackMenu::Get().BackpackTile));
 	if (!TileViewPtr)
 	{
@@ -205,19 +360,13 @@ void UBackpackMenu::ResetUIByData_All()
 			Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Material)
 		)
 		{
-			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
-			if (WidgetPtr)
-			{
-				WidgetPtr->TargetBasicProxyPtr = Iter;
-				WidgetPtr->AllocationSkillsMenuPtr = AllocationSkillsMenuPtr;
-				TileViewPtr->AddItem(WidgetPtr);
-			}
+			AddProxy(Iter);
 		}
 	}
 }
 
-void UBackpackMenu::ResetProxys(
-	const TSet<FGameplayTag>& TargetProxyTypeTag
+void UBackpackMenu::AddProxy(
+	const TSharedPtr<FBasicProxy>& ProxySPtr
 	)
 {
 	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(FBackpackMenu::Get().BackpackTile));
@@ -226,32 +375,34 @@ void UBackpackMenu::ResetProxys(
 		return;
 	}
 
-	TileViewPtr->ClearListItems();
-	
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	auto ItemAryRef = GetProxys();
-	
-	for (const auto& Iter : ItemAryRef)
+	auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
+	if (WidgetPtr)
 	{
-		if (!Iter)
+		WidgetPtr->TargetBasicProxyPtr = ProxySPtr;
+		WidgetPtr->AllocationSkillsMenuPtr = AllocationSkillsMenuPtr;
+		TileViewPtr->AddItem(WidgetPtr);
+	}
+}
+
+void UBackpackMenu::RemoveProxy(
+	const TSharedPtr<FBasicProxy>& ProxySPtr
+	)
+{
+	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(FBackpackMenu::Get().BackpackTile));
+	if (!TileViewPtr)
+	{
+		return;
+	}
+
+	auto Items = TileViewPtr->GetListItems();
+	for (auto Iter : Items)
+	{
+		auto WrapperPtr = Cast<UBackpackIconWrapper>(Iter);
+		if (WrapperPtr && WrapperPtr->TargetBasicProxyPtr == ProxySPtr)
 		{
-			continue;
-		}
-		for (const auto &SecondIter: TargetProxyTypeTag)
-		{
-			if (
-				Iter->GetProxyType().MatchesTag(SecondIter)
-			)
-			{
-				auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
-				if (WidgetPtr)
-				{
-					WidgetPtr->TargetBasicProxyPtr = Iter;
-					WidgetPtr->AllocationSkillsMenuPtr = AllocationSkillsMenuPtr;
-					TileViewPtr->AddItem(WidgetPtr);
-				}
-				break;
-			}
+			TileViewPtr->RemoveItem(WrapperPtr);
+			return;
 		}
 	}
 }
@@ -306,7 +457,7 @@ void UBackpackMenu::OnConsumableBtnCliked()
 
 void UBackpackMenu::OnMaterialBtnCliked()
 {
-	ResetProxys({UGameplayTagsLibrary::Proxy_Material});
+	ResetUIByData_Material();
 }
 
 void UBackpackMenu::OnShowAllBtnCliked()

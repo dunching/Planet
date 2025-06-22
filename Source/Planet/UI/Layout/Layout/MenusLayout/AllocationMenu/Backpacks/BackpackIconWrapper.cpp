@@ -63,6 +63,8 @@ void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Basi
 {
 	if (BasicProxyPtr)
 	{
+		TargetBasicProxyPtr = BasicProxyPtr;
+		
 		if (BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 		{
 			auto UIPtr = Cast<UBorder>(GetWidgetFromName(BackpackIconWrapper::Border));
