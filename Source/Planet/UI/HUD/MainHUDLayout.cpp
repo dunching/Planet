@@ -261,6 +261,26 @@ UOverlaySlot* UMainHUDLayout::DisplayWidget(
 	return SlotPtr; 
 }
 
+void UMainHUDLayout::RemoveWidget(
+	const TSubclassOf<UUserWidget>& WidgetClass
+	)
+{
+	auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FMainHUDLayout::Get().OtherWidgets));
+	if (!UIPtr)
+	{
+		return;
+	}
+	auto ChildrensAry = UIPtr->GetAllChildren();
+	for (auto Iter : ChildrensAry)
+	{
+		if (Iter->IsA(WidgetClass))
+		{
+			Iter->RemoveFromParent();
+			return;
+		}
+	}
+}
+
 void UMainHUDLayout::SwitchIsLowerHP(
 	bool bIsLowerHP
 	)

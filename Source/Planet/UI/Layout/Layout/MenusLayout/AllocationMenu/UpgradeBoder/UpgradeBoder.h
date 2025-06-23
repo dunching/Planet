@@ -16,6 +16,7 @@ class UProgressBar;
 class UButton;
 class UTextBlock;
 class UScrollBox;
+class UWidgetSwitcher;
 class UMaterialIcon;
 
 struct FPassiveSkillProxy;
@@ -37,9 +38,19 @@ public:
 		)
 	>::FCallbackHandleSPtr;
 
+	using FOnUpgradeSkillCompleteDelagateHandle = TCallbackHandleContainer<void(
+		const TArray<FGeneratedPropertyEntryInfo>&
+		
+		)>::FCallbackHandleSPtr;
+
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
+
+	virtual FReply NativeOnKeyDown(
+		const FGeometry& InGeometry,
+		const FKeyEvent& InKeyEvent
+		) override;
 
 	void BindData(
 		const TSharedPtr<FPassiveSkillProxy>& ProxySPtr
@@ -65,6 +76,9 @@ protected:
 	UFUNCTION()
 	void OnClickedCancelBtn();
 
+	UFUNCTION()
+	void OnClickedConfirmBtn();
+
 	void OnProxyChanged(
 		const TSharedPtr<
 			FMaterialProxy>& ProxySPtr,
@@ -73,23 +87,29 @@ protected:
 		int32 Num
 		);
 
+	void OnUpgradeSkillComplete(
+		const TArray<FGeneratedPropertyEntryInfo>& GeneratedPropertyEntryInfoAry
+		);
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<UMaterialIcon> MaterialIconClass = nullptr;
 
 	/**
-	 * TODO 
 	 * 0. 选材料界面
 	 * 1. 升级中，等待Server执行成功回调
 	 * 2. 完成界面，显示新增的词条
 	 */
-	// UPROPERTY(meta = (BindWidget))
-	// UWidgetSwitcher* WidgetSwitcher = nullptr;
+	UPROPERTY(meta = (BindWidget))
+	UWidgetSwitcher* WidgetSwitcher = nullptr;
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* UpgradeBtn = nullptr;
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* CancelBtn = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* ConfirmBtn = nullptr;
 
 	UPROPERTY(meta = (BindWidget))
 	UProgressBar* ProgressBar = nullptr;
@@ -106,6 +126,12 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UScrollBox* ScrollBox = nullptr;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UPropertyEntryDescription> PropertyEntryDescriptionClass;
+
+	UPROPERTY(meta = (BindWidget))
+	UScrollBox* PropertyEntrysBox = nullptr;
+
 	/**
 	 * 要升级的对象
 	 */
@@ -119,5 +145,9 @@ protected:
 
 	int32 OffsetLevel = 0;
 
+	bool bIsWaiting = false;
+
 	FOnProxyChangedDelegateHandle OnProxyChangedDelegateHandle;
+
+	FOnUpgradeSkillCompleteDelagateHandle OnUpgradeSkillCompleteDelagateHandle;
 };

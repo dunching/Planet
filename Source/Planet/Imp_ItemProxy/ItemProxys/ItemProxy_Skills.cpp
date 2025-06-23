@@ -27,6 +27,7 @@
 #include "ItemProxy_Character.h"
 #include "MainHUDLayout.h"
 #include "ModifyItemProxyStrategy.h"
+#include "PlanetPlayerController.h"
 #include "PropertyEntrySussystem.h"
 #include "Tools.h"
 #include "UIManagerSubSystem.h"
@@ -507,7 +508,7 @@ void FPassiveSkillProxy::InitialProxy(
 {
 	Super::InitialProxy(InProxyType);
 
-	GenerationPropertyEntry();
+	GenerationPropertyEntry(nullptr);
 }
 
 void FPassiveSkillProxy::UpdateByRemote(
@@ -518,7 +519,7 @@ void FPassiveSkillProxy::UpdateByRemote(
 	UpdateByRemote_Allocationble(RemoteSPtr);
 
 	GeneratedPropertyEntryAry = RemoteSPtr->GeneratedPropertyEntryAry;
-	
+
 	if (Level != RemoteSPtr->Level)
 	{
 		LevelChangedDelegate.ValueChanged(Level, RemoteSPtr->Level);
@@ -694,7 +695,9 @@ void FPassiveSkillProxy::UnAllocation()
 	Super::UnAllocation();
 }
 
-void FPassiveSkillProxy::GenerationPropertyEntry()
+void FPassiveSkillProxy::GenerationPropertyEntry(
+	APlanetPlayerController* PlayerController
+	)
 {
 	// 已根据等级生成的词条索引
 	uint8 NeedGenerationLevel = 0;
@@ -714,6 +717,7 @@ void FPassiveSkillProxy::GenerationPropertyEntry()
 		return;
 	}
 
+	TArray<FGeneratedPropertyEntryInfo> GeneratedPropertyEntryInfoAry;
 	for (; NeedGenerationLevel <= Level; NeedGenerationLevel++)
 	{
 		if (!TableRowProxy_PassiveSkillExtendInfoPtr->GrowthAttributeMap.IsValidIndex(NeedGenerationLevel))
@@ -731,7 +735,12 @@ void FPassiveSkillProxy::GenerationPropertyEntry()
 		for (const auto& Iter : Ary)
 		{
 			GeneratedPropertyEntryAry.emplace(NeedGenerationLevel, Iter);
+			GeneratedPropertyEntryInfoAry.Add(Iter);
 		}
+	}
+	if (PlayerController)
+	{
+		PlayerController->OnUpgradeSkillComplete(GeneratedPropertyEntryInfoAry);
 	}
 }
 
@@ -760,8 +769,8 @@ void UItemDecription_Skill_PassiveSkill::SetUIStyle()
 			}
 		}
 	}
-	
-	
+
+
 	auto ItemProxy_DescriptionPtr = ItemProxy_Description.LoadSynchronous();
 	if (ItemProxy_DescriptionPtr && !ItemProxy_DescriptionPtr->DecriptionText.IsEmpty())
 	{
@@ -887,7 +896,8 @@ void FPassiveSkillProxy::OffsetCooldownTime()
 }
 
 void FPassiveSkillProxy::AddExperience(
-	uint32 Value
+	uint32 Value,
+	APlanetPlayerController* PlayerController
 	)
 {
 	const auto CharacterGrowthAttributeAry = GetTableRowProxy_PassiveSkillExtendInfo()->GrowthAttributeMap;
@@ -932,7 +942,7 @@ void FPassiveSkillProxy::AddExperience(
 
 		if (Experience < LevelExperience)
 		{
-			return;
+			break;
 		}
 
 		// 调整数据
@@ -959,7 +969,7 @@ void FPassiveSkillProxy::AddExperience(
 		}
 	}
 
-	GenerationPropertyEntry();
+	GenerationPropertyEntry(PlayerController);
 }
 
 uint8 FPassiveSkillProxy::GetLevel() const

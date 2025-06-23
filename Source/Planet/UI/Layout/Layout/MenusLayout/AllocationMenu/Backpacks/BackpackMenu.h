@@ -129,6 +129,10 @@ private:
 		const TSharedPtr<FBasicProxy>& ProxySPtr
 		);
 
+	void UpdateProxy(
+		const TSharedPtr<FBasicProxy>& ProxySPtr
+		);
+
 	void RemoveProxy(
 		const TSharedPtr<FBasicProxy>& ProxySPtr
 		);

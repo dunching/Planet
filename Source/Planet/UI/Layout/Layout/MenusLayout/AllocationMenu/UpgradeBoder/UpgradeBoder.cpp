@@ -8,8 +8,10 @@
 #include "MaterialIcon.h"
 #include "InventoryComponent.h"
 #include "ModifyItemProxyStrategy.h"
+#include "PropertyEntryDescription.h"
 #include "Components/Button.h"
 #include "Components/ProgressBar.h"
+#include "Components/WidgetSwitcher.h"
 
 void UUpgradeBoder::NativeConstruct()
 {
@@ -17,13 +19,32 @@ void UUpgradeBoder::NativeConstruct()
 
 	UpgradeBtn->OnClicked.AddDynamic(this, &ThisClass::OnClickedUpgradeBtn);
 	CancelBtn->OnClicked.AddDynamic(this, &ThisClass::OnClickedCancelBtn);
+	ConfirmBtn->OnClicked.AddDynamic(this, &ThisClass::OnClickedConfirmBtn);
+
+	WidgetSwitcher->SetActiveWidgetIndex(0);
 }
 
 void UUpgradeBoder::NativeDestruct()
 {
 	OnProxyChangedDelegateHandle.Reset();
+	OnUpgradeSkillCompleteDelagateHandle.Reset();
 
 	Super::NativeDestruct();
+}
+
+FReply UUpgradeBoder::NativeOnKeyDown(
+	const FGeometry& InGeometry,
+	const FKeyEvent& InKeyEvent
+	)
+{
+	if (!bIsWaiting && InKeyEvent.GetKey() == EKeys::Escape)
+	{
+		OnClickedCancelBtn();
+		
+		return FReply::Handled();
+	}
+	
+	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
 
 void UUpgradeBoder::BindData(
@@ -49,7 +70,7 @@ void UUpgradeBoder::BindData(
 	{
 		ProgressBar->SetPercent(Experience / static_cast<float>(LevelExperience));
 	}
-	
+
 	OffsetLevelText->SetText(FText::FromString(TEXT("")));
 
 	ScrollBox->ClearChildren();
@@ -214,6 +235,7 @@ int32 UUpgradeBoder::OnUpdateMaterial(
 
 void UUpgradeBoder::OnClickedUpgradeBtn()
 {
+	// 选择的经验道具至少能升一级
 	if (OffsetLevel > 0)
 	{
 		auto PCPtr = Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
@@ -222,24 +244,36 @@ void UUpgradeBoder::OnClickedUpgradeBtn()
 			TArray<FGuid> CosumeProxysIDS;
 			TArray<uint32> CosumeProxyNums;
 
-			for (auto Iter :CosumeProxysSet)
+			for (auto Iter : CosumeProxysSet)
 			{
 				CosumeProxysIDS.Add(Iter.Key->GetID());
 				CosumeProxyNums.Add(Iter.Value);
 			}
-			
+
+			OnUpgradeSkillCompleteDelagateHandle = PCPtr->OnUpgradeSkillCompleteDelegate.AddCallback(
+				 std::bind(&ThisClass::OnUpgradeSkillComplete, this, std::placeholders::_1)
+				);
+
 			PCPtr->UpgradeSkill(ProxySPtr->GetID(), CosumeProxysIDS, CosumeProxyNums);
+
+			WidgetSwitcher->SetActiveWidgetIndex(1);
+			bIsWaiting = true;
 		}
 	}
 	else
 	{
 		// 无效.
 	}
-	
+
 	CosumeProxysSet.Empty();
 }
 
 void UUpgradeBoder::OnClickedCancelBtn()
+{
+	RemoveFromParent();
+}
+
+void UUpgradeBoder::OnClickedConfirmBtn()
 {
 	RemoveFromParent();
 }
@@ -252,7 +286,7 @@ void UUpgradeBoder::OnProxyChanged(
 {
 	switch (ProxyModifyType)
 	{
-	case EProxyModifyType::kNumChanged:
+	case EProxyModifyType::kAdd:
 		break;
 	case EProxyModifyType::kRemove:
 		{
@@ -273,5 +307,31 @@ void UUpgradeBoder::OnProxyChanged(
 		break;
 	case EProxyModifyType::kPropertyChange:
 		break;
+	}
+}
+
+void UUpgradeBoder::OnUpgradeSkillComplete(
+	const TArray<FGeneratedPropertyEntryInfo>& GeneratedPropertyEntryInfoAry
+	)
+{
+	bIsWaiting = false;
+	OnUpgradeSkillCompleteDelagateHandle.Reset();
+
+	WidgetSwitcher->SetActiveWidgetIndex(2);
+
+	if (PropertyEntrysBox)
+	{
+		PropertyEntrysBox->SetVisibility(ESlateVisibility::Visible);
+		PropertyEntrysBox->ClearChildren();
+
+		for (const auto& Iter : GeneratedPropertyEntryInfoAry)
+		{
+			auto UIPtr = CreateWidget<UPropertyEntryDescription>(this, PropertyEntryDescriptionClass);
+			if (UIPtr)
+			{
+				UIPtr->SetDta(Iter);
+				PropertyEntrysBox->AddChild(UIPtr);
+			}
+		}
 	}
 }

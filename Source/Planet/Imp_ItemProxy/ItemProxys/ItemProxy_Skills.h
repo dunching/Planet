@@ -52,6 +52,7 @@ class AHumanCharacter;
 class UInventoryComponent;
 class UItemInteractionList;
 class UPropertyEntryDescription;
+class APlanetPlayerController;
 
 struct FCharacterProxy;
 
@@ -252,7 +253,12 @@ public:
 	virtual void OffsetCooldownTime() override;
 #pragma endregion
 
-	void AddExperience(uint32 Value);
+	/**
+	 * 仅玩家相关的技能才可能被升级
+	 * @param Value 
+	 * @param PlayerController 
+	 */
+	void AddExperience(uint32 Value, APlanetPlayerController* PlayerController);
 
 	uint8 GetLevel()const;
 	
@@ -284,7 +290,7 @@ protected:
 	// 从插槽移除
 	virtual void UnAllocation() override;
 private:
-	void GenerationPropertyEntry();
+	void GenerationPropertyEntry(APlanetPlayerController* PlayerController);
 	
 	// 当前等级
 	uint8 Level = 1;

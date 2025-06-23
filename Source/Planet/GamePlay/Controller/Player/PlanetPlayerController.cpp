@@ -461,7 +461,14 @@ void APlanetPlayerController::UpgradeSkill_Implementation(
 		return;
 	}
 
-	SkillProxySPtr->AddExperience(Experience);
+	SkillProxySPtr->AddExperience(Experience, this);
+}
+
+void APlanetPlayerController::OnUpgradeSkillComplete_Implementation(
+	const TArray<FGeneratedPropertyEntryInfo>& GeneratedPropertyEntryInfoAry
+	)
+{
+	OnUpgradeSkillCompleteDelegate(GeneratedPropertyEntryInfoAry);
 }
 
 void APlanetPlayerController::GetLifetimeReplicatedProps(

@@ -53,7 +53,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Weapon::Add(
 		                                NewResultSPtr->GetTableRowProxy_WeaponExtendInfo()->WeaponSkillProxyType
 		                               )->GetID();
 
-	OnWeaponProxyChanged(NewResultSPtr, EProxyModifyType::kNumChanged);
+	OnWeaponProxyChanged(NewResultSPtr, EProxyModifyType::kAdd);
 
 	return {NewResultSPtr};
 }
@@ -70,7 +70,7 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_Weapon::AddByRemote(
 		                                                          )
 	                                                         );
 
-	OnWeaponProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged);
+	OnWeaponProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kPropertyChange);
 
 	return NewResultSPtr;
 }
@@ -93,7 +93,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_WeaponSkill::Add(
 
 	InventoryComponentPtr->AddToContainer(NewResultSPtr);
 
-	OnSkillProxyChanged(NewResultSPtr, EProxyModifyType::kNumChanged);
+	OnSkillProxyChanged(NewResultSPtr, EProxyModifyType::kAdd);
 
 	return {NewResultSPtr};
 }
@@ -110,7 +110,7 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_WeaponSkill::AddByRemote(
 		                                                          )
 	                                                         );
 
-	OnSkillProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged);
+	OnSkillProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kPropertyChange);
 
 	return NewResultSPtr;
 }
@@ -133,7 +133,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_ActiveSkill::Add(
 
 	InventoryComponentPtr->AddToContainer(NewResultSPtr);
 
-	OnSkillProxyChanged(NewResultSPtr, EProxyModifyType::kNumChanged);
+	OnSkillProxyChanged(NewResultSPtr, EProxyModifyType::kAdd);
 
 	return {NewResultSPtr};
 }
@@ -150,7 +150,7 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_ActiveSkill::AddByRemote(
 		                                                          )
 	                                                         );
 
-	OnSkillProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged);
+	OnSkillProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kPropertyChange);
 
 	return NewResultSPtr;
 }
@@ -173,7 +173,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_PassveSkill::Add(
 
 	InventoryComponentPtr->AddToContainer(NewResultSPtr);
 
-	OnSkillProxyChanged(NewResultSPtr, EProxyModifyType::kNumChanged);
+	OnSkillProxyChanged(NewResultSPtr, EProxyModifyType::kAdd);
 
 	return {NewResultSPtr};
 }
@@ -190,7 +190,7 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_PassveSkill::AddByRemote(
 		                                                          )
 	                                                         );
 
-	OnSkillProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged);
+	OnSkillProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kPropertyChange);
 
 	return NewResultSPtr;
 }
@@ -228,7 +228,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Coin::Add(
 
 		InventoryComponentPtr->UpdateInContainer(NewResultSPtr);
 
-		OnCoinProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged, Num);
+		OnCoinProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kAdd, Num);
 
 		return {NewResultSPtr};
 	}
@@ -245,7 +245,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Coin::Add(
 
 		ProxyTypeMap.Add(InProxyType, {NewResultSPtr});
 
-		OnCoinProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged, Num);
+		OnCoinProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kPropertyChange, Num);
 
 		return {NewResultSPtr};
 	}
@@ -265,7 +265,7 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_Coin::AddByRemote(
 
 	ProxyTypeMap.Add(NewResultSPtr->GetProxyType(), {NewResultSPtr});
 
-	OnCoinProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged, NewResultSPtr->GetNum());
+	OnCoinProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kPropertyChange, NewResultSPtr->GetNum());
 
 	return NewResultSPtr;
 }
@@ -285,7 +285,7 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_Coin::UpdateByRemote(
 		                                                          )
 	                                                         );
 
-	OnCoinProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged, NewResultSPtr->GetNum());
+	OnCoinProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kPropertyChange, NewResultSPtr->GetNum());
 
 	return NewResultSPtr;
 }
@@ -343,7 +343,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Consumable::Add(
 
 		InventoryComponentPtr->UpdateInContainer(NewResultSPtr);
 
-		OnConsumableProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged, Num);
+		OnConsumableProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kAdd, Num);
 
 		return {NewResultSPtr};
 	}
@@ -365,7 +365,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_Consumable::Add(
 
 		ProxyTypeMap.Add(InProxyType, {NewResultSPtr});
 
-		OnConsumableProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged, Num);
+		OnConsumableProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kPropertyChange, Num);
 
 		return {NewResultSPtr};
 	}
@@ -385,7 +385,7 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_Consumable::AddByRemote(
 
 	ProxyTypeMap.Add(NewResultSPtr->GetProxyType(), {NewResultSPtr});
 
-	OnConsumableProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged, NewResultSPtr->GetNum());
+	OnConsumableProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kPropertyChange, NewResultSPtr->GetNum());
 
 	return NewResultSPtr;
 }
@@ -405,7 +405,7 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_Consumable::UpdateByRemote(
 		                                                          )
 	                                                         );
 
-	OnConsumableProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged, NewResultSPtr->GetNum());
+	OnConsumableProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kPropertyChange, NewResultSPtr->GetNum());
 
 	return NewResultSPtr;
 }

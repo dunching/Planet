@@ -422,7 +422,7 @@ TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategy_MaterialProxy::AddImp(
 		Result.Add(NewResultSPtr);
 	}
 
-	OnProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged, Num);
+	OnProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kPropertyChange, Num);
 
 	return Result;
 }
@@ -451,7 +451,7 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_MaterialProxy::AddByRemoteImp(
 		ProxyTypeMap.Add(InProxyType, {NewResultSPtr});
 	}
 
-	OnProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kNumChanged, NewResultSPtr->GetNum());
+	OnProxyChanged.ExcuteCallback(NewResultSPtr, EProxyModifyType::kAdd, NewResultSPtr->GetNum());
 
 	return NewResultSPtr;
 }
@@ -469,7 +469,7 @@ TSharedPtr<FBasicProxy> FModifyItemProxyStrategy_MaterialProxy::UpdateByRemoteIm
 
 	LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
-	OnProxyChanged.ExcuteCallback(LeftProxySPtr, EProxyModifyType::kNumChanged, LeftProxySPtr->GetNum());
+	OnProxyChanged.ExcuteCallback(LeftProxySPtr, EProxyModifyType::kPropertyChange, LeftProxySPtr->GetNum());
 
 	return LeftProxySPtr;
 }

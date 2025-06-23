@@ -252,12 +252,33 @@ public:
 		int32 NewLevel
 		);
 
+	/**
+	 * 完成之后 调用 OnUpgradeSkillComplete，其他情况暂时不考虑
+	 * @param SkillID 
+	 * @param CosumeProxysIDS 
+	 * @param CosumeProxyNums 
+	 */
 	UFUNCTION(Server, Reliable)
 	void UpgradeSkill(
 		const FGuid& SkillID,
 		const TArray<FGuid>& CosumeProxysIDS,
 		const TArray<uint32>& CosumeProxyNums
 		);
+
+	/**
+	 * 将新增的词条传到Client
+	 * 为什么不通过属性同步？
+	 * 因为我们现在的结构不支持
+	 * @param GeneratedPropertyEntryInfoAry 
+	 */
+	UFUNCTION(Client, Reliable)
+	void OnUpgradeSkillComplete(
+		const TArray<FGeneratedPropertyEntryInfo>& GeneratedPropertyEntryInfoAry
+		);
+
+	using FOnUpgradeSkillComplete = TCallbackHandleContainer<void(const TArray<FGeneratedPropertyEntryInfo>&)>;
+
+	FOnUpgradeSkillComplete OnUpgradeSkillCompleteDelegate;
 
 #pragma endregion
 
@@ -333,6 +354,7 @@ protected:
 
 	using FMakedDamageDelegate = TCallbackHandleContainer<void(
 		const FOnEffectedTargetCallback&
+
 
 		
 		)>;

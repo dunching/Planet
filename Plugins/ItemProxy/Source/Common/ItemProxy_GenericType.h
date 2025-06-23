@@ -8,7 +8,7 @@
 
 enum class EProxyModifyType
 {
-	kNumChanged, // 新增
+	kAdd, // 新增
 	kRemove, // 移除
 	kPropertyChange, // 属性改变
 };

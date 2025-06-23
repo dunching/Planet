@@ -29,6 +29,8 @@
 #include "ItemDetails.h"
 #include "ItemProxy_Character.h"
 #include "ItemProxy_Weapon.h"
+#include "MainHUDLayout.h"
+#include "UIManagerSubSystem.h"
 
 struct FAllocationSkillsMenu : public TStructVariable<FAllocationSkillsMenu>
 {
@@ -355,6 +357,8 @@ void UAllocationSkillsMenu::DisEnableMenu()
 			}
 		}
 	}
+
+	UUIManagerSubSystem::GetInstance()->GetMainHUDLayout()->RemoveWidget(UUpgradeBoder::StaticClass());
 }
 
 EMenuType UAllocationSkillsMenu::GetMenuType() const

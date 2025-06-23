@@ -59,6 +59,8 @@ public:
  
 		);
 
+	void RemoveWidget(const TSubclassOf<UUserWidget>& WidgetClass);
+	
 	void SwitchIsLowerHP(
 		bool bIsLowerHP 
 		);

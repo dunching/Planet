@@ -43,7 +43,7 @@ void UGetItemInfosItem::ResetToolUIByData(
 	const auto Text =
 		FString::Printf(
 		                TEXT("%s:%s"),
-		                ProxyModifyType == EProxyModifyType::kNumChanged ?
+		                ProxyModifyType == EProxyModifyType::kPropertyChange ?
 			                *UTextSubSystem::GetInstance()->GetText(TextCollect::GetSkill) :
 			                *UTextSubSystem::GetInstance()->GetText(TextCollect::LoseSkill),
 		                *ProxyPtr->GetProxyName()
@@ -63,7 +63,7 @@ void UGetItemInfosItem::ResetToolUIByData(
 	const auto Text =
 		FString::Printf(
 		                TEXT("%s:%s"),
-		                ProxyModifyType == EProxyModifyType::kNumChanged ?
+		                ProxyModifyType == EProxyModifyType::kPropertyChange ?
 			                *UTextSubSystem::GetInstance()->GetText(TextCollect::GetSkill) :
 			                *UTextSubSystem::GetInstance()->GetText(TextCollect::LoseSkill),
 		                *ProxyPtr->GetProxyName()
@@ -82,123 +82,19 @@ void UGetItemInfosItem::ResetToolUIByData(
 
 	switch (ProxyModifyType)
 	{
-	case EProxyModifyType::kNumChanged:
+	case EProxyModifyType::kAdd:
 		{
-			if (ProxyPtr->GetOffsetNum() > 0)
-			{
-				SetText(
-				        FString::Printf(
-				                        TEXT("%s %dX%s"),
-				                        TEXT("Get"),
-				                        ProxyPtr->GetOffsetNum(),
-				                        *ProxyPtr->GetProxyName()
-				                       )
-				       );
-			}
-			else
-			{
-				SetText(
-				        FString::Printf(
-				                        TEXT("%s %dX%s"),
-				                        TEXT("Lose"),
-				                        ProxyPtr->GetOffsetNum(),
-				                        *ProxyPtr->GetProxyName()
-				                       )
-				       );
-			}
+			SetText(
+					FString::Printf(
+									TEXT("%s %dX%s"),
+									TEXT("Get"),
+									ProxyPtr->GetOffsetNum(),
+									*ProxyPtr->GetProxyName()
+								   )
+				   );
 		}
 		break;
 	case EProxyModifyType::kPropertyChange:
-		break;
-	case EProxyModifyType::kRemove:
-		{
-			SetText(FString::Printf(TEXT("Lose:%dX%s"), ProxyPtr->GetNum(), *ProxyPtr->GetProxyName()));
-		}
-		break;
-	default:
-		break;
-	}
-
-	ResetToolUIByData(ProxyPtr);
-}
-
-void UGetItemInfosItem::ResetToolUIByData(
-	const TSharedPtr<FCoinProxy>& ProxyPtr,
-	EProxyModifyType ProxyModifyType,
-	int32 Num
-	)
-{
-	SetTexutre(ProxyPtr->GetIcon());
-
-	switch (ProxyModifyType)
-	{
-	case EProxyModifyType::kNumChanged:
-		{
-			if (ProxyPtr->GetOffsetNum() > 0)
-			{
-				SetText(
-				        FString::Printf(
-				                        TEXT("%s %dX%s"),
-				                        TEXT("Get"),
-				                        ProxyPtr->GetOffsetNum(),
-				                        *ProxyPtr->GetProxyName()
-				                       )
-				       );
-			}
-			else
-			{
-				SetText(
-				        FString::Printf(
-				                        TEXT("%s %dX%s"),
-				                        TEXT("Lose"),
-				                        ProxyPtr->GetOffsetNum(),
-				                        *ProxyPtr->GetProxyName()
-				                       )
-				       );
-			}
-		}
-		break;
-	case EProxyModifyType::kPropertyChange:
-		break;
-	case EProxyModifyType::kRemove:
-		{
-		}
-		break;
-	default:
-		break;
-	}
-
-	ResetToolUIByData(ProxyPtr);
-}
-
-void UGetItemInfosItem::ResetToolUIByData(
-	const TSharedPtr<FCharacterProxy>& ProxyPtr,
-	EProxyModifyType ProxyModifyType
-	)
-{
-	SetTexutre(ProxyPtr->GetIcon());
-
-	SetText(
-	        FString::Printf(
-	                        TEXT("%s X%s"),
-	                        ProxyModifyType == EProxyModifyType::kNumChanged ? TEXT("Get") : TEXT("Lose"),
-	                        *ProxyPtr->GetProxyName()
-	                       )
-	       );
-
-	ResetToolUIByData(ProxyPtr);
-}
-
-void UGetItemInfosItem::ResetToolUIByData(
-	const TSharedPtr<FMaterialProxy>& ProxyPtr,
-	EProxyModifyType ProxyModifyType
-	)
-{
-	SetTexutre(ProxyPtr->GetIcon());
-
-	switch (ProxyModifyType)
-	{
-	case EProxyModifyType::kNumChanged:
 		{
 			if (ProxyPtr->GetOffsetNum() > 0)
 			{
@@ -224,7 +120,141 @@ void UGetItemInfosItem::ResetToolUIByData(
 			}
 		}
 		break;
+	case EProxyModifyType::kRemove:
+		{
+			SetText(FString::Printf(TEXT("Lose:%dX%s"), ProxyPtr->GetNum(), *ProxyPtr->GetProxyName()));
+		}
+		break;
+	default:
+		break;
+	}
+
+	ResetToolUIByData(ProxyPtr);
+}
+
+void UGetItemInfosItem::ResetToolUIByData(
+	const TSharedPtr<FCoinProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType,
+	int32 Num
+	)
+{
+	SetTexutre(ProxyPtr->GetIcon());
+
+	switch (ProxyModifyType)
+	{
+	case EProxyModifyType::kAdd:
+		{
+			SetText(
+					FString::Printf(
+									TEXT("%s %dX%s"),
+									TEXT("Get"),
+									ProxyPtr->GetOffsetNum(),
+									*ProxyPtr->GetProxyName()
+								   )
+				   );
+		}
+		break;
 	case EProxyModifyType::kPropertyChange:
+		{
+			if (ProxyPtr->GetOffsetNum() > 0)
+			{
+				SetText(
+						FString::Printf(
+										TEXT("%s %dX%s"),
+										TEXT("Get"),
+										ProxyPtr->GetOffsetNum(),
+										*ProxyPtr->GetProxyName()
+									   )
+					   );
+			}
+			else
+			{
+				SetText(
+						FString::Printf(
+										TEXT("%s %dX%s"),
+										TEXT("Lose"),
+										ProxyPtr->GetOffsetNum(),
+										*ProxyPtr->GetProxyName()
+									   )
+					   );
+			}
+		}
+		break;
+	case EProxyModifyType::kRemove:
+		{
+		}
+		break;
+	default:
+		break;
+	}
+
+	ResetToolUIByData(ProxyPtr);
+}
+
+void UGetItemInfosItem::ResetToolUIByData(
+	const TSharedPtr<FCharacterProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
+{
+	SetTexutre(ProxyPtr->GetIcon());
+
+	SetText(
+	        FString::Printf(
+	                        TEXT("%s X%s"),
+	                        ProxyModifyType == EProxyModifyType::kPropertyChange ? TEXT("Get") : TEXT("Lose"),
+	                        *ProxyPtr->GetProxyName()
+	                       )
+	       );
+
+	ResetToolUIByData(ProxyPtr);
+}
+
+void UGetItemInfosItem::ResetToolUIByData(
+	const TSharedPtr<FMaterialProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
+{
+	SetTexutre(ProxyPtr->GetIcon());
+
+	switch (ProxyModifyType)
+	{
+	case EProxyModifyType::kAdd:
+		{
+			SetText(
+					FString::Printf(
+									TEXT("%s %dX%s"),
+									TEXT("Get"),
+									ProxyPtr->GetOffsetNum(),
+									*ProxyPtr->GetProxyName()
+								   )
+				   );
+		}
+		break;
+	case EProxyModifyType::kPropertyChange:
+		{
+			if (ProxyPtr->GetOffsetNum() > 0)
+			{
+				SetText(
+						FString::Printf(
+										TEXT("%s %dX%s"),
+										TEXT("Get"),
+										ProxyPtr->GetOffsetNum(),
+										*ProxyPtr->GetProxyName()
+									   )
+					   );
+			}
+			else
+			{
+				SetText(
+						FString::Printf(
+										TEXT("%s %dX%s"),
+										TEXT("Lose"),
+										ProxyPtr->GetOffsetNum(),
+										*ProxyPtr->GetProxyName()
+									   )
+					   );
+			}
+		}
 		break;
 	case EProxyModifyType::kRemove:
 		{

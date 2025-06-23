@@ -501,7 +501,7 @@ void UInteractionTransactionLayout::OnTraderSkillProxyChanged(
 				{
 					switch (ProxyModifyType)
 					{
-					case EProxyModifyType::kNumChanged:
+					case EProxyModifyType::kAdd:
 						break;
 					case EProxyModifyType::kRemove:
 						{
@@ -539,7 +539,7 @@ void UInteractionTransactionLayout::OnTraderWeaponProxyChanged(
 				{
 					switch (ProxyModifyType)
 					{
-					case EProxyModifyType::kNumChanged:
+					case EProxyModifyType::kAdd:
 						break;
 					case EProxyModifyType::kRemove:
 						{
@@ -578,7 +578,7 @@ void UInteractionTransactionLayout::OnTraderConsumableProxyChanged(
 				{
 					switch (ProxyModifyType)
 					{
-					case EProxyModifyType::kNumChanged:
+					case EProxyModifyType::kAdd:
 						{
 							// 刷新一下
 							const auto ProxyPtrNum = GetProxyNum(GoodsItemPtr->BasicProxyPtr);
@@ -593,6 +593,11 @@ void UInteractionTransactionLayout::OnTraderConsumableProxyChanged(
 						}
 						break;
 					case EProxyModifyType::kPropertyChange:
+						{
+							// 刷新一下
+							const auto ProxyPtrNum = GetProxyNum(GoodsItemPtr->BasicProxyPtr);
+							GoodsItemPtr->SetNum(ProxyPtrNum);
+						}
 						break;
 					}
 					UIPtr->RequestRefresh();
@@ -622,7 +627,7 @@ void UInteractionTransactionLayout::OnTraderMaterialProxyProxyChanged(
 				{
 					switch (ProxyModifyType)
 					{
-					case EProxyModifyType::kNumChanged:
+					case EProxyModifyType::kAdd:
 						{
 							// 刷新一下
 							const auto ProxyPtrNum = GetProxyNum(GoodsItemPtr->BasicProxyPtr);
@@ -637,6 +642,11 @@ void UInteractionTransactionLayout::OnTraderMaterialProxyProxyChanged(
 						}
 						break;
 					case EProxyModifyType::kPropertyChange:
+						{
+							// 刷新一下
+							const auto ProxyPtrNum = GetProxyNum(GoodsItemPtr->BasicProxyPtr);
+							GoodsItemPtr->SetNum(ProxyPtrNum);
+						}
 						break;
 					}
 					UIPtr->RequestRefresh();

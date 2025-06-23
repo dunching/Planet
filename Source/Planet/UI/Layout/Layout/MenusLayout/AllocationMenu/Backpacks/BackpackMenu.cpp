@@ -317,10 +317,14 @@ void UBackpackMenu::AddMaterialProxy(
 	{
 		switch (ProxyModifyType)
 		{
-		case EProxyModifyType::kPropertyChange:
-		case EProxyModifyType::kNumChanged:
+		case EProxyModifyType::kAdd:
 			{
 				AddProxy(ProxySPtr);
+			}
+			break;
+		case EProxyModifyType::kPropertyChange:
+			{
+				UpdateProxy(ProxySPtr);
 			}
 			break;
 		case EProxyModifyType::kRemove:
@@ -382,6 +386,28 @@ void UBackpackMenu::AddProxy(
 		WidgetPtr->TargetBasicProxyPtr = ProxySPtr;
 		WidgetPtr->AllocationSkillsMenuPtr = AllocationSkillsMenuPtr;
 		TileViewPtr->AddItem(WidgetPtr);
+	}
+}
+
+void UBackpackMenu::UpdateProxy(
+	const TSharedPtr<FBasicProxy>& ProxySPtr
+	)
+{
+	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(FBackpackMenu::Get().BackpackTile));
+	if (!TileViewPtr)
+	{
+		return;
+	}
+
+	auto Items = TileViewPtr->GetDisplayedEntryWidgets();
+	for (auto Iter : Items)
+	{
+		auto WrapperPtr = Cast<UBackpackIconWrapper>(Iter);
+		if (WrapperPtr && WrapperPtr->TargetBasicProxyPtr == ProxySPtr)
+		{
+			WrapperPtr->ResetToolUIByData(ProxySPtr);
+			return;
+		}
 	}
 }
 

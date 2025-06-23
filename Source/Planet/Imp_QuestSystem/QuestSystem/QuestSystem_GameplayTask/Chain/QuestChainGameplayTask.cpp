@@ -396,7 +396,7 @@ void UGameplayTask_Guide_CollectResource::OnGetConsumableProxy(
 	{
 		switch (ProxyModifyType)
 		{
-		case EProxyModifyType::kNumChanged:
+		case EProxyModifyType::kAdd:
 			{
 				CurrentNum += ConsumableProxySPtr->GetNum();
 				UpdateDescription();
@@ -409,6 +409,16 @@ void UGameplayTask_Guide_CollectResource::OnGetConsumableProxy(
 			}
 			break;
 		case EProxyModifyType::kPropertyChange:
+			{
+				CurrentNum += ConsumableProxySPtr->GetNum();
+				UpdateDescription();
+				if (CurrentNum >= Num)
+				{
+					StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
+					EndTask();
+					return;
+				}
+			}
 			break;
 		case EProxyModifyType::kRemove:
 			break;
@@ -427,7 +437,7 @@ void UGameplayTask_Guide_CollectResource::OnCoinProxyChanged(
 	{
 		switch (ProxyModifyType)
 		{
-		case EProxyModifyType::kNumChanged:
+		case EProxyModifyType::kAdd:
 			{
 				CurrentNum += Num_;
 				UpdateDescription();
@@ -440,6 +450,16 @@ void UGameplayTask_Guide_CollectResource::OnCoinProxyChanged(
 			}
 			break;
 		case EProxyModifyType::kPropertyChange:
+			{
+				CurrentNum += Num_;
+				UpdateDescription();
+				if (CurrentNum >= Num_)
+				{
+					StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
+					EndTask();
+					return;
+				}
+			}
 			break;
 		case EProxyModifyType::kRemove:
 			break;

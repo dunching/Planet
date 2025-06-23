@@ -197,7 +197,7 @@ void UGetItemInfosList::OnWeaponProxyChanged(
 {
 	switch (ProxyModifyType)
 	{
-	case EProxyModifyType::kNumChanged:
+	case EProxyModifyType::kPropertyChange:
 		{
 		}
 		break;
@@ -237,7 +237,7 @@ void UGetItemInfosList::OnSkillProxyChanged(
 {
 	switch (ProxyModifyType)
 	{
-	case EProxyModifyType::kNumChanged:
+	case EProxyModifyType::kPropertyChange:
 		{
 			if (ProxyPtr)
 			{
@@ -289,7 +289,7 @@ void UGetItemInfosList::OnCoinProxyChanged(
 {
 	switch (ProxyModifyType)
 	{
-	case EProxyModifyType::kNumChanged:
+	case EProxyModifyType::kPropertyChange:
 		{
 			if (Num == 0)
 			{
@@ -339,7 +339,7 @@ void UGetItemInfosList::OnConsumableProxyChanged(
 {
 	switch (ProxyModifyType)
 	{
-	case EProxyModifyType::kNumChanged:
+	case EProxyModifyType::kPropertyChange:
 		{
 		}
 		break;
@@ -379,7 +379,7 @@ void UGetItemInfosList::OnGourpmateProxyChanged(
 {
 	switch (ProxyModifyType)
 	{
-	case EProxyModifyType::kNumChanged:
+	case EProxyModifyType::kPropertyChange:
 		{
 		}
 		break;
@@ -420,7 +420,7 @@ void UGetItemInfosList::OnMaterialProxyChanged(
 {
 	switch (ProxyModifyType)
 	{
-	case EProxyModifyType::kNumChanged:
+	case EProxyModifyType::kPropertyChange:
 		{
 		}
 		break;
