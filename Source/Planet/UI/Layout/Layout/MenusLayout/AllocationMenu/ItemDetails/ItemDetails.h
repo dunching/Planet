@@ -37,7 +37,7 @@ public:
 
 private:
 	/**
-	 * 0, 未选中
+	 * 0. 未选中
 	 * 1. 选中
 	 */
 	UPROPERTY(meta = (BindWidget))

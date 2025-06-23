@@ -76,6 +76,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<UMaterialIcon> MaterialIconClass = nullptr;
 
+	/**
+	 * TODO 
+	 * 0. 选材料界面
+	 * 1. 升级中，等待Server执行成功回调
+	 * 2. 完成界面，显示新增的词条
+	 */
+	// UPROPERTY(meta = (BindWidget))
+	// UWidgetSwitcher* WidgetSwitcher = nullptr;
+
 	UPROPERTY(meta = (BindWidget))
 	UButton* UpgradeBtn = nullptr;
 

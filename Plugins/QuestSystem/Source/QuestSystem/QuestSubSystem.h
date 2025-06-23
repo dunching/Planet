@@ -112,6 +112,12 @@ public:
 	 */
 	TArray<TSubclassOf<AQuestChain_BranchBase>> GetGuideThreadAry()const;
 
+	/**
+	 * 查询该类型的任务是否被激活，如查询是否处于挑战模式
+	 * TODO：改成Tag以用于包含子集
+	 * @param GuideClass 
+	 * @return 
+	 */
 	TObjectPtr<AQuestChainBase> IsActivedGuideThread(const TSubclassOf<AQuestChain_ImmediateBase>& GuideClass)const;
 
 	const TArray<TObjectPtr<AQuestChainBase>> &GetActivedGuideThreadsAry()const;

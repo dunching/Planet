@@ -29,6 +29,7 @@
 #include "MainHUDLayout.h"
 #include "PawnStateActionHUD.h"
 #include "PawnStateConsumablesHUD.h"
+#include "PlanetPlayerState.h"
 #include "PlayerGameplayTasks.h"
 #include "ProgressTips.h"
 #include "TeamMatesHelperComponent.h"
@@ -147,14 +148,14 @@ void URegularActionLayout::Enable()
 		                                                                      );
 
 		ReceivedOhterCharacterCallbackDelegate = PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->
-		                                                           ReceivedDamageDelegate.
-		                                                           AddCallback(
-		                                                                       std::bind(
-			                                                                        &ThisClass::OnEffectOhterCharacter,
-			                                                                        this,
-			                                                                        std::placeholders::_1
-			                                                                       )
-		                                                                      );
+		                                                             ReceivedDamageDelegate.
+		                                                             AddCallback(
+			                                                              std::bind(
+				                                                               &ThisClass::OnEffectOhterCharacter,
+				                                                               this,
+				                                                               std::placeholders::_1
+				                                                              )
+			                                                             );
 
 		auto CharacterProxySPtr = PlayerCharacterPtr->GetCharacterProxy();
 		if (!CharacterProxySPtr)
@@ -173,11 +174,11 @@ void URegularActionLayout::Enable()
 			 &ThisClass::OnStartGuide
 			);
 		const auto Ary = UQuestSubSystem::GetInstance()->GetActivedGuideThreadsAry();
-		for (const auto &Iter : Ary)
+		for (const auto& Iter : Ary)
 		{
-			OnStartGuide(Iter);	
+			OnStartGuide(Iter);
 		}
-		
+
 		StopGuideDelegateHandle = UQuestSubSystem::GetInstance()->GetOnStopGuide().AddUObject(
 			 this,
 			 &ThisClass::OnStopGuide
@@ -187,6 +188,9 @@ void URegularActionLayout::Enable()
 		if (UIPtr)
 		{
 			UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnQuitChallengeBtnClicked);
+
+			const auto Value = GEngine->GetFirstLocalPlayerController(GetWorld())->GetPlayerState<APlanetPlayerState>()->GetIsInChallenge();
+			UIPtr->SetVisibility(Value ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 		}
 	}
 }
