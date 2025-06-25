@@ -53,6 +53,8 @@ public:
 
 	using FOnQuitFunc = std::function<void()>;
 
+	static UInputProcessorSubSystemBase* GetInstanceBase();
+
 	virtual void Initialize(
 		FSubsystemCollectionBase& Collection
 		) override;
@@ -82,6 +84,8 @@ public:
 	const FInputKeyEventArgs& EventArgs
 		);
 
+	void SwitchShowCursor(bool bIsShowCursor);
+
 protected:
 	template <typename ProcessorType>
 	void SwitchToProcessorBase();
@@ -109,6 +113,9 @@ private:
 	bool bIsRunning = true;
 
 	FTSTicker::FDelegateHandle TickDelegateHandle;
+
+	int8 ShowCursorCount = 0;
+	
 };
 
 template <typename ProcessorType>

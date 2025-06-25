@@ -18,6 +18,8 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GameOptions.h"
+#include "InputProcessorSubSystem_Imp.h"
+#include "MainHUDLayout.h"
 #include "OpenWorldDataLayer.h"
 #include "PlanetChildActorComponent.h"
 #include "PlanetRichTextBlock.h"
@@ -26,6 +28,8 @@
 #include "TargetPoint_Runtime.h"
 #include "Tools.h"
 #include "UIManagerSubSystem.h"
+#include "MyMediaPlayer.h"
+#include "TutorialMediaPlayer.h"
 
 const UStruct* FSTT_GuideThreadDistributeRewards::GetInstanceDataType() const
 {
@@ -46,7 +50,7 @@ EStateTreeRunStatus FSTT_GuideThreadDistributeRewards::EnterState(
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 	                                                          *this
 	                                                         );
-	
+
 	auto PCPtr = Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorldImp()));
 	if (PCPtr)
 	{
@@ -690,8 +694,8 @@ FTaskNodeDescript FSTGT_GuideThreadCheckIsInValidArea::GetTaskNodeDescripton(
 	) const
 {
 	return FSTT_QuestChainBase::GetTaskNodeDescripton(
-	                                                   Context
-	                                                  );
+	                                                  Context
+	                                                 );
 }
 
 
@@ -846,9 +850,9 @@ EStateTreeRunStatus FSTT_GuideThread_WaitPlayerEquipment::Tick(
 	) const
 {
 	FSTT_QuestChainBase::Tick(
-	                           Context,
-	                           DeltaTime
-	                          );
+	                          Context,
+	                          DeltaTime
+	                         );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 	                                                          *this
@@ -881,9 +885,9 @@ void FSTT_GuideThread_WaitPlayerEquipment::ExitState(
 	InstanceData.GameplayTaskPtr = nullptr;
 
 	FSTT_QuestChainBase::ExitState(
-	                                Context,
-	                                Transition
-	                               );
+	                               Context,
+	                               Transition
+	                              );
 }
 
 FTaskNodeDescript FSTT_GuideThread_WaitPlayerEquipment::GetTaskNodeDescripton(
@@ -923,10 +927,13 @@ EStateTreeRunStatus FSTT_GuideThread_SpawnNPC::EnterState(
 		Transform.SetLocation(
 		                      InstanceData.PlayerCharacterPtr->GetActorLocation() + (InstanceData.PlayerCharacterPtr->
 			                      GetActorForwardVector() * 100)
-			                      );
+		                     );
 		Transform.SetRotation(
-		UKismetMathLibrary::MakeRotFromZX(FVector::UpVector, -PCPtr->GetPawn()->GetActorForwardVector()).Quaternion()
-							 );
+		                      UKismetMathLibrary::MakeRotFromZX(
+		                                                        FVector::UpVector,
+		                                                        -PCPtr->GetPawn()->GetActorForwardVector()
+		                                                       ).Quaternion()
+		                     );
 
 		PCPtr->ServerSpawnCharacter(
 		                            InstanceData.NPCClass,
@@ -1118,7 +1125,8 @@ FTaskNodeDescript FSTT_GuideThread_AttckCharacter::GetTaskNodeDescripton(
 		                                                    "Attack <%s>%s</>"
 		                                                   ),
 		                                               *RichText_Emphasis,
-		                                               *InstanceData.HumanCharacterAI->GetCharacterProxy()->GetDisplayTitle()
+		                                               *InstanceData.HumanCharacterAI->GetCharacterProxy()->
+		                                                             GetDisplayTitle()
 		                                              );
 
 		return TaskNodeDescript;
@@ -1131,6 +1139,81 @@ FTaskNodeDescript FSTT_GuideThread_AttckCharacter::GetTaskNodeDescripton(
 
 		return TaskNodeDescript;
 	}
+}
+
+void FSTID_GuideThread_OpenTutorialVideo::OpenTutorialVideo()
+{
+	auto MainHUDLayoutPtr = UUIManagerSubSystem::GetInstance()->GetMainHUDLayout();
+	if (MainHUDLayoutPtr)
+	{
+		MainHUDLayoutPtr->DisplayWidget(
+		                                GuideVideoWidgetClass,
+		                                [this](
+		                                auto WidgetPtr
+		                                )
+		                                {
+			                                auto CurUIPtr = Cast<UTutorialMediaPlayer>(WidgetPtr);
+			                                if (CurUIPtr)
+			                                {
+				                                CurUIPtr->FileMediaSourceRef = FileMediaSourceRef;
+				                                CurUIPtr->SetOnClicked(std::bind(&FSTID_GuideThread_OpenTutorialVideo::OnConfirm, this));
+				                                CurUIPtr->Display();
+			                                }
+		                                }
+		                               );
+	}
+}
+
+void FSTID_GuideThread_OpenTutorialVideo::OnConfirm()
+{
+	bIsConfirmed = true;
+}
+
+EStateTreeRunStatus FSTT_GuideThread_OpenTutorialVideo::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+	) const
+{
+	Super::EnterState(Context, Transition);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+															  *this
+															 );
+
+	InstanceData.OpenTutorialVideo();
+
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchShowCursor(true);
+	
+	return EStateTreeRunStatus::Running;
+}
+
+EStateTreeRunStatus FSTT_GuideThread_OpenTutorialVideo::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+	) const
+{
+	Super::Tick(Context, DeltaTime);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+															  *this
+															 );
+
+	if (InstanceData.bIsConfirmed)
+	{
+		return EStateTreeRunStatus::Succeeded;
+	}
+
+	return EStateTreeRunStatus::Running;
+}
+
+void FSTT_GuideThread_OpenTutorialVideo::ExitState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+	) const
+{
+	UInputProcessorSubSystem_Imp::GetInstance()->SwitchShowCursor(false);
+	
+	Super::ExitState(Context, Transition);
 }
 
 FTaskNodeDescript FSTT_GuideThread_ToBeContinued::GetTaskNodeDescripton(
@@ -1241,21 +1324,21 @@ EStateTreeRunStatus FSTT_QuestChain::EnterState(
 	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-															  *this
-															 );
+	                                                          *this
+	                                                         );
 
 	// 因为这个PlayerCharacter可能会被销毁，所以我们在每次任务时重新获取而不是在STE里面获取
 	InstanceData.PlayerCharacterPtr = Cast<AHumanCharacter_Player>(
-																   UGameplayStatics::GetPlayerCharacter(
-																		InstanceData.GuideThreadActorPtr,
-																		0
-																	   )
-																  );
+	                                                               UGameplayStatics::GetPlayerCharacter(
+		                                                                InstanceData.GuideThreadActorPtr,
+		                                                                0
+		                                                               )
+	                                                              );
 
 	return Super::EnterState(
-							 Context,
-							 Transition
-							);
+	                         Context,
+	                         Transition
+	                        );
 }
 
 FTaskNodeDescript FSTT_QuestChain::GetTaskNodeDescripton(
@@ -1667,31 +1750,31 @@ EStateTreeRunStatus FSTT_GuideThread_ShowCursor::EnterState(
 	) const
 {
 	Super::EnterState(
-					  Context,
-					  Transition
-					 );
+	                  Context,
+	                  Transition
+	                 );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-															  *this
-															 );
+	                                                          *this
+	                                                         );
 
 	// 因为这个PlayerCharacter可能会被销毁，所以我们在每次任务时重新获取而不是在STE里面获取
 	InstanceData.PCPtr = UGameplayStatics::GetPlayerController(
-															   InstanceData.PlayerCharacterPtr,
-															   0
-															  );
-	
+	                                                           InstanceData.PlayerCharacterPtr,
+	                                                           0
+	                                                          );
+
 	auto GameOptionsPtr = UGameOptions::GetInstance();
 
 	InstanceData.Key = GameOptionsPtr->ShowCursor;
-	
+
 	if (InstanceData.GuideThreadActorPtr)
 	{
 		InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
-																GetTaskNodeDescripton(
-																	 Context
-																	)
-															   );
+		                                                        GetTaskNodeDescripton(
+			                                                         Context
+			                                                        )
+		                                                       );
 	}
 
 	if (InstanceData.PCPtr)
@@ -1708,8 +1791,8 @@ EStateTreeRunStatus FSTT_GuideThread_ShowCursor::Tick(
 	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-															  *this
-															 );
+	                                                          *this
+	                                                         );
 
 	if (InstanceData.PCPtr->GetMouseCursor())
 	{
@@ -1717,9 +1800,9 @@ EStateTreeRunStatus FSTT_GuideThread_ShowCursor::Tick(
 	}
 
 	return Super::Tick(
-					   Context,
-					   DeltaTime
-					  );
+	                   Context,
+	                   DeltaTime
+	                  );
 }
 
 FTaskNodeDescript FSTT_GuideThread_ShowCursor::GetTaskNodeDescripton(
@@ -1727,12 +1810,12 @@ FTaskNodeDescript FSTT_GuideThread_ShowCursor::GetTaskNodeDescripton(
 	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-															  *this
-															 );
+	                                                          *this
+	                                                         );
 
 	FTaskNodeDescript TaskNodeDescript;
 
-	TaskNodeDescript.Description = InstanceData.Description.Replace(TEXT("{Key}"), *InstanceData.Key .ToString());
+	TaskNodeDescript.Description = InstanceData.Description.Replace(TEXT("{Key}"), *InstanceData.Key.ToString());
 
 	return TaskNodeDescript;
 }
@@ -1952,9 +2035,9 @@ EStateTreeRunStatus FSTT_GuideThread_WaitInteractionSceneActor::Tick(
 	) const
 {
 	FSTT_QuestChainBase::Tick(
-	                           Context,
-	                           DeltaTime
-	                          );
+	                          Context,
+	                          DeltaTime
+	                         );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 	                                                          *this

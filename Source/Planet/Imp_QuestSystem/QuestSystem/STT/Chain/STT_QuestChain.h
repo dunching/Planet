@@ -19,7 +19,9 @@
 
 class UGameplayAbility;
 class UPlanetGameplayAbility;
+class UFileMediaSource;
 class UMarkPoints;
+class UTutorialMediaPlayer;
 class ASceneActor;
 class AResourceBoxBase;
 class AChallengeEntry;
@@ -1327,6 +1329,66 @@ struct PLANET_API FSTT_GuideThread_AttckCharacter :
 
 	virtual FTaskNodeDescript GetTaskNodeDescripton(
 		FStateTreeExecutionContext& Context
+	) const override;
+
+protected:
+};
+#pragma endregion
+
+#pragma region 打开一个视频教程，并且等待玩家确认
+USTRUCT()
+struct PLANET_API FSTID_GuideThread_OpenTutorialVideo :
+	public FSTID_GuideThread
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, Category = Context)
+	UGloabVariable_GuideThread_MainBase* GloabVariable_Main = nullptr;
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+		)
+	TSoftObjectPtr<UFileMediaSource>FileMediaSourceRef;
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+		)
+	TSubclassOf<UTutorialMediaPlayer>GuideVideoWidgetClass;
+
+	bool bIsConfirmed = false;
+	
+	void OpenTutorialVideo();
+
+	void OnConfirm();
+	
+};
+
+// 执行引导任务 给目标角色添加互动引导内容
+USTRUCT()
+struct PLANET_API FSTT_GuideThread_OpenTutorialVideo :
+	public FSTT_QuestChain
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideThread_OpenTutorialVideo;
+
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
+		) const override;
+	
+	virtual void ExitState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
 	) const override;
 
 protected:

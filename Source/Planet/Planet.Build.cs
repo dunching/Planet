@@ -69,6 +69,8 @@ public class Planet : ModuleRules
 		PublicIncludePaths.Add("Planet/Transition");
 		PublicIncludePaths.Add("Planet/UI");
 		PublicIncludePaths.Add("Planet/UI/Common");
+		PublicIncludePaths.Add("Planet/UI/Common/Media");
+		PublicIncludePaths.Add("Planet/UI/Common/Minimap");
 		PublicIncludePaths.Add("Planet/UI/Hover");
 		PublicIncludePaths.Add("Planet/UI/Hover/DestroyProgress");
 		PublicIncludePaths.Add("Planet/UI/Hover/CharacterRisingTips");
@@ -205,6 +207,7 @@ public class Planet : ModuleRules
 			"NetCore",
 			"ShaderConductor",
 			"Json",
+			"MediaAssets",
 
 			// 引擎插件
 			"GameplayTags",

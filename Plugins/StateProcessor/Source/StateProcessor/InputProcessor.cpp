@@ -1,5 +1,6 @@
 #include "InputProcessor.h"
 
+#include "InputProcessorSubSystemBase.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
 FInputProcessor::FInputProcessor(
@@ -23,26 +24,7 @@ void FInputProcessor::SwitchShowCursor(
 	bool bIsShowCursor
 	)
 {
-	auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-	if (OnwerActorPtr)
-	{
-		auto PlayerPCPtr = OnwerActorPtr->GetController<APlayerController>();
-		if (PlayerPCPtr)
-		{
-			if (bIsShowCursor)
-			{
-				PlayerPCPtr->SetShowMouseCursor(true);
-
-				UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(PlayerPCPtr, nullptr, EMouseLockMode::DoNotLock, true);
-			}
-			else
-			{
-				PlayerPCPtr->SetShowMouseCursor(false);
-
-				UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerPCPtr);
-			}
-		}
-	}
+	UInputProcessorSubSystemBase::GetInstanceBase()->SwitchShowCursor(bIsShowCursor);
 }
 
 bool FInputProcessor::Tick(

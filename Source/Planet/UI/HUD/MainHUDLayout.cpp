@@ -254,7 +254,7 @@ UOverlaySlot* UMainHUDLayout::DisplayWidget(
 	auto SlotPtr = UIPtr->AddChildToOverlay(WidgetPtr);
 	if (SlotPtr)
 	{
-		SlotPtr->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center);
+		SlotPtr->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
 		SlotPtr->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
 	}
 

@@ -6,6 +6,13 @@
 #include "LogWriter.h"
 
 #include "InputProcessor.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+
+UInputProcessorSubSystemBase* UInputProcessorSubSystemBase::GetInstanceBase()
+{
+	auto WorldSetting = Cast<IGetInputProcessorSubSystemInterface>(GetWorldImp()->GetWorldSettings());
+	return WorldSetting->GetInputProcessorSubSystem();
+}
 
 void UInputProcessorSubSystemBase::Initialize(
 	FSubsystemCollectionBase& Collection
@@ -164,5 +171,37 @@ bool UInputProcessorSubSystemBase::InputAxis(
 	else
 	{
 		return true;
+	}
+}
+
+void UInputProcessorSubSystemBase::SwitchShowCursor(
+	bool bIsShowCursor
+	)
+{
+	const auto OldValue = ShowCursorCount >= 0;
+	
+	ShowCursorCount += bIsShowCursor ? 1 : -1;
+
+	const auto Value = ShowCursorCount >= 0;
+	if (Value == OldValue)
+	{
+		return;
+	}
+
+	auto PlayerPCPtr = GEngine->GetFirstLocalPlayerController(GetWorld());
+	if (PlayerPCPtr)
+	{
+		if (Value)
+		{
+			PlayerPCPtr->SetShowMouseCursor(true);
+
+			UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(PlayerPCPtr, nullptr, EMouseLockMode::DoNotLock, true);
+		}
+		else
+		{
+			PlayerPCPtr->SetShowMouseCursor(false);
+
+			UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerPCPtr);
+		}
 	}
 }

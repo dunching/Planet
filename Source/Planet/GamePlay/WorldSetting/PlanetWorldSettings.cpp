@@ -45,6 +45,16 @@ UQuestSubSystem* APlanetWorldSettings::GetGuideSubSystem() const
 	                                );
 }
 
+UInputProcessorSubSystemBase* APlanetWorldSettings::GetInputProcessorSubSystem() const
+{
+	return Cast<UInputProcessorSubSystem_Imp>(
+									 USubsystemBlueprintLibrary::GetGameInstanceSubsystem(
+										  GetWorldImp(),
+										  UInputProcessorSubSystem_Imp::StaticClass()
+										 )
+									);
+}
+
 const UPAD_ItemProxyCollection* APlanetWorldSettings::GetItemProxyCollection() const
 {
 	return PAD_ItemProxyCollectionRef.LoadSynchronous();

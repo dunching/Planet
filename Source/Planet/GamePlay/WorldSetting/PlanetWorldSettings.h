@@ -30,6 +30,7 @@ class PLANET_API APlanetWorldSettings :
 	public AWorldSettings,
 	public IGetItemProxyCollectionInterface,
 	public IGetQuestSubSystemInterface,
+	public IGetInputProcessorSubSystemInterface,
 	public IGetPropertyEntrysDTInterface
 {
 	GENERATED_BODY()
@@ -47,6 +48,8 @@ public:
 	UDataTableCollection* GetSceneProxyExtendInfoMap()const;
 
 	virtual UQuestSubSystem* GetGuideSubSystem()const override;
+	
+	virtual UInputProcessorSubSystemBase* GetInputProcessorSubSystem()const override;
 	
 	virtual const UPAD_ItemProxyCollection*GetItemProxyCollection()const override;
 	
