@@ -791,6 +791,44 @@ void APlanetPlayerController::RemoveProvideEyesViewActor(
 	}
 }
 
+void APlanetPlayerController::SetCharacterAttributeTemporaryValue_Implementation(
+	const TArray<FString>& Args
+	)
+{
+	if (Args.Num() < 2)
+	{
+		return;
+	}
+
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
+	auto GASPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+
+	auto SpecHandle = GASPtr->MakeOutgoingSpec(
+											   UAssetRefMap::GetInstance()->OnceGEClass,
+											   1,
+											   GASPtr->MakeEffectContext()
+											  );
+
+	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override);
+	SpecHandle.Data.Get()->AddDynamicAssetTag(FGameplayTag::RequestGameplayTag(*Args[0]));
+
+	SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+												  UGameplayTagsLibrary::DataSource_Character ,
+												   UKismetStringLibrary::Conv_StringToInt(Args[1])
+												  );
+
+	const auto GEHandle = GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	if (!GEHandle.IsValid())
+	{
+		// checkNoEntry();
+	}
+}
+
 void APlanetPlayerController::StunTarget_Implementation(
 	const TArray<FString>& Args
 	)

@@ -10,6 +10,7 @@
 
 class UCharacterAbilitySystemComponent;
 class ACharacterBase;
+class UAS_Character;
 
 class IGameplayEffectDataModifyInterface;
 
@@ -173,7 +174,10 @@ public:
 		int32 InPriority = 1
 		);
 
-	virtual int32 GetDuration(int32 Duration) const;
+	virtual float GetDuration(
+		const UAS_Character* AS_CharacterAttributePtr, 
+		float Duration
+		) const;
 };
 
 /**
@@ -188,7 +192,10 @@ public:
 		int32 InPriority = 1
 		);
 
-	virtual int32 GetCooldown(int32 Cooldown) const;
+	virtual int32 GetCooldown(
+		const UAS_Character* AS_CharacterAttributePtr, 
+		int32 Cooldown
+		) const;
 };
 
 /**

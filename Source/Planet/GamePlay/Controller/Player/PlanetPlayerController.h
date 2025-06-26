@@ -146,6 +146,11 @@ public:
 		);
 
 	UFUNCTION(Server, Reliable)
+	void SetCharacterAttributeTemporaryValue(
+		const TArray<FString>& Args
+		);
+
+	UFUNCTION(Server, Reliable)
 	void RepelTarget(
 		const TArray<FString>& Args
 		);

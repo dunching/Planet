@@ -145,6 +145,38 @@ public:
 		) const override;
 };
 
+/**
+ * 
+ */
+class PLANET_API IBasicDurationModifyInterface : public IDurationModifyInterface
+{
+public:
+	IBasicDurationModifyInterface(
+		int32 InPriority
+		);
+
+	virtual float GetDuration(
+		const UAS_Character* AS_CharacterAttributePtr, 
+		float Duration
+		) const override;
+};
+
+/**
+ * 
+ */
+class PLANET_API IBasicCooldownModifyInterface : public ICooldownModifyInterface
+{
+public:
+	IBasicCooldownModifyInterface(
+		int32 InPriority
+		);
+
+	virtual int32 GetCooldown(
+		const UAS_Character* AS_CharacterAttributePtr, 
+		int32 Cooldown
+		) const override;
+};
+
 #pragma endregion
 
 #pragma region 通用的修正
@@ -248,4 +280,14 @@ enum class EGostModifyOrder: uint16
 	kBasic = 150,
 	
 	kSkill_Passive_ManaCostModify_HP = 151,
+};
+
+enum class EDurationModifyOrder: uint16
+{
+	kBasic = 150,
+};
+
+enum class ECooldownModifyOrder: uint16
+{
+	kBasic = 150,
 };

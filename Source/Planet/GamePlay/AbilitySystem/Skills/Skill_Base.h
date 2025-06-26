@@ -165,13 +165,6 @@ protected:
 		float Elemental_Damage_Magnification
 		) const;
 
-	virtual void ApplyCostImp(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const TMap<FGameplayTag, int32>& CostMap
-		) const override;
-
 	TObjectPtr<ACharacterBase> CharacterPtr = nullptr;
 
 	TSharedPtr<FSkillProxy> SkillProxyPtr = nullptr;

@@ -322,6 +322,24 @@ void TestCommand::SetCharacterAttributeValue(
 #endif
 }
 
+void TestCommand::SetCharacterAttributeTemporaryValue(
+	const TArray<FString>& Args
+	)
+{
+#if WITH_EDITOR
+	if (!Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (PCPtr)
+	{
+		PCPtr->SetCharacterAttributeTemporaryValue(Args);
+	}
+#endif
+}
+
 void TestCommand::UpdateWeather(
 	const TArray<FString>& Args
 	)

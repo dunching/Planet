@@ -104,14 +104,16 @@ IDurationModifyInterface::IDurationModifyInterface(
 {
 }
 
-int32 IDurationModifyInterface::GetDuration(
-	int32 Duration
+float IDurationModifyInterface::GetDuration(
+	const UAS_Character* AS_CharacterAttributePtr, 
+	float Duration
 	) const
 {
 	return Duration;
 }
 
 int32 ICooldownModifyInterface::GetCooldown(
+	const UAS_Character* AS_CharacterAttributePtr, 
 	int32 Cooldown
 	) const
 {

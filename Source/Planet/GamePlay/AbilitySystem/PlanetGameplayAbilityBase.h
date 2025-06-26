@@ -16,7 +16,6 @@ class PLANET_API UPlanetGameplayAbilityBase : public UPlanetGameplayAbility
 	GENERATED_BODY()
 
 public:
-	
 	virtual UGameplayEffect* GetCooldownGameplayEffect() const override;
 
 	virtual UGameplayEffect* GetCostGameplayEffect() const override;
@@ -58,13 +57,23 @@ public:
 		const FGameplayAbilityTargetDataHandle& TargetData
 		) const;
 
+protected:
+	
+	virtual void ApplyCDImp(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayTag& CDTag,
+		int32 Cooldown
+		) const;
+
 	virtual void ApplyCostImp(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayTag& CDTag,
 		const TMap<FGameplayTag, int32>& CostMap
 		) const;
 
-	virtual TMap<FGameplayTag, int32>GetCostMap()const ;
-	
+	virtual TMap<FGameplayTag, int32> GetCostMap() const;
 };

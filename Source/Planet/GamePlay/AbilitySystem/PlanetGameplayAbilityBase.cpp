@@ -53,7 +53,7 @@ void UPlanetGameplayAbilityBase::ApplyCost(
 	const FGameplayAbilityActivationInfo ActivationInfo
 	) const
 {
-	ApplyCostImp(Handle, ActorInfo, ActivationInfo, GetCostMap());
+	ApplyCostImp(Handle, ActorInfo, ActivationInfo, FGameplayTag::EmptyTag, GetCostMap());
 }
 
 bool UPlanetGameplayAbilityBase::CheckCost(
@@ -81,6 +81,7 @@ void UPlanetGameplayAbilityBase::ApplyCostImp(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayTag& CDTag,
 	const TMap<FGameplayTag, int32>& CostMap
 	) const
 {
@@ -96,6 +97,7 @@ void UPlanetGameplayAbilityBase::ApplyCostImp(
 		FGameplayEffectSpecHandle SpecHandle =
 			MakeOutgoingGameplayEffectSpec(CostGE->GetClass(), GetAbilityLevel());
 
+		SpecHandle.Data.Get()->AddDynamicAssetTag(CDTag);
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
 
 		const auto CostsMap = AbilitySystemComponentPtr->GetCost(CostMap);
@@ -119,6 +121,36 @@ TArray<FActiveGameplayEffectHandle> UPlanetGameplayAbilityBase::MyApplyGameplayE
 	) const
 {
 	return ApplyGameplayEffectSpecToTarget(AbilityHandle, ActorInfo, ActivationInfo, SpecHandle, TargetData);
+}
+
+void UPlanetGameplayAbilityBase::ApplyCDImp(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayTag& CDTag,
+	int32 Cooldown
+	) const
+{
+	auto AbilitySystemComponentPtr = Cast<UCharacterAbilitySystemComponent>(ActorInfo->AbilitySystemComponent.Get());
+	if (!AbilitySystemComponentPtr)
+	{
+		return;
+	}
+
+	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
+	if (CooldownGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(CDTag);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_CD);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+		                                               UGameplayTagsLibrary::GEData_Duration,
+		                                               AbilitySystemComponentPtr->GetCooldown(Cooldown)
+		                                              );
+
+		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
 }
 
 TMap<FGameplayTag, int32> UPlanetGameplayAbilityBase::GetCostMap() const

@@ -520,6 +520,9 @@ FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed =
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Shield =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Shield")));
 
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Haste =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Haste")));
+
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Metal.Value")));
 

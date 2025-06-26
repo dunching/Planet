@@ -360,6 +360,40 @@ TMap<FGameplayTag, int32> IBasicGostModifyInterface::GetCost(
 	return Original;
 }
 
+IBasicDurationModifyInterface::IBasicDurationModifyInterface(
+	int32 InPriority
+	):
+	 IDurationModifyInterface(InPriority)
+{
+}
+
+float IBasicDurationModifyInterface::GetDuration(
+	const UAS_Character* AS_CharacterAttributePtr,
+	float Duration
+	) const
+{
+	return Duration;
+}
+
+IBasicCooldownModifyInterface::IBasicCooldownModifyInterface(
+	int32 InPriority
+	):
+	 ICooldownModifyInterface(InPriority)
+{
+}
+
+int32 IBasicCooldownModifyInterface::GetCooldown(
+	const UAS_Character* AS_CharacterAttributePtr,
+	int32 Cooldown
+	) const
+{
+	const auto Haste = AS_CharacterAttributePtr->GetHaste();
+
+	const auto Scale = 1 + (Haste / 100.f);
+
+	return Cooldown / Scale;
+}
+
 IOutputData_MultipleDamega_ModifyInterface::IOutputData_MultipleDamega_ModifyInterface(
 	int32 InPriority,
 	int32 InCount,

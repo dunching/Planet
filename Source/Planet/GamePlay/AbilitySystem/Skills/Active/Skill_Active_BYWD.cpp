@@ -145,7 +145,9 @@ void USkill_Active_BYWD::ApplyCooldown(
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_CD);
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 		                                               UGameplayTagsLibrary::GEData_Duration,
-		                                               ItemProxy_DescriptionPtr->CD.PerLevelValue[0]
+		                                               Cast<UCharacterAbilitySystemComponent>(
+			                                                GetAbilitySystemComponentFromActorInfo()
+			                                               )->GetCooldown(ItemProxy_DescriptionPtr->CD.PerLevelValue[0])
 		                                              );
 
 		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
@@ -231,7 +233,7 @@ void USkill_Active_BYWD::OnDuration(
 	{
 		return;
 	}
-	
+
 	RemainTime = (TotalTime - CurrentTiem) / TotalTime;
 	if (RemainTime < 0.f)
 	{

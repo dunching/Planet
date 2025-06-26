@@ -221,20 +221,13 @@ void USkill_Active_XYFH::ApplyCooldown(
 {
 	Super::ApplyCooldown(Handle, ActorInfo, ActivationInfo);
 
-	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
-	if (CooldownGE)
-	{
-		FGameplayEffectSpecHandle SpecHandle =
-			MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
-		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_CD);
-		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-		                                               UGameplayTagsLibrary::GEData_Duration,
-		                                               ItemProxy_DescriptionPtr->CD.PerLevelValue[0]
-		                                              );
-
-		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
-	}
+	ApplyCDImp(
+	           Handle,
+	           ActorInfo,
+	           ActivationInfo,
+	           SkillProxyPtr->GetProxyType(),
+	           ItemProxy_DescriptionPtr->CD.PerLevelValue[0]
+	          );
 }
 
 void USkill_Active_XYFH::ApplyCost(
@@ -243,7 +236,7 @@ void USkill_Active_XYFH::ApplyCost(
 	const FGameplayAbilityActivationInfo ActivationInfo
 	) const
 {
-	ApplyCostImp(Handle, ActorInfo, ActivationInfo,GetCostMap());
+	ApplyCostImp(Handle, ActorInfo, ActivationInfo, SkillProxyPtr->GetProxyType(), GetCostMap());
 }
 
 void USkill_Active_XYFH::PerformAction(
@@ -734,10 +727,11 @@ void USkill_Active_XYFH::MakeDamage(
 	const int32 BaseDamage = ItemProxy_DescriptionPtr->Elemental_Damage;
 
 	FGameplayEffectSpecHandle SpecHandle = MakeDamageToTargetSpecHandle(
-																  ItemProxy_DescriptionPtr->ElementalType,
-																  ItemProxy_DescriptionPtr->Elemental_Damage,
-																  ItemProxy_DescriptionPtr->Elemental_Damage_Magnification
-																 );
+	                                                                    ItemProxy_DescriptionPtr->ElementalType,
+	                                                                    ItemProxy_DescriptionPtr->Elemental_Damage,
+	                                                                    ItemProxy_DescriptionPtr->
+	                                                                    Elemental_Damage_Magnification
+	                                                                   );
 
 	TArray<TWeakObjectPtr<AActor>> Ary;
 	Ary.Add(TargetCharacterPtr);

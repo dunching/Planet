@@ -496,39 +496,6 @@ FGameplayEffectSpecHandle USkill_Base::MakeDamageToTargetSpecHandle(
 	return SpecHandle;
 }
 
-void USkill_Base::ApplyCostImp(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const TMap<FGameplayTag, int32>& CostMap
-	) const
-{
-	auto AbilitySystemComponentPtr = Cast<UCharacterAbilitySystemComponent>(ActorInfo->AbilitySystemComponent.Get());
-	if (!AbilitySystemComponentPtr)
-	{
-		return;
-	}
-
-	UGameplayEffect* CostGE = GetCostGameplayEffect();
-	if (CostGE)
-	{
-		FGameplayEffectSpecHandle SpecHandle =
-			MakeOutgoingGameplayEffectSpec(CostGE->GetClass(), GetAbilityLevel());
-		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
-
-		const auto CostsMap = AbilitySystemComponentPtr->GetCost(CostMap);
-		for (const auto& Iter : CostsMap)
-		{
-			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-			                                               Iter.Key,
-			                                               -Iter.Value
-			                                              );
-		}
-		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
-	}
-}
-
 TSet<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistance(
 	int32 MaxDistance,
 	int32 UpForwardDistance,

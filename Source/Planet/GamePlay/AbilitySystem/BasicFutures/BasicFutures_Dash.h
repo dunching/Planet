@@ -75,6 +75,12 @@ public:
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	)override;
 
+	virtual void ApplyCost(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo
+		) const override;
+
 	virtual void EndAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -101,13 +107,6 @@ protected:
 
 	virtual TMap<FGameplayTag, int32>GetCostMap()const override;
 	
-	virtual void ApplyCostImp(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const TMap<FGameplayTag, int32>& CostMap
-		) const override;
-
 	// virtual void InitalDefaultTags()override;
 
 	void DoDash(

@@ -88,6 +88,10 @@ void UCharacterAbilitySystemComponent::BeginPlay()
 		                 );
 
 		AddGostModify(MakeShared<IBasicGostModifyInterface>(static_cast<int32>(EGostModifyOrder::kBasic)));
+
+		AddDurationModify(MakeShared<IBasicDurationModifyInterface>(static_cast<int32>(EDurationModifyOrder::kBasic)));
+
+		AddCooldownModify(MakeShared<IBasicCooldownModifyInterface>(static_cast<int32>(ECooldownModifyOrder::kBasic)));
 	}
 }
 
@@ -475,15 +479,15 @@ void UCharacterAbilitySystemComponent::StunTarget_Implementation(
 	UGameplayEffect* GameplayEffect = NewObject<UGameplayEffect>(this, UAssetRefMap::GetInstance()->DurationGEClass);
 	{
 		auto& GEComponentRef = GameplayEffect->FindOrAddComponent<UActivationOwnedTagsGameplayEffectComponent>();
-		
+
 		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Stun);
-		
+
 		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
 		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPathFollowMove);
 		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
 		// GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRootMotion);
 		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation_All);
-		
+
 		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::Skill_Block_OtherSkill_Weapon);
 		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::Skill_Block_OtherSkill_Active);
 		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::Skill_Block_Displacement);
@@ -500,7 +504,12 @@ void UCharacterAbilitySystemComponent::StunTarget_Implementation(
 
 	SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 	                                               UGameplayTagsLibrary::GEData_Duration,
-	                                               Duration
+	                                               GetDuration(
+	                                                           Cast<UAS_Character>(
+		                                                            GetAttributeSet(UAS_Character::StaticClass())
+		                                                           ),
+	                                                           Duration
+	                                                          )
 	                                              );
 
 	ApplyGameplayEffectSpecToTarget(
@@ -1035,6 +1044,10 @@ void UCharacterAbilitySystemComponent::ModifyType_Temporary(
 	{
 		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Shield, UAS_Character::GetShieldAttribute());
 	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Haste))
+	{
+		Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Haste, UAS_Character::GetHasteAttribute());
+	}
 
 	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_CriticalDamage))
 	{
@@ -1493,6 +1506,10 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			const auto NewValue = Lambda(UAS_Character::GetShieldAttribute());
 			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
 		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Haste))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetHasteAttribute());
+		}
 		else
 		{
 			TargetSet->ProcessForAttributeTag(Iter, std::bind(Lambda, std::placeholders::_1));
@@ -1573,4 +1590,16 @@ bool UCharacterAbilitySystemComponent::CheckCost(
 	}
 
 	return true;
+}
+
+int32 UCharacterAbilitySystemComponent::GetCooldown(
+	int32 Cooldown
+	) const
+{
+	return IGameplayEffectDataModifyInterface::GetCooldown(
+															   Cast<UAS_Character>(
+																	GetAttributeSet(UAS_Character::StaticClass())
+																   ),
+																   Cooldown
+															  );
 }

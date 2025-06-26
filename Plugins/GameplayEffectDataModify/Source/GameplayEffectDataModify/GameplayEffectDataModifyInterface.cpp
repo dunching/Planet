@@ -91,6 +91,38 @@ bool IGameplayEffectDataModifyInterface::CheckCost(
 	return false;
 }
 
+float IGameplayEffectDataModifyInterface::GetDuration(
+	const UAS_Character* AS_CharacterAttributePtr,
+	float Duration
+	) const
+{
+	auto& ModifyStrategiesRef = DurationModifysMap;
+
+	float Result = Duration;
+	for (auto Iter = ModifyStrategiesRef.begin(); Iter != ModifyStrategiesRef.end(); Iter++)
+	{
+		Result = (*Iter)->GetDuration(AS_CharacterAttributePtr, Result);
+	}
+
+	return Result;
+}
+
+int32 IGameplayEffectDataModifyInterface::GetCooldown(
+	const UAS_Character* AS_CharacterAttributePtr,
+	int32 Cooldown
+	) const
+{
+	auto& ModifyStrategiesRef = CooldownModifysMap;
+
+	int32 Result = Cooldown;
+	for (auto Iter = ModifyStrategiesRef.begin(); Iter != ModifyStrategiesRef.end(); Iter++)
+	{
+		Result = (*Iter)->GetCooldown(AS_CharacterAttributePtr, Result);
+	}
+
+	return Result;
+}
+
 void IGameplayEffectDataModifyInterface::ModifyInputData(
 	const FGameplayTagContainer& AllAssetTags,
 	TSet<FGameplayTag>& NeedModifySet,
@@ -293,6 +325,60 @@ void IGameplayEffectDataModifyInterface::RemoveGostModify(
 		if ((*Iter)->ID == GAEventModifySPtr->ID)
 		{
 			CostModifysMap.erase(Iter);
+			break;
+		}
+	}
+}
+
+void IGameplayEffectDataModifyInterface::AddDurationModify(
+	const TSharedPtr<IDurationModifyInterface>& GAEventModifySPtr
+	)
+{
+	for (bool bIsContinue = true; bIsContinue;)
+	{
+		bIsContinue = false;
+		GAEventModifySPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
+		for (const auto& Iter : DurationModifysMap)
+		{
+			if (Iter->ID == GAEventModifySPtr->ID)
+			{
+				bIsContinue = true;
+				break;
+			}
+		}
+	}
+	DurationModifysMap.emplace(GAEventModifySPtr);
+}
+
+inline void IGameplayEffectDataModifyInterface::AddCooldownModify(
+	const TSharedPtr<ICooldownModifyInterface>& GAEventModifySPtr
+	)
+{
+	for (bool bIsContinue = true; bIsContinue;)
+	{
+		bIsContinue = false;
+		GAEventModifySPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
+		for (const auto& Iter : CooldownModifysMap)
+		{
+			if (Iter->ID == GAEventModifySPtr->ID)
+			{
+				bIsContinue = true;
+				break;
+			}
+		}
+	}
+	CooldownModifysMap.emplace(GAEventModifySPtr);
+}
+
+void IGameplayEffectDataModifyInterface::RemoveCooldownModify(
+	const TSharedPtr<ICooldownModifyInterface>& GAEventModifySPtr
+	)
+{
+	for (auto Iter = CooldownModifysMap.begin(); Iter != CooldownModifysMap.end(); Iter++)
+	{
+		if ((*Iter)->ID == GAEventModifySPtr->ID)
+		{
+			CooldownModifysMap.erase(Iter);
 			break;
 		}
 	}
@@ -529,6 +615,20 @@ void IGameplayEffectDataModifyInterface::UpdateTemporaryValue(
 			return;
 		}
 		break;
+	}
+}
+
+void IGameplayEffectDataModifyInterface::RemoveDurationModify(
+	const TSharedPtr<IDurationModifyInterface>& GAEventModifySPtr
+	)
+{
+	for (auto Iter = DurationModifysMap.begin(); Iter != DurationModifysMap.end(); Iter++)
+	{
+		if ((*Iter)->ID == GAEventModifySPtr->ID)
+		{
+			DurationModifysMap.erase(Iter);
+			break;
+		}
 	}
 }
 

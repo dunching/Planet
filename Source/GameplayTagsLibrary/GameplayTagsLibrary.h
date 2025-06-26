@@ -395,6 +395,8 @@ public:
 
 	static FGameplayTag GEData_ModifyItem_Shield;
 
+	static FGameplayTag GEData_ModifyItem_Haste;
+
 	static FGameplayTag GEData_ModifyItem_Metal_Value;
 
 	static FGameplayTag GEData_ModifyItem_Metal_Level;

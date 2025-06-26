@@ -109,6 +109,10 @@ public:
 		const TMap<FGameplayTag, int32>& CostMap
 		) const override;
 
+	int32 GetCooldown(
+		int32 Cooldown
+		) const;
+
 #pragma endregion
 
 #pragma region 基础GA

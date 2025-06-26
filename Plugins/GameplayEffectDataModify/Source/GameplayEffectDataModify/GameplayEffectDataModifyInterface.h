@@ -41,14 +41,14 @@ struct GAMEPLAYEFFECTDATAMODIFY_API FDataComposition
 	GENERATED_USTRUCT_BODY()
 
 	void Empty();
-	
+
 	/**
 	 * 数据的基础组成
 	 * 来源 FGameplayTag::EmptyTag为基础数据
 	 * 值
 	 */
 	TMap<FGameplayTag, float> DataMap;
-	
+
 	/**
 	 * 数据的百分比组成
 	 * 来源
@@ -61,14 +61,14 @@ enum class EUpdateValueType : uint8
 {
 	kPermanent_Addtive,
 	kPermanent_Override,
-	
+
 	kTemporary_Data_Addtive,
 	kTemporary_Data_Override,
-	
+
 	kTemporary_Percent_Addtive,
 	kTemporary_Percent_Override,
 };
-	
+
 class GAMEPLAYEFFECTDATAMODIFY_API IGameplayEffectDataModifyInterface
 {
 	GENERATED_BODY()
@@ -87,8 +87,8 @@ public:
 	 * @param ExecutionParams 
 	 * @param OutExecutionOutput 
 	 */
-	virtual  void ModifyOutputData(
-		const FGameplayTagContainer & AllAssetTags,
+	virtual void ModifyOutputData(
+		const FGameplayTagContainer& AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
 		TMap<FGameplayTag, float>& NewDatas,
 		TSet<EAdditionalModify>& AdditionalModifyAry,
@@ -106,7 +106,7 @@ public:
 	 * @param OutExecutionOutput 
 	 */
 	virtual void ModifyInputData(
-		const FGameplayTagContainer & AllAssetTags,
+		const FGameplayTagContainer& AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
 		TMap<FGameplayTag, float>& NewDatas,
 		TSet<EAdditionalModify>& AdditionalModifyAry,
@@ -134,7 +134,7 @@ public:
 	 * @param OutExecutionOutput 
 	 */
 	virtual void ApplyInputData(
-		const FGameplayTagContainer & AllAssetTags,
+		const FGameplayTagContainer& AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
 		const TSet<EAdditionalModify>& AdditionalModifyAry,
@@ -148,15 +148,29 @@ public:
 	 * @param CostMap 
 	 * @return 
 	 */
-	TMap<FGameplayTag, int32>GetCost(const TMap<FGameplayTag, int32>&CostMap);
+	TMap<FGameplayTag, int32> GetCost(
+		const TMap<FGameplayTag, int32>& CostMap
+		);
 
 	/**
 	 * 确认折算之后的消耗是否满足释放条件
 	 * @param CostMap 
 	 * @return 
 	 */
-	virtual bool CheckCost(const TMap<FGameplayTag, int32>&CostMap)const;	
-	
+	virtual bool CheckCost(
+		const TMap<FGameplayTag, int32>& CostMap
+		) const;
+
+	virtual float GetDuration(
+		const UAS_Character* AS_CharacterAttributePtr,
+		float Duration
+		) const;
+
+	int32 GetCooldown(
+		const UAS_Character* AS_CharacterAttributePtr,
+		int32 Cooldown
+		) const;
+
 	void AddOutputModify(
 		const TSharedPtr<IOutputDataModifyInterface>& GAEventModifySPtr
 		);
@@ -187,6 +201,22 @@ public:
 
 	void RemoveGostModify(
 		const TSharedPtr<IGostModifyInterface>& GAEventModifySPtr
+		);
+
+	void AddDurationModify(
+		const TSharedPtr<IDurationModifyInterface>& GAEventModifySPtr
+		);
+
+	void RemoveDurationModify(
+		const TSharedPtr<IDurationModifyInterface>& GAEventModifySPtr
+		);
+
+	void AddCooldownModify(
+		const TSharedPtr<ICooldownModifyInterface>& GAEventModifySPtr
+		);
+
+	void RemoveCooldownModify(
+		const TSharedPtr<ICooldownModifyInterface>& GAEventModifySPtr
 		);
 #pragma endregion
 
@@ -252,6 +282,16 @@ protected:
 	 * "战斗资源"消耗的折算
 	 */
 	std::multiset<TSharedPtr<IGostModifyInterface>, FDataModify_key_compare> CostModifysMap;
+
+	/**
+	 * 持续时长修正
+	 */
+	std::multiset<TSharedPtr<IDurationModifyInterface>, FDataModify_key_compare> DurationModifysMap;
+
+	/**
+	 * 冷却修正
+	 */
+	std::multiset<TSharedPtr<ICooldownModifyInterface>, FDataModify_key_compare> CooldownModifysMap;
 
 	/**
 	 * GameplayAttributeData的组成
