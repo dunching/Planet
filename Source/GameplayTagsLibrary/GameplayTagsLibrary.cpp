@@ -425,6 +425,18 @@ FGameplayTag UGameplayTagsLibrary::Skill_CanBeInterrupted =
 FGameplayTag UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Skill.CanBeInterrupted.Stagnation")));
 
+FGameplayTag UGameplayTagsLibrary::Skill_CanBeInterrupted_Stun =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Skill.CanBeInterrupted.Stun")));
+
+FGameplayTag UGameplayTagsLibrary::Skill_Block_OtherSkill_Weapon =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Skill.Block.OtherSkill.Weapon")));
+
+FGameplayTag UGameplayTagsLibrary::Skill_Block_OtherSkill_Active =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Skill.Block.OtherSkill.Active")));
+
+FGameplayTag UGameplayTagsLibrary::Skill_Block_Displacement =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Skill.Block.Displacement")));
+
 
 FGameplayTag UGameplayTagsLibrary::GEData_Info =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Info")));

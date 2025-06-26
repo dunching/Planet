@@ -64,12 +64,14 @@ public:
 	using FCharacterStateChanged = TCallbackHandleContainer<void(
 		ECharacterStateType,
 		UCS_Base*
-	
+
+		
 		)>;
 
 	using FMakedDamageDelegate = TCallbackHandleContainer<void(
 		const FOnEffectedTargetCallback&
-	
+
+		
 		)>;
 
 	UCharacterAbilitySystemComponent(
@@ -95,7 +97,7 @@ public:
 #pragma region 输入和输出得修正
 
 	virtual void ApplyInputData(
-		const FGameplayTagContainer & AllAssetTags,
+		const FGameplayTagContainer& AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
 		const TSet<EAdditionalModify>& AdditionalModifyAry,
@@ -103,8 +105,10 @@ public:
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 		) override;
 
-	virtual bool CheckCost(const TMap<FGameplayTag, int32>&CostMap)const override;	
-	
+	virtual bool CheckCost(
+		const TMap<FGameplayTag, int32>& CostMap
+		) const override;
+
 #pragma endregion
 
 #pragma region 基础GA
@@ -181,16 +185,21 @@ public:
 	 */
 	void HasBeenRepel(
 		const TWeakObjectPtr<ACharacterBase>& InstigatorPtr,
+		float Duration,
 		FVector RepelDirection,
 		int32 RepelDistance
 		);
 
+	/**
+	 * 是否进入【不可选中】状态
+	 * @param bIsCanBeSelect 
+	 */
 	void SwitchCantBeSelect(
 		bool bIsCanBeSelect
 		);
 
 	/**
-	 * 是否进入隐身状态
+	 * 是否进入【隐身】状态
 	 * @param bIsInvisible 
 	 */
 	void SwitchInvisible(
@@ -199,6 +208,12 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void Respawn();
+
+	UFUNCTION(Server, Reliable)
+	void StunTarget(
+		ACharacterBase* TargetCharacterPtr,
+		float Duration
+		);
 
 	// 移动至攻击范围内
 	void MoveToAttackDistance(
@@ -216,7 +231,7 @@ public:
 
 	// 对“其他”角色造成的影响（伤害、控制）
 	FMakedDamageDelegate MakedDamageDelegate;
-	
+
 	// 收到“其他”角色造成的影响（伤害、控制）
 	FMakedDamageDelegate ReceivedDamageDelegate;
 #pragma endregion
@@ -227,7 +242,7 @@ public:
 	void OnEffectOhterCharacter(
 		const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 		);
-	
+
 	// 收到“其他”角色造成的影响（伤害、控制）
 	UFUNCTION(NetMulticast, Reliable)
 	void OnReceivedOhterCharacter(
@@ -258,27 +273,27 @@ public:
 		);
 
 	void ModifyType_Permanent(
-		FOnEffectedTargetCallback &ReceivedEventModifyDataCallback,
+		FOnEffectedTargetCallback& ReceivedEventModifyDataCallback,
 		EUpdateValueType UpdateValueType,
-		const FGameplayTagContainer & AllAssetTags,
+		const FGameplayTagContainer& AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
 		const TSet<EAdditionalModify>& AdditionalModifyAry,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 		);
-	
+
 	void ModifyType_Temporary(
-		FOnEffectedTargetCallback &ReceivedEventModifyDataCallback,
+		FOnEffectedTargetCallback& ReceivedEventModifyDataCallback,
 		EUpdateValueType UpdateValueType,
-		const FGameplayTagContainer & AllAssetTags,
+		const FGameplayTagContainer& AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
 		const TSet<EAdditionalModify>& AdditionalModifyAry,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 		);
-	
+
 #pragma region 基础GA
 	/**
 	 * 基础GA
@@ -289,5 +304,4 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<USkill_Element_Metal> Skill_Element_GoldClass;
 #pragma endregion GAs
-
 };

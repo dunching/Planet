@@ -383,6 +383,13 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(
 			AnimInsPtr->SetIsMelee(Lambda());
 		}
 	}
+	else if (Tag.MatchesTagExact(UGameplayTagsLibrary::State_Debuff_Stun))
+	{
+		auto CharacterPtr = GetOwner<FOwnerPawnType>();
+		if (CharacterPtr)
+		{
+		}
+	}
 }
 
 bool UStateProcessorComponent::GetOrientDefautl(

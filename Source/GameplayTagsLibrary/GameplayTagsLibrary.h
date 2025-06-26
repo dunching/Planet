@@ -76,6 +76,18 @@ public:
 	static FGameplayTag MovementStateAble_UseCustomRotation;
 #pragma endregion
 
+	static FGameplayTag Skill_CanBeInterrupted;
+
+	static FGameplayTag Skill_CanBeInterrupted_Stagnation;
+
+	static FGameplayTag Skill_CanBeInterrupted_Stun;
+
+	static FGameplayTag Skill_Block_OtherSkill_Weapon;
+	
+	static FGameplayTag Skill_Block_OtherSkill_Active;
+	
+	static FGameplayTag Skill_Block_Displacement;
+
 #pragma region State Tag
 	static FGameplayTag UsingConsumable;
 
@@ -289,10 +301,6 @@ public:
 
 #pragma endregion
 
-
-	static FGameplayTag Skill_CanBeInterrupted;
-
-	static FGameplayTag Skill_CanBeInterrupted_Stagnation;
 
 
 	// 人物身上自带的属性

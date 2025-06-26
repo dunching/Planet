@@ -49,7 +49,7 @@
 #include "ItemProxy_Coin.h"
 #include "ModifyItemProxyStrategy.h"
 #include "OpenWorldSystem.h"
-#include "PlanetGameViewportClient.h"
+#include "GE_Component.h"
 #include "PlayerGameplayTasks.h"
 #include "DataTableCollection.h"
 #include "Dynamic_WeatherBase.h"
@@ -788,6 +788,108 @@ void APlanetPlayerController::RemoveProvideEyesViewActor(
 	if (ProvideEyesViewActorSet.Contains(ProvideEyesViewActor))
 	{
 		ProvideEyesViewActorSet.Remove(ProvideEyesViewActor);
+	}
+}
+
+void APlanetPlayerController::StunTarget_Implementation(
+	const TArray<FString>& Args
+	)
+{
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (!CharacterPtr && !Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	if (Args.IsValidIndex(1))
+	{
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+
+		float Duration = 1.f;
+		LexFromString(Duration, *Args[0]);
+
+		ICPtr->StunTarget(CharacterPtr, Duration);
+	}
+	else
+	{
+		FCollisionObjectQueryParams ObjectQueryParams;
+		ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(CharacterPtr);
+
+		FVector OutCamLoc = CharacterPtr->GetActorLocation();
+		FRotator OutCamRot = CharacterPtr->GetActorRotation();
+
+		FHitResult OutHit;
+		if (GetWorld()->LineTraceSingleByObjectType(
+		                                            OutHit,
+		                                            OutCamLoc,
+		                                            OutCamLoc + (OutCamRot.Vector() * 1000),
+		                                            ObjectQueryParams,
+		                                            Params
+		                                           ))
+		{
+			auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+			if (TargetCharacterPtr)
+			{
+				auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+
+				float Duration = 1.f;
+				LexFromString(Duration, *Args[0]);
+
+				ICPtr->StunTarget(TargetCharacterPtr, Duration);
+			}
+		}
+	}
+}
+
+void APlanetPlayerController::RepelTarget_Implementation(
+	const TArray<FString>& Args
+	)
+{
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (!CharacterPtr && !Args.IsValidIndex(1))
+	{
+		return;
+	}
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(CharacterPtr);
+
+	FVector OutCamLoc = CharacterPtr->GetActorLocation();
+	FRotator OutCamRot = CharacterPtr->GetActorRotation();
+
+	FHitResult OutHit;
+	if (GetWorld()->LineTraceSingleByObjectType(
+	                                            OutHit,
+	                                            OutCamLoc,
+	                                            OutCamLoc + (OutCamRot.Vector() * 1000),
+	                                            ObjectQueryParams,
+	                                            Params
+	                                           ))
+	{
+		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+		if (TargetCharacterPtr)
+		{
+			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+			auto ASCPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
+
+			float Duration = 1.f;
+			LexFromString(Duration, Args[0]);
+			ASCPtr->HasBeenRepel(
+			                     CharacterPtr,
+			                     Duration,
+			                     TargetCharacterPtr->GetActorLocation() -
+			                     CharacterPtr->GetActorLocation(),
+			                     UKismetStringLibrary::Conv_StringToInt(
+			                                                            Args[1]
+			                                                           )
+			                    );
+		}
 	}
 }
 

@@ -127,6 +127,42 @@ void TestCommand::TestHasBeenFlyAway(
 #endif
 }
 
+void TestCommand::HasBeenRepel(
+	const TArray<FString>& Args
+	)
+{
+	if (!Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	auto PCPtr = Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorldImp()));
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	PCPtr->RepelTarget(Args);
+}
+
+void TestCommand::StunTarget(
+	const TArray<FString>& Args
+	)
+{
+	if (!Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	auto PCPtr = Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorldImp()));
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	PCPtr->StunTarget(Args);
+}
+
 void TestCommand::ReplyHP(
 	const TArray<FString>& Args
 	)

@@ -26,6 +26,7 @@
 #include "BasicFutures_HasbeenTraction.h"
 #include "BasicFutures_MoveToAttaclArea.h"
 #include "EventSubjectComponent.h"
+#include "GE_Component.h"
 #include "Tornado.h"
 #include "OnEffectedTargetCallback.h"
 #include "PlanetWeapon_Base.h"
@@ -386,6 +387,7 @@ void UCharacterAbilitySystemComponent::HasbeenAttacked(
 
 void UCharacterAbilitySystemComponent::HasBeenRepel(
 	const TWeakObjectPtr<ACharacterBase>& InstigatorPtr,
+	float Duration,
 	FVector RepelDirection,
 	int32 RepelDistance
 	)
@@ -394,15 +396,17 @@ void UCharacterAbilitySystemComponent::HasBeenRepel(
 	if (OnwerActorPtr)
 	{
 		FGameplayEventData Payload;
-		auto GameplayAbilityTargetData = new FGameplayAbilityTargetData_Affected;
+		auto GameplayAbilityTargetData = new FGameplayAbilityTargetData_HasBeenRepel;
 		GameplayAbilityTargetData->TriggerCharacterPtr = InstigatorPtr;
+		GameplayAbilityTargetData->Duration = Duration;
 		GameplayAbilityTargetData->RepelDirection = RepelDirection;
+		GameplayAbilityTargetData->RepelDistance = RepelDistance;
 
 		Payload.TargetData.Add(GameplayAbilityTargetData);
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
 		                                                         OnwerActorPtr,
-		                                                         UGameplayTagsLibrary::BaseFeature_HasBeenAffected,
+		                                                         UGameplayTagsLibrary::BaseFeature_HasBeenRepel,
 		                                                         Payload
 		                                                        );
 	}
@@ -459,6 +463,51 @@ void UCharacterAbilitySystemComponent::Respawn_Implementation()
 		                                                         Payload
 		                                                        );
 	}
+}
+
+void UCharacterAbilitySystemComponent::StunTarget_Implementation(
+	ACharacterBase* TargetCharacterPtr,
+	float Duration
+	)
+{
+	auto ASCPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
+
+	UGameplayEffect* GameplayEffect = NewObject<UGameplayEffect>(this, UAssetRefMap::GetInstance()->DurationGEClass);
+	{
+		auto& GEComponentRef = GameplayEffect->FindOrAddComponent<UActivationOwnedTagsGameplayEffectComponent>();
+		
+		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Stun);
+		
+		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
+		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPathFollowMove);
+		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
+		// GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRootMotion);
+		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation_All);
+		
+		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::Skill_Block_OtherSkill_Weapon);
+		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::Skill_Block_OtherSkill_Active);
+		GEComponentRef.ActivationOwnedTags.AddTag(UGameplayTagsLibrary::Skill_Block_Displacement);
+	}
+	{
+		auto& GEComponentRef = GameplayEffect->FindOrAddComponent<UCancelAbilityGameplayEffectComponent>();
+		GEComponentRef.CancelAbility.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stun);
+	}
+	FGameplayEffectSpec* NewSpec = new FGameplayEffectSpec(GameplayEffect, MakeEffectContext());
+	FGameplayEffectSpecHandle SpecHandle(NewSpec);
+
+	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
+	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::State_Debuff_Stun);
+
+	SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+	                                               UGameplayTagsLibrary::GEData_Duration,
+	                                               Duration
+	                                              );
+
+	ApplyGameplayEffectSpecToTarget(
+	                                *SpecHandle.Data.Get(),
+	                                ASCPtr,
+	                                ASCPtr->GetPredictionKeyForNewAction()
+	                               );
 }
 
 void UCharacterAbilitySystemComponent::MoveToAttackDistance(

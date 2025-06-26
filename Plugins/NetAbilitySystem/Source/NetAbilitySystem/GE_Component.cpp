@@ -26,6 +26,7 @@ bool UActivationOwnedTagsGameplayEffectComponent::OnActiveGameplayEffectAdded(
 	UAbilitySystemComponent* OwnerASC = ActiveGEContainer.Owner;
 
 	OwnerASC->AddLooseGameplayTags(ActivationOwnedTags);
+	OwnerASC->AddReplicatedLooseGameplayTags(ActivationOwnedTags);
 
 	// Register our immunity query to potentially block applications of any Gameplay Effects
 	FGameplayEffectApplicationQuery& BoundQuery = OwnerASC->GameplayEffectApplicationQueries.AddDefaulted_GetRef();
@@ -44,13 +45,19 @@ bool UActivationOwnedTagsGameplayEffectComponent::OnActiveGameplayEffectAdded(
 			                                            {
 				                                            if (It->GetHandle() == QueryToRemove)
 				                                            {
-				                                            	OwnerASC->RemoveLooseGameplayTags(ActivationOwnedTags);
-				                                            	It.RemoveCurrentSwap();
+					                                            OwnerASC->RemoveLooseGameplayTags(
+						                                             ActivationOwnedTags
+						                                            );
+					                                            OwnerASC->RemoveReplicatedLooseGameplayTags(
+						                                             ActivationOwnedTags
+						                                            );
+					                                            It.RemoveCurrentSwap();
 					                                            break;
 				                                            }
 			                                            }
 		                                            }
 	                                            }
 	                                           );
+
 	return Super::OnActiveGameplayEffectAdded(ActiveGEContainer, ActiveGE);
 }

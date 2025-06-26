@@ -9,7 +9,7 @@
 #include "GE_Component.generated.h"
 
 UCLASS()
-class PLANET_API UCancelAbilityGameplayEffectComponent : public UGameplayEffectComponent
+class NETABILITYSYSTEM_API UCancelAbilityGameplayEffectComponent : public UGameplayEffectComponent
 {
 	GENERATED_BODY()
 
@@ -24,7 +24,7 @@ public:
 };
 
 UCLASS()
-class PLANET_API UActivationOwnedTagsGameplayEffectComponent : public UGameplayEffectComponent
+class NETABILITYSYSTEM_API UActivationOwnedTagsGameplayEffectComponent : public UGameplayEffectComponent
 {
 	GENERATED_BODY()
 

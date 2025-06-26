@@ -6,11 +6,6 @@
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "CharacterAbilitySystemComponent.h"
 
-UScriptStruct* FGameplayAbilityTargetData_Affected::GetScriptStruct() const
-{
-	return FGameplayAbilityTargetData_Affected::StaticStruct();
-}
-
 bool FGameplayAbilityTargetData_Affected::NetSerialize(
 	FArchive& Ar,
 	class UPackageMap* Map,
@@ -60,7 +55,7 @@ void UBasicFutures_Affected::PreActivate(
 #ifdef WITH_EDITOR
 #endif
 
-		ActiveParamPtr = dynamic_cast<const FGameplayAbilityTargetData_Affected*>(TriggerEventData->TargetData.Get(0));
+		ActiveParamPtr = dynamic_cast<const ActiveParamType*>(TriggerEventData->TargetData.Get(0));
 		if (ActiveParamPtr)
 		{
 			Perform();
@@ -171,11 +166,6 @@ void UBasicFutures_Affected::Perform()
 
 	const auto Rate = 1.f;
 	PlayMontage(CurMontagePtr, Rate);
-
-	if (ActiveParamPtr->RepelDistance > 0)
-	{
-		Move(CurMontagePtr, Rate);
-	}
 }
 
 void UBasicFutures_Affected::PlayMontage(
@@ -205,9 +195,100 @@ void UBasicFutures_Affected::PlayMontage(
 	}
 }
 
-void UBasicFutures_Affected::Move(
-	UAnimMontage* CurMontagePtr,
-	float Rate
+bool FGameplayAbilityTargetData_HasBeenRepel::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+	)
+{
+	Ar << RepelDistance;
+	Ar << TriggerCharacterPtr;
+	Ar << Duration;
+
+	return true;
+}
+
+UBasicFutures_HasBeenRepel::UBasicFutures_HasBeenRepel()
+{
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+
+	bRetriggerInstancedAbility = true;
+}
+
+void UBasicFutures_HasBeenRepel::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+	)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+	if (CharacterPtr)
+	{
+	}
+}
+
+void UBasicFutures_HasBeenRepel::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+	)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
+
+bool UBasicFutures_HasBeenRepel::CanActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags,
+	const FGameplayTagContainer* TargetTags,
+	FGameplayTagContainer* OptionalRelevantTags
+	) const
+{
+	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
+}
+
+void UBasicFutures_HasBeenRepel::PreActivate(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+	const FGameplayEventData* TriggerEventData
+	)
+{
+	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
+	if (CharacterPtr)
+	{
+#ifdef WITH_EDITOR
+#endif
+
+		ActiveParamPtr = dynamic_cast<const ActiveParamType*>(TriggerEventData->TargetData.Get(0));
+		if (ActiveParamPtr)
+		{
+			Perform();
+		}
+		else
+		{
+			checkNoEntry();
+			K2_CancelAbility();
+		}
+	}
+}
+
+void UBasicFutures_HasBeenRepel::Perform()
+{
+	if (ActiveParamPtr->RepelDistance > 0)
+	{
+		Move(ActiveParamPtr->Duration, ActiveParamPtr->RepelDistance);
+	}
+}
+
+void UBasicFutures_HasBeenRepel::Move(
+	float Duration,
+	float RepelDistance
 	)
 {
 	if (
@@ -215,7 +296,6 @@ void UBasicFutures_Affected::Move(
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 	)
 	{
-		const auto Duration = CurMontagePtr->CalculateSequenceLength();
 		const auto Direction =
 			ActiveParamPtr->RepelDirection.IsNearlyZero() ?
 				(ActiveParamPtr->TriggerCharacterPtr->GetActorLocation() - CharacterPtr->GetActorLocation()).
