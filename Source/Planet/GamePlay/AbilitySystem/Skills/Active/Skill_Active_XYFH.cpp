@@ -674,7 +674,8 @@ void USkill_Active_XYFH::EmitProjectile() const
 			auto TargetsAry = GetTargetsInDistanceByNearestCharacterViewDirection(
 				 ItemProxy_DescriptionPtr->AttackDistance,
 				 ItemProxy_DescriptionPtr->UpOffset,
-				 ItemProxy_DescriptionPtr->DownOffset
+				 ItemProxy_DescriptionPtr->DownOffset,
+				 ItemProxy_DescriptionPtr->LimitAngle
 				);
 
 			if (TargetsAry.IsEmpty())

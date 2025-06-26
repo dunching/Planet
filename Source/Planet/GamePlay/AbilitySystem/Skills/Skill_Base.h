@@ -151,12 +151,14 @@ protected:
 	/**
 	 * 获取范围内所有目标，按距离角色视线排序
 	 * @param MaxDistance 
+	 * @param Angle < 0,不限制角度 
 	 * @return 
 	 */
 	TArray<TObjectPtr<ACharacterBase>> GetTargetsInDistanceByNearestCharacterViewDirection(
 		int32 MaxDistance,
 		int32 UpForwardDistance,
-		int32 DownDistance
+		int32 DownDistance,
+		int32 Angle = -1
 		) const;
 
 	FGameplayEffectSpecHandle MakeDamageToTargetSpecHandle(

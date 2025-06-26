@@ -88,6 +88,8 @@ public:
 
 	int32 DownOffset = 500;
 
+	int32 LimitAngle = 30;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<ASPlineActor> SPlineActorClass;
 	

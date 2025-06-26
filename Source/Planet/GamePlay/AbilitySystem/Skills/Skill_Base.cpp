@@ -390,7 +390,8 @@ TArray<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistanceByNearestCha
 TArray<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistanceByNearestCharacterViewDirection(
 	int32 MaxDistance,
 	int32 UpForwardDistance,
-	int32 DownDistance
+	int32 DownDistance,
+	int32 Angle
 	) const
 {
 	TArray<TObjectPtr<ACharacterBase>> Result;
@@ -413,7 +414,16 @@ TArray<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistanceByNearestCha
 	{
 		const auto TargetDir = (Iter->GetActorLocation() - CharacterLocation).
 			GetSafeNormal();
+		
 		const auto DotProduct = FVector::DotProduct(TargetDir, Dir);
+
+		auto CurAngle = FMath::RadiansToDegrees(FMath::Acos(DotProduct));
+		
+		if (Angle > 0 && CurAngle > Angle)
+		{
+			continue;
+		}
+		
 		Map.emplace(DotProduct, Iter);
 	}
 
