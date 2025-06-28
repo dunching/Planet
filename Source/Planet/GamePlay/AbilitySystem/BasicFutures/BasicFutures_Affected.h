@@ -181,6 +181,8 @@ public:
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	) const override;
 
+	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
+
 protected:
 
 	virtual void PreActivate(

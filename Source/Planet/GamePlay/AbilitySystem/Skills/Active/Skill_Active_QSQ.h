@@ -33,9 +33,6 @@ public:
 	TObjectPtr<UNiagaraSystem> Asset;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	float MoveDuration = .1f;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float ChargeMaxTime = 3.5f;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
@@ -45,8 +42,14 @@ public:
 	float MaxMagnification = 3.5f;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	int32 RepelDistance = 500;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	int32 Duration = 1;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 AttackDistance = 500;
-	
+
 	int32 UpOffset = 500;
 
 	int32 DownOffset = 500;
@@ -55,7 +58,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<ANiagaraActor> NiagaraActorClass;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	EElementalType ElementalType = EElementalType::kMetal;
 
@@ -64,9 +67,11 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Elemental_Damage_Magnification = .5f;
-
 };
 
+/**
+ * 七伤拳！！！
+ */
 UCLASS()
 class PLANET_API USkill_Active_QSQ : public USkill_Active_Base
 {
@@ -78,6 +83,14 @@ public:
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
+		) override;
+
+	virtual void EndAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		bool bReplicateEndAbility,
+		bool bWasCancelled
 		) override;
 
 	virtual void ApplyCooldown(
@@ -100,7 +113,7 @@ public:
 		) override;
 
 	virtual void OnStopContinuePerform() override;
-	
+
 	virtual float GetRemainTime() const override;
 
 	void PlayMontage(
@@ -114,7 +127,9 @@ public:
 		);
 
 	UFUNCTION()
-	void OnNotifyBeginReceived(FName NotifyName);
+	void OnNotifyBeginReceived(
+		FName NotifyName
+		);
 
 	void OnPlayPrevMontageEnd();
 
@@ -126,6 +141,20 @@ public:
 		float IntervalTime
 		);
 
+	void DoDash(
+		);
+
+	UFUNCTION()
+	void OnComponentHit(
+		UPrimitiveComponent* HitComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		FVector NormalImpulse,
+		const FHitResult& Hit
+		);
+
+	void MakeDamage(const TObjectPtr<ACharacterBase >& TargetCharacterPtr)const;
+	
 	/**
 	 * < 0 跳过
 	 */
@@ -139,4 +168,5 @@ public:
 
 	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
 
+	TSet<ACharacterBase*> HasCollisionCharacters;
 };

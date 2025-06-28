@@ -514,6 +514,11 @@ void USkill_Active_XYFH::OnProjectileBounce(
 	if (OtherActor && OtherActor->IsA(ACharacterBase::StaticClass()))
 	{
 		auto OtherCharacterPtr = Cast<ACharacterBase>(OtherActor);
+		if (!OtherCharacterPtr)
+		{
+			return;
+		}
+	
 		if (CharacterPtr->IsGroupmate(OtherCharacterPtr))
 		{
 			return;

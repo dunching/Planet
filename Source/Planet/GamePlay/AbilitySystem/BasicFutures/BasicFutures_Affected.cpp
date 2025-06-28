@@ -202,8 +202,9 @@ bool FGameplayAbilityTargetData_HasBeenRepel::NetSerialize(
 	)
 {
 	Ar << RepelDistance;
-	Ar << TriggerCharacterPtr;
+	Ar << RepelDirection;
 	Ar << Duration;
+	Ar << TriggerCharacterPtr;
 
 	return true;
 }
@@ -220,7 +221,6 @@ void UBasicFutures_HasBeenRepel::OnAvatarSet(
 	const FGameplayAbilitySpec& Spec
 	)
 {
-	Super::OnAvatarSet(ActorInfo, Spec);
 	Super::OnAvatarSet(ActorInfo, Spec);
 
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
@@ -248,6 +248,23 @@ bool UBasicFutures_HasBeenRepel::CanActivateAbility(
 	) const
 {
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
+}
+
+void UBasicFutures_HasBeenRepel::OnGameplayTaskDeactivated(
+	UGameplayTask& Task
+	)
+{
+	Super::OnGameplayTaskDeactivated(Task);
+
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) 
+	)
+	{
+		if (ActiveTasks.IsEmpty())
+		{
+			K2_CancelAbility();
+		}
+	}
 }
 
 void UBasicFutures_HasBeenRepel::PreActivate(

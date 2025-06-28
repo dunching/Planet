@@ -5,6 +5,7 @@
 #include "UObject/Class.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "AbilitySystemComponent.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_PlayMontage.h"
 #include "AbilityTask_TimerHelper.h"
 #include "CharacterAbilitySystemComponent.h"
@@ -15,6 +16,8 @@
 #include "Tool_PickAxe.h"
 #include "ItemProxy_Skills.h"
 #include "PlayerComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 struct FSkill_Active_QSQ : public TStructVariable<FSkill_Active_QSQ>
 {
@@ -42,6 +45,34 @@ void USkill_Active_QSQ::OnAvatarSet(
 			                                                            )->GetTableRowProxy_ActiveSkillExtendInfo()
 		                                                           );
 	}
+}
+
+void USkill_Active_QSQ::EndAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility,
+	bool bWasCancelled
+	)
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
+	{
+		CommitAbility(Handle, ActorInfo, ActivationInfo);
+	}
+#endif
+
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+	)
+	{
+		CharacterPtr->GetCapsuleComponent()->OnComponentHit.RemoveDynamic(
+		                                                                  this,
+		                                                                  &ThisClass::OnComponentHit
+		                                                                 );
+	}
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void USkill_Active_QSQ::ApplyCooldown(
@@ -80,8 +111,11 @@ void USkill_Active_QSQ::PerformAction(
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	AbilityTask_TimerHelperPtr = nullptr;
+	
 	ChargeTimePercent = 0.f;
 
+	HasCollisionCharacters.Empty();
+	
 	PlayMontage(
 	            ItemProxy_DescriptionPtr->HumanMontage1.LoadSynchronous()
 	           );
@@ -222,6 +256,9 @@ void USkill_Active_QSQ::OnNotifyBeginReceived(
 				                                                              FSkill_Active_QSQ::Get().ChargeOff,
 				                                                              1.f
 				                                                             );
+
+				                                                  DoDash();
+
 				                                                  return true;
 			                                                  }
 			                                                 );
@@ -235,6 +272,8 @@ void USkill_Active_QSQ::OnNotifyBeginReceived(
 			            FSkill_Active_QSQ::Get().ChargeOff,
 			            1.f
 			           );
+
+			DoDash();
 		}
 	}
 }
@@ -272,4 +311,136 @@ void USkill_Active_QSQ::DurationDelegate(
 	}
 
 	ChargeTimePercent = CurrentTiem / TotalTime;
+}
+
+void USkill_Active_QSQ::DoDash(
+	)
+{
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+	)
+	{
+		CharacterPtr->GetCapsuleComponent()->OnComponentHit.AddDynamic(
+		                                                               this,
+		                                                               &ThisClass::OnComponentHit
+		                                                              );
+	}
+
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+	)
+	{
+		const FRotator Rotation = CharacterPtr->Controller->GetControlRotation();
+		const auto Direction = UKismetMathLibrary::MakeRotFromZX(
+		                                                         -CharacterPtr->GetGravityDirection(),
+		                                                         Rotation.Quaternion().GetForwardVector()
+		                                                        ).
+			Vector();
+
+		auto MontagePtr = ItemProxy_DescriptionPtr->HumanMontage1.LoadSynchronous();
+		const auto Duration = MontagePtr->GetSectionLength(
+		                                                   MontagePtr->GetSectionIndex(
+			                                                    FSkill_Active_QSQ::Get().ChargeOff
+			                                                   )
+		                                                  );
+
+		auto TaskPtr = UAbilityTask_ARM_ConstantForce::ApplyRootMotionConstantForce(
+			 this,
+			 TEXT(""),
+			 Direction,
+			 ItemProxy_DescriptionPtr->AttackDistance / Duration,
+			 Duration,
+			 false,
+			 true,
+			 nullptr,
+			 ERootMotionFinishVelocityMode::ClampVelocity,
+			 FVector::ZeroVector,
+			 0.f,
+			 false
+			);
+
+		TaskPtr->Ability = this;
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
+
+		TaskPtr->ReadyForActivation();
+	}
+}
+
+void USkill_Active_QSQ::OnComponentHit(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse,
+	const FHitResult& Hit
+	)
+{
+	auto OtherCharacterPtr = Cast<ACharacterBase>(OtherActor);
+	if (!OtherCharacterPtr)
+	{
+		return;
+	}
+	
+	if (CharacterPtr->IsGroupmate(OtherCharacterPtr))
+	{
+		return;
+	}
+	
+	if (OtherCharacterPtr->GetCharacterAbilitySystemComponent()->IsCantBeDamage())
+	{
+		return;
+	}
+
+	if (HasCollisionCharacters.Contains(OtherCharacterPtr))
+	{
+		return;
+	}
+	
+	HasCollisionCharacters.Add(OtherCharacterPtr);
+	
+	const FRotator Rotation = CharacterPtr->Controller->GetControlRotation();
+	const auto Direction = UKismetMathLibrary::MakeRotFromZX(
+	                                                         -CharacterPtr->GetGravityDirection(),
+	                                                         Rotation.Vector()
+	                                                        ).
+		Vector();
+
+	OtherCharacterPtr->GetCharacterAbilitySystemComponent()->HasBeenRepel(
+	                                                                      CharacterPtr,
+	                                                                      ItemProxy_DescriptionPtr->Duration,
+	                                                                      Direction,
+	                                                                      ItemProxy_DescriptionPtr->RepelDistance
+	                                                                     );
+	
+	MakeDamage(OtherCharacterPtr);
+}
+
+void USkill_Active_QSQ::MakeDamage(
+	const TObjectPtr<ACharacterBase>& TargetCharacterPtr
+	) const
+{
+	const int32 BaseDamage = ItemProxy_DescriptionPtr->Elemental_Damage;
+
+	FGameplayEffectSpecHandle SpecHandle = MakeDamageToTargetSpecHandle(
+																		ItemProxy_DescriptionPtr->ElementalType,
+																		ItemProxy_DescriptionPtr->Elemental_Damage,
+																		ItemProxy_DescriptionPtr->
+																		Elemental_Damage_Magnification
+																	   );
+
+	TArray<TWeakObjectPtr<AActor>> Ary;
+	Ary.Add(TargetCharacterPtr);
+	FGameplayAbilityTargetDataHandle TargetData;
+
+	auto GameplayAbilityTargetData_ActorArrayPtr = new FGameplayAbilityTargetData_ActorArray;
+	GameplayAbilityTargetData_ActorArrayPtr->SetActors(Ary);
+
+	TargetData.Add(GameplayAbilityTargetData_ActorArrayPtr);
+	const auto GEHandleAry = MyApplyGameplayEffectSpecToTarget(
+															   GetCurrentAbilitySpecHandle(),
+															   GetCurrentActorInfo(),
+															   GetCurrentActivationInfo(),
+															   SpecHandle,
+															   TargetData
+															  );
 }
