@@ -137,6 +137,11 @@ void UPlayerComponent::SetupPlayerInputComponent(
 #endif
 }
 
+ECameraType UPlayerComponent::GetCameraType() const
+{
+	return CameraType;
+}
+
 void UPlayerComponent::SetCameraType(
 	ECameraType NewCameraType
 	)

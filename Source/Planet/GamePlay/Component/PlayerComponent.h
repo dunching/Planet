@@ -53,6 +53,8 @@ public:
 		UInputComponent* PlayerInputComponent
 		);
 
+	ECameraType GetCameraType()const;
+	
 	void SetCameraType(
 		ECameraType NewCameraType
 		);

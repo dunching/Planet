@@ -73,7 +73,13 @@ public:
 	 * 默认臂长
 	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
-	int32 DefaultBoomLength = 800;
+	int32 DefaultBoomLength = 300;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
+	int32 AmplitudeMultiplier = 2;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
+	int32 FrequencyMultiplier = 30;
 	
 	float VolumeMultiplier = 1.f;
 	
@@ -160,6 +166,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey Return = EKeys::RightMouseButton;
 	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey Return_Key = EKeys::Escape;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey InteractionWithSceneActor = EKeys::E;
 	

@@ -160,10 +160,10 @@ void UCharacterPlayerStateProcessorComponent::SetFocusCharactersAry(
 
 		TargetCharacterPtr->OnDestroyed.AddDynamic(this, &ThisClass::OnFocusCharacterDestroyed);
 		OnFocusTargetGETagCountChangedHandle = TargetCharacterPtr->GetCharacterAbilitySystemComponent()->
-		                                                            RegisterGenericGameplayTagEvent().AddUObject(
-			                                                             this,
-			                                                             &ThisClass::OnFocusTargetGETagCountChanged
-			                                                            );
+		                                                           RegisterGenericGameplayTagEvent().AddUObject(
+			                                                            this,
+			                                                            &ThisClass::OnFocusTargetGETagCountChanged
+			                                                           );
 	}
 	else
 	{
@@ -274,7 +274,7 @@ void AHumanCharacter_Player::BeginPlay()
 			                                AdjustCamera(UGameOptions::GetInstance()->DefaultBoomLength);
 		                                },
 		                                1,
-		                                true
+		                                false
 		                               );
 	}
 #endif
@@ -601,12 +601,12 @@ void AHumanCharacter_Player::InteractionSceneObj_Server_Implementation(
 	{
 		return;
 	}
-	
+
 	auto InterfacePtr = Cast<ISceneActorInteractionInterface>(SceneObjPtr);
 	if (!InterfacePtr)
 	{
 		return;
 	}
-	
+
 	InterfacePtr->HasbeenInteracted(this);
 }

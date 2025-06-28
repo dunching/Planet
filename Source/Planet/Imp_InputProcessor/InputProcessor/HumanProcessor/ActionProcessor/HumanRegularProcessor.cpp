@@ -211,6 +211,15 @@ namespace HumanProcessor
 					return true;
 				}
 
+				if (EventArgs.Key == GameOptionsPtr->Return_Key)
+				{
+					auto CurrentLayoutPtr = UUIManagerSubSystem::GetInstance()->GetCurrentLayout();
+					if (CurrentLayoutPtr && CurrentLayoutPtr->RemovedWidgets())
+					{
+						return true;
+					}
+				}
+
 				if (EventArgs.Key == GameOptionsPtr->ViewSetting)
 				{
 					UInputProcessorSubSystem_Imp::GetInstance()->SwitchToProcessor<FHumanViewSetting>();

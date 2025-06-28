@@ -199,6 +199,8 @@ private:
 		bool bIsContinue
 	);
 
+	virtual void OnStopContinuePerform();
+	
 	/**
 	 * GA是否持续执行
 	 * 通用的属性

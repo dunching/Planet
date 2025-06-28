@@ -58,6 +58,8 @@ public:
 	FString GetLayoutName(
 		ELayoutCommon MainHUDType
 		)const;
+
+	ILayoutInterfacetion *GetCurrentLayout()const;
 #pragma endregion
 
 #pragma region MenuLayout

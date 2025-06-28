@@ -4,6 +4,8 @@
 #include "Components/Border.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
+#include "Components/Overlay.h"
+#include "Components/OverlaySlot.h"
 
 #include "TemplateHelper.h"
 #include "PlanetPlayerController.h"
@@ -266,6 +268,65 @@ void URegularActionLayout::DisEnable()
 ELayoutCommon URegularActionLayout::GetLayoutType() const
 {
 	return ELayoutCommon::kActionLayout;
+}
+
+UOverlaySlot* URegularActionLayout::DisplayWidget(
+	const TSubclassOf<UUserWidget>& WidgetClass,
+	const std::function<void(UUserWidget*)>& Initializer
+	)
+{
+	if (!OtherWidgetsOverlay)
+	{
+		return nullptr;
+	}
+
+	auto WidgetPtr = CreateWidget(OtherWidgetsOverlay, WidgetClass);
+	if (Initializer && WidgetPtr)
+	{
+		Initializer(WidgetPtr);
+	}
+
+	auto SlotPtr = OtherWidgetsOverlay->AddChildToOverlay(WidgetPtr);
+	if (SlotPtr)
+	{
+		SlotPtr->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
+		SlotPtr->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
+	}
+
+	return SlotPtr; 
+}
+
+bool URegularActionLayout::RemovedWidgets()
+{
+	auto ChildrensAry = OtherWidgetsOverlay->GetAllChildren();
+	if (ChildrensAry.IsEmpty())
+	{}
+	else
+	{
+		OtherWidgetsOverlay->ClearChildren();
+		return true;
+	}
+
+	return false;
+}
+
+void URegularActionLayout::RemoveWidget(
+	const TSubclassOf<UUserWidget>& WidgetClass
+	)
+{
+	if (!OtherWidgetsOverlay)
+	{
+		return;
+	}
+	auto ChildrensAry = OtherWidgetsOverlay->GetAllChildren();
+	for (auto Iter : ChildrensAry)
+	{
+		if (Iter->IsA(WidgetClass))
+		{
+			Iter->RemoveFromParent();
+			return;
+		}
+	}
 }
 
 void URegularActionLayout::OnStartGuide(

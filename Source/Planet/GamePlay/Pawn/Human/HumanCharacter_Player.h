@@ -15,11 +15,13 @@
 using FOnPlayerHaveNewSentence = TMulticastDelegate<void(
 	bool,
 	const FTaskNode_Conversation_SentenceInfo&
-)>;
+
+	)>;
 
 using FOnPlayerInteraction = TMulticastDelegate<void(
 	ISceneActorInteractionInterface*
-)>;
+
+	)>;
 
 class UPlayerComponent;
 class AHumanCharacter_AI;
@@ -63,7 +65,7 @@ public:
 
 	void SetFocusCharactersAry(
 		ACharacterBase* TargetCharacterPtr
-	);
+		);
 
 	void ClearFocusCharactersAry();
 
@@ -71,21 +73,29 @@ private:
 	UFUNCTION(Server, Reliable)
 	void SetFocusCharactersAry_Server(
 		ACharacterBase* TargetCharacterPtr
-	);
+		);
 
 	UFUNCTION(Server, Reliable)
 	void ClearFocusCharactersAry_Server();
-	
+
 	UFUNCTION()
-	void OnFocusCharacterDestroyed(AActor* DestroyedActor);
+	void OnFocusCharacterDestroyed(
+		AActor* DestroyedActor
+		);
 
-	virtual void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count) override;
+	virtual void OnGameplayEffectTagCountChanged(
+		const FGameplayTag Tag,
+		int32 Count
+		) override;
 
-	void OnFocusTargetGETagCountChanged(const FGameplayTag Tag, int32 Count);
+	void OnFocusTargetGETagCountChanged(
+		const FGameplayTag Tag,
+		int32 Count
+		);
 
 	FDelegateHandle OnFocusTargetGETagCountChangedHandle;
 
-	TObjectPtr<ACharacterBase>PreviousFocusCharactersPtr = nullptr;
+	TObjectPtr<ACharacterBase> PreviousFocusCharactersPtr = nullptr;
 };
 
 /* 角色的会话组件
@@ -100,7 +110,7 @@ public:
 	virtual void DisplaySentence_Player(
 		const FTaskNode_Conversation_SentenceInfo& Sentence,
 		const std::function<void()>& SentenceStop
-	) override;
+		) override;
 
 	virtual void CloseConversationborder_Player() override;
 
@@ -122,7 +132,7 @@ class PLANET_API AHumanCharacter_Player : public AHumanCharacter
 public:
 	AHumanCharacter_Player(
 		const FObjectInitializer& ObjectInitializer
-	);
+		);
 
 	UPlayerConversationComponent* GetPlayerConversationComponent() const;
 
@@ -130,9 +140,9 @@ public:
 
 	UCharacterPlayerStateProcessorComponent* GetCharacterPlayerStateProcessorComponent() const;
 
-	TObjectPtr<UGameplayCameraComponent> GetGameplayCameraComponent()const;
+	TObjectPtr<UGameplayCameraComponent> GetGameplayCameraComponent() const;
 
-	TObjectPtr<UPlayerComponent> GetPlayerComponent()const;
+	TObjectPtr<UPlayerComponent> GetPlayerComponent() const;
 
 	void UpdateSightActor();
 
@@ -143,19 +153,19 @@ public:
 	virtual bool InteractionSceneActor(
 		ASceneActor* SceneObjPtr,
 		ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr
-	);
+		);
 
 	virtual bool InteractionSceneCharacter(
 		AHumanCharacter_AI* CharacterPtr
-	);
+		);
 
 	virtual void StartLookAt(
 		ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr
-	);
+		);
 
 	virtual void LookingAt(
 		ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr
-	);
+		);
 
 	virtual void EndLookAt();
 
@@ -166,7 +176,7 @@ protected:
 
 	virtual void PossessedBy(
 		AController* NewController
-	) override;
+		) override;
 
 	virtual void OnRep_Controller() override;
 
@@ -177,32 +187,33 @@ protected:
 		const FRotator& DestRotation,
 		bool bIsATest = false,
 		bool bNoCheck = false
-	) override;
+		) override;
 
 	virtual void SetupPlayerInputComponent(
 		UInputComponent* PlayerInputComponent
-	) override;
+		) override;
 
 	virtual void OnRep_GroupManagger() override;
 
 	virtual void OnGroupManaggerReady(
 		AGroupManagger* NewGroupSharedInfoPtr
-	) override;
+		) override;
 
 	UFUNCTION(Server, Reliable)
 	virtual void InteractionSceneObj_Server(
 		ASceneActor* SceneObjPtr
-	);
+		);
 
 #if WITH_EDITORONLY_DATA
 
 #endif
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void AdjustCamera(int32 BoomLength)const;
-	
-private:
+	void AdjustCamera(
+		int32 BoomLength
+		) const;
 
+private:
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UGameplayCameraComponent> GameplayCameraComponentPtr = nullptr;
@@ -212,4 +223,9 @@ private:
 
 	UPROPERTY(Transient)
 	UInteractionList* InteractionListPtr = nullptr;
+
+	/**
+	 * > 0 开启
+	 */
+	int8 EnableShakeCount = 1;
 };

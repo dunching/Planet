@@ -1143,10 +1143,10 @@ FTaskNodeDescript FSTT_GuideThread_AttckCharacter::GetTaskNodeDescripton(
 
 void FSTID_GuideThread_OpenTutorialVideo::OpenTutorialVideo()
 {
-	auto MainHUDLayoutPtr = UUIManagerSubSystem::GetInstance()->GetMainHUDLayout();
-	if (MainHUDLayoutPtr)
+	auto CurrentLayoutPtr = UUIManagerSubSystem::GetInstance()->GetCurrentLayout();
+	if (CurrentLayoutPtr)
 	{
-		MainHUDLayoutPtr->DisplayWidget(
+		CurrentLayoutPtr->DisplayWidget(
 		                                GuideVideoWidgetClass,
 		                                [this](
 		                                auto WidgetPtr

@@ -12,6 +12,21 @@ void UTutorialMediaPlayer::NativeConstruct()
 	}
 }
 
+void UTutorialMediaPlayer::NativeDestruct()
+{
+	OnConfirmBtnClicked();
+	
+	Super::NativeDestruct();
+}
+
+FReply UTutorialMediaPlayer::NativeOnKeyDown(
+	const FGeometry& InGeometry,
+	const FKeyEvent& InKeyEvent
+	)
+{
+	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
+}
+
 void UTutorialMediaPlayer::Display()
 {
 	DisplayVideo();

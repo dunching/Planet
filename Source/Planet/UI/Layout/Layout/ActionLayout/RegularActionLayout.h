@@ -41,6 +41,7 @@ class AGeneratorNPC;
 class UFocusTitle;
 class ACharacterBase;
 class UUpgradePromt;
+class UOverlay;
 
 /**
  *
@@ -63,6 +64,15 @@ public:
 
 	virtual ELayoutCommon GetLayoutType() const override final;
 
+	virtual UOverlaySlot* DisplayWidget(
+		const TSubclassOf<UUserWidget>& WidgetClass,
+		const std::function<void(UUserWidget*)>& Initializer
+		) override;
+
+	virtual bool RemovedWidgets() override;
+	
+	virtual void RemoveWidget(const TSubclassOf<UUserWidget>& WidgetClass) override;
+	
 private:
 	void OnStartGuide(
 		AQuestChainBase* GuideThread
@@ -117,6 +127,9 @@ protected:
 	
 #pragma endregion MenusUI
 	
+	UPROPERTY(meta = (BindWidget))
+	UOverlay* OtherWidgetsOverlay = nullptr;
+
 	UPROPERTY(Transient)
 	UFocusIcon* FocusIconPtr = nullptr;
 

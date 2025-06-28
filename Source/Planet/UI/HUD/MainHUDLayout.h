@@ -40,6 +40,8 @@ public:
 		const ILayoutInterfacetion::FOnQuit& OnQuit
 		);
 
+	ILayoutInterfacetion *GetCurrentLayout()const;
+	
 	UMainMenuLayout* GetMenuLayout();
 
 	UInteractionConversationLayout* GetConversationLayout();
@@ -53,6 +55,12 @@ public:
 	// 获取物品的提示
 	UGetItemInfosList* GetItemInfos();
 
+	/**
+	 * 在主HUD上显示一些Widget
+	 * @param WidgetClass 
+	 * @param Initializer 
+	 * @return 
+	 */
 	UOverlaySlot* DisplayWidget(
 		const TSubclassOf<UUserWidget>& WidgetClass,
 		const std::function<void(UUserWidget*)>& Initializer

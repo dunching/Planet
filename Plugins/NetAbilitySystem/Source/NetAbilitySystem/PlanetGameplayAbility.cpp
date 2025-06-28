@@ -1,5 +1,3 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
-
 
 #include "PlanetGameplayAbility.h"
 
@@ -194,6 +192,18 @@ void UPlanetGameplayAbility::SetContinuePerform(
 {
 	PRINTFUNCSTR(UKismetStringLibrary::Conv_BoolToString(bIsContinue_));
 	bIsContinueAction = bIsContinue_;
+	if (bIsContinueAction)
+	{
+		
+	}
+	else
+	{
+		OnStopContinuePerform();
+	}
+}
+
+void UPlanetGameplayAbility::OnStopContinuePerform()
+{
 }
 
 void UPlanetGameplayAbility::RunIfListLock() const

@@ -18,6 +18,7 @@ enum EUIOrder : int8
 	kFocus,
 
 	kHUD,
+	kOtherWidget,
 
 	/**
 	 * 玩家的角色的Title

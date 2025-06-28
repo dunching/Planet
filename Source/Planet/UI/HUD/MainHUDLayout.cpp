@@ -105,6 +105,21 @@ void UMainHUDLayout::SwitchToNewLayout(
 	}
 }
 
+ILayoutInterfacetion* UMainHUDLayout::GetCurrentLayout() const
+{
+	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
+	if (UIPtr)
+	{
+		auto MenuInterfacePtr = Cast<ILayoutInterfacetion>(UIPtr->GetActiveWidget());
+		if (MenuInterfacePtr)
+		{
+			return MenuInterfacePtr;
+		}
+	}
+
+	return nullptr;
+}
+
 UMainMenuLayout* UMainHUDLayout::GetMenuLayout()
 {
 	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
@@ -212,11 +227,11 @@ void UMainHUDLayout::DisplayWidgetInOtherCanvas(
 	auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FMainHUDLayout::Get().OtherWidgets));
 	if (UIPtr)
 	{
-		auto SlotPtr = Cast <UOverlaySlot>(UIPtr->AddChild(WidgetPtr));
+		auto SlotPtr = Cast<UOverlaySlot>(UIPtr->AddChild(WidgetPtr));
 		if (SlotPtr)
 		{
-			SlotPtr->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill); 
-			SlotPtr->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill); 
+			SlotPtr->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
+			SlotPtr->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
 		}
 	}
 }
@@ -236,6 +251,7 @@ UOverlaySlot* UMainHUDLayout::DisplayWidget(
 	const TSubclassOf<UUserWidget>& WidgetClass,
 	const std::function<void(
 		UUserWidget*
+		
 		)>& Initializer
 	)
 {
@@ -251,14 +267,16 @@ UOverlaySlot* UMainHUDLayout::DisplayWidget(
 		Initializer(WidgetPtr);
 	}
 
-	auto SlotPtr = UIPtr->AddChildToOverlay(WidgetPtr);
-	if (SlotPtr)
-	{
-		SlotPtr->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
-		SlotPtr->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
-	}
+	WidgetPtr->AddToViewport(kOtherWidget);
+	return nullptr;
+	// auto SlotPtr = UIPtr->AddChildToOverlay(WidgetPtr);
+	// if (SlotPtr)
+	// {
+	// 	SlotPtr->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Fill);
+	// 	SlotPtr->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
+	// }
 
-	return SlotPtr; 
+	// return SlotPtr; 
 }
 
 void UMainHUDLayout::RemoveWidget(

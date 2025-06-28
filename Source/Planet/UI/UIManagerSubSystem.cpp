@@ -107,6 +107,11 @@ FString UUIManagerSubSystem::GetLayoutName(
 	return Result;
 }
 
+ILayoutInterfacetion* UUIManagerSubSystem::GetCurrentLayout() const
+{
+	return GetMainHUDLayout()->GetCurrentLayout();
+}
+
 void UUIManagerSubSystem::SwitchMenuLayout(
 	EMenuType MenuType
 	)

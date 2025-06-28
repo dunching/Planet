@@ -14,6 +14,8 @@
 #include "LayoutInterfacetion.generated.h"
 
 class UMainHUDLayout;
+class UOverlaySlot;
+class UUserWidget;
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
 class ULayoutInterfacetion : public UInterface
@@ -36,6 +38,21 @@ public:
 
 	virtual ELayoutCommon GetLayoutType() const = 0;
 
+	/**
+	 * 在Layout上显示一些Widget
+	 * @param WidgetClass 
+	 * @param Initializer 
+	 * @return 
+	 */
+	virtual UOverlaySlot* DisplayWidget(
+		const TSubclassOf<UUserWidget>& WidgetClass,
+		const std::function<void(UUserWidget*)>& Initializer
+		);
+
+	virtual bool RemovedWidgets();
+	
+	virtual void RemoveWidget(const TSubclassOf<UUserWidget>& WidgetClass);
+	
 protected:
 	bool bIsActive = false;
 
