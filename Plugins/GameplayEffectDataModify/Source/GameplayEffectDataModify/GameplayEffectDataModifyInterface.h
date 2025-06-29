@@ -234,7 +234,9 @@ public:
 		);
 
 protected:
-	void UpdateValueMap();
+	void UpdateValueMap(
+		const FGameplayAttributeData* GameplayAttributeDataPtr
+		);
 
 	/**
 	 * 更新数据组成

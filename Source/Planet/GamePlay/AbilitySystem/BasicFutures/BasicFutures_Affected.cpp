@@ -317,7 +317,7 @@ void UBasicFutures_HasBeenRepel::Move(
 			ActiveParamPtr->RepelDirection.IsNearlyZero() ?
 				(ActiveParamPtr->TriggerCharacterPtr->GetActorLocation() - CharacterPtr->GetActorLocation()).
 				GetSafeNormal() :
-				ActiveParamPtr->RepelDirection;
+				ActiveParamPtr->RepelDirection.GetSafeNormal();
 
 		auto TaskPtr = UAbilityTask_ARM_ConstantForce::ApplyRootMotionConstantForce(
 			 this,

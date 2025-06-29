@@ -72,6 +72,20 @@ void USkill_Active_QSQ::EndAbility(
 		                                                                 );
 	}
 
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->
+		 GetOwnerRole() == ROLE_AutonomousProxy)
+	)
+	{
+		auto PlayerCharacterPtr = Cast<
+			AHumanCharacter_Player>(CharacterPtr);
+		if (PlayerCharacterPtr)
+		{
+			PlayerCharacterPtr->GetPlayerComponent()->
+				SetCameraType(ECameraType::kAction);
+		}
+	}
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -236,27 +250,6 @@ void USkill_Active_QSQ::OnNotifyBeginReceived(
 			                                                  auto
 			                                                  )
 			                                                  {
-				                                                  if (
-					                                                  (GetAbilitySystemComponentFromActorInfo()->
-					                                                   GetOwnerRole() == ROLE_AutonomousProxy)
-				                                                  )
-				                                                  {
-					                                                  auto PlayerCharacterPtr = Cast<
-						                                                  AHumanCharacter_Player>(CharacterPtr);
-					                                                  if (PlayerCharacterPtr)
-					                                                  {
-						                                                  PlayerCharacterPtr->GetPlayerComponent()->
-							                                                  SetCameraType(ECameraType::kAction);
-					                                                  }
-				                                                  }
-
-				                                                  PlayMontage(
-				                                                              ItemProxy_DescriptionPtr->HumanMontage1.
-				                                                              LoadSynchronous(),
-				                                                              FSkill_Active_QSQ::Get().ChargeOff,
-				                                                              1.f
-				                                                             );
-
 				                                                  DoDash();
 
 				                                                  return true;
@@ -266,13 +259,6 @@ void USkill_Active_QSQ::OnNotifyBeginReceived(
 		}
 		else
 		{
-			PlayMontage(
-			            ItemProxy_DescriptionPtr->HumanMontage1.
-			                                      LoadSynchronous(),
-			            FSkill_Active_QSQ::Get().ChargeOff,
-			            1.f
-			           );
-
 			DoDash();
 		}
 	}
@@ -316,6 +302,27 @@ void USkill_Active_QSQ::DurationDelegate(
 void USkill_Active_QSQ::DoDash(
 	)
 {
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->
+		 GetOwnerRole() == ROLE_AutonomousProxy)
+	)
+	{
+		auto PlayerCharacterPtr = Cast<
+			AHumanCharacter_Player>(CharacterPtr);
+		if (PlayerCharacterPtr)
+		{
+			PlayerCharacterPtr->GetPlayerComponent()->
+				SetCameraType(ECameraType::kDashing);
+		}
+	}
+
+	PlayMontage(
+				ItemProxy_DescriptionPtr->HumanMontage1.
+				LoadSynchronous(),
+				FSkill_Active_QSQ::Get().ChargeOff,
+				1.f
+			   );
+
 	if (
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	)
@@ -397,7 +404,7 @@ void USkill_Active_QSQ::OnComponentHit(
 	}
 	
 	HasCollisionCharacters.Add(OtherCharacterPtr);
-	
+
 	const FRotator Rotation = CharacterPtr->Controller->GetControlRotation();
 	const auto Direction = UKismetMathLibrary::MakeRotFromZX(
 	                                                         -CharacterPtr->GetGravityDirection(),
@@ -405,10 +412,30 @@ void USkill_Active_QSQ::OnComponentHit(
 	                                                        ).
 		Vector();
 
+	// 目标在玩家左边还是右边？
+	const auto Offset = OtherCharacterPtr->GetActorLocation() - CharacterPtr->GetActorLocation();
+	const auto CrossProduct = FVector::CrossProduct(Direction, Offset);
+
+	auto NewDirection = Direction;
+	if (CrossProduct.Z > 0)
+	{
+		NewDirection = Direction + UKismetMathLibrary::MakeRotFromZY(
+															 -CharacterPtr->GetGravityDirection(),
+															 -Rotation.Vector()
+															).Vector();
+	}
+	else
+	{
+		NewDirection = Direction + UKismetMathLibrary::MakeRotFromZY(
+															 -CharacterPtr->GetGravityDirection(),
+															 Rotation.Vector()
+															).Vector();
+	}
+	
 	OtherCharacterPtr->GetCharacterAbilitySystemComponent()->HasBeenRepel(
 	                                                                      CharacterPtr,
 	                                                                      ItemProxy_DescriptionPtr->Duration,
-	                                                                      Direction,
+	                                                                      NewDirection,
 	                                                                      ItemProxy_DescriptionPtr->RepelDistance
 	                                                                     );
 	

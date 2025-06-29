@@ -1540,37 +1540,44 @@ void APlanetPlayerController::MakeTrueDamegeInArea_Implementation(
 	                                         Params
 	                                        ))
 	{
+		TSet<AHumanCharacter*>TargetSet;
+		
 		for (const auto& Iter : OutHit)
 		{
 			auto TargetCharacterPtr = Cast<AHumanCharacter>(Iter.GetActor());
 			if (TargetCharacterPtr)
 			{
-				auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-				auto ASCPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
-				FGameplayEffectSpecHandle SpecHandle =
-					ICPtr->MakeOutgoingSpec(
-					                        UAssetRefMap::GetInstance()->OnceGEClass,
-					                        1,
-					                        ICPtr->MakeEffectContext()
-					                       );
-
-				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
-				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
-				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::Proxy_Weapon_Test);
-
-				int32 Damege = 0;
-				LexFromString(Damege, *Args[0]);
-				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-				                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal,
-				                                               Damege
-				                                              );
-
-				CharacterPtr->GetCharacterAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(
-					 *SpecHandle.Data.Get(),
-					 ASCPtr,
-					 ASCPtr->GetPredictionKeyForNewAction()
-					);
+				TargetSet.Add(TargetCharacterPtr);
 			}
+		}
+		
+		for (const auto& Iter : TargetSet)
+		{
+			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+			auto ASCPtr = Iter->GetCharacterAbilitySystemComponent();
+			FGameplayEffectSpecHandle SpecHandle =
+				ICPtr->MakeOutgoingSpec(
+										UAssetRefMap::GetInstance()->OnceGEClass,
+										1,
+										ICPtr->MakeEffectContext()
+									   );
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::Proxy_Weapon_Test);
+
+			int32 Damege = 0;
+			LexFromString(Damege, *Args[0]);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal,
+														   Damege
+														  );
+
+			CharacterPtr->GetCharacterAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(
+				 *SpecHandle.Data.Get(),
+				 ASCPtr,
+				 ASCPtr->GetPredictionKeyForNewAction()
+				);
 		}
 	}
 }

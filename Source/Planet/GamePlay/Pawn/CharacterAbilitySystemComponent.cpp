@@ -961,7 +961,14 @@ void UCharacterAbilitySystemComponent::ModifyType_Permanent(
 
 	for (const auto& Iter : CustomMagnitudes)
 	{
-		if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
+		if (
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_True) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Water) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Fire) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth))
 		{
 			Lambda(
 			       Iter,
@@ -1597,9 +1604,11 @@ int32 UCharacterAbilitySystemComponent::GetCooldown(
 	) const
 {
 	return IGameplayEffectDataModifyInterface::GetCooldown(
-															   Cast<UAS_Character>(
-																	GetAttributeSet(UAS_Character::StaticClass())
-																   ),
-																   Cooldown
-															  );
+	                                                       Cast<UAS_Character>(
+	                                                                           GetAttributeSet(
+		                                                                            UAS_Character::StaticClass()
+		                                                                           )
+	                                                                          ),
+	                                                       Cooldown
+	                                                      );
 }

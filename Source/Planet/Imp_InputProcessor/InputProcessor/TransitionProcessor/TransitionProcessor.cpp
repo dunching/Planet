@@ -23,18 +23,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			auto PlayerPCPtr = OnwerActorPtr->GetController<APlayerController>();
-			if (PlayerPCPtr)
-			{
-				PlayerPCPtr->bShowMouseCursor = false;
-
-				UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(
-					PlayerPCPtr,
-					nullptr,
-					EMouseLockMode::DoNotLock,
-					true
-				);
-			}
+			SwitchShowCursor(false);
 		}
 	}
 }

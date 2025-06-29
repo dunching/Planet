@@ -22,6 +22,9 @@ auto UAnimNotifyState_AddTagInDuration::NotifyBegin(
 			CharacterOwnerPtr->GetCharacterAbilitySystemComponent()->AddLooseGameplayTags(
 				 ActivedTags
 				);
+			CharacterOwnerPtr->GetCharacterAbilitySystemComponent()->AddReplicatedLooseGameplayTags(
+				 ActivedTags
+				);
 		}
 	}
 }
@@ -40,6 +43,9 @@ void UAnimNotifyState_AddTagInDuration::NotifyEnd(
 		{
 			CharacterOwnerPtr->GetCharacterAbilitySystemComponent()->RemoveLooseGameplayTags(
 				 ActivedTags
+				 );
+			CharacterOwnerPtr->GetCharacterAbilitySystemComponent()->RemoveReplicatedLooseGameplayTags(
+			ActivedTags
 				);
 		}
 	}

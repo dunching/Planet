@@ -114,8 +114,6 @@ private:
 
 	FTSTicker::FDelegateHandle TickDelegateHandle;
 
-	int8 ShowCursorCount = 0;
-	
 };
 
 template <typename ProcessorType>

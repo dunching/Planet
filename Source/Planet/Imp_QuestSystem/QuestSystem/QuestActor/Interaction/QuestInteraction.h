@@ -159,7 +159,7 @@ public:
 		);
 
 	// 
-	AChallengeEntry* ChallengeEntryPtr = nullptr;
+	TWeakObjectPtr<AChallengeEntry> ChallengeEntryPtr = nullptr;
 };
 
 UCLASS()

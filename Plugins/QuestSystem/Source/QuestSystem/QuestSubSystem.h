@@ -15,11 +15,13 @@ class AQuestChain_ImmediateBase;
 
 using FOnStartGuide = TMulticastDelegate<void(
 	AQuestChainBase*
-)>;
+
+	)>;
 
 using FOnStopGuide = TMulticastDelegate<void(
 	AQuestChainBase*
-)>;
+
+	)>;
 
 struct FTaskNodeDescript;
 
@@ -34,7 +36,7 @@ class QUESTSYSTEM_API IGetQuestSubSystemInterface
 	GENERATED_BODY()
 
 public:
-	virtual UQuestSubSystem* GetGuideSubSystem()const = 0;
+	virtual UQuestSubSystem* GetGuideSubSystem() const = 0;
 };
 
 /**
@@ -49,7 +51,7 @@ class QUESTSYSTEM_API UQuestSubSystem : public UWorldSubsystem
 public:
 	virtual bool ShouldCreateSubsystem(
 		UObject* Outer
-	) const override;
+		) const override;
 
 	static UQuestSubSystem* GetInstance();
 
@@ -61,7 +63,7 @@ public:
 	// 添加支线内容
 	void AddGuideThread_Brand(
 		const TSubclassOf<AQuestChain_BranchBase>& BranchLineGuideClass
-	);
+		);
 
 	/**
 	 * 将任务设置为当前任务
@@ -70,7 +72,7 @@ public:
 	 */
 	void ActiveBrandGuideThread(
 		const TSubclassOf<AQuestChain_BranchBase>& GuideClass
-	);
+		);
 
 	/**
 	 * 停止当前任务，如果类型为指定类型的话
@@ -79,7 +81,7 @@ public:
 	 */
 	void StopActiveBrandGuideThread(
 		const TSubclassOf<AQuestChain_BranchBase>& GuideClass
-	);
+		);
 
 	/**
 	 * 开始并行引导
@@ -87,30 +89,30 @@ public:
 	 */
 	void StartParallelGuideThread(
 		const TSubclassOf<AQuestChain_ImmediateBase>& GuideClass
-	);
+		);
 
 	void StopParallelGuideThread(
 		const TSubclassOf<AQuestChain_ImmediateBase>& GuideClass
-	);
+		);
 
 	void OnGuideThreadStoped(
 		AQuestChainBase* GuideThreadPtr
-	);
+		);
 
 	/**
 	 * @return 当前激活的任务 
 	 */
 	TObjectPtr<AQuestChainBase> GetCurrentGuideThread() const;
-	
+
 	/**
 	 * @return 当前的主线任务
 	 */
-	TSubclassOf<AQuestChain_MainBase> GetCurrentMainGuideThread()const;
-	
+	TSubclassOf<AQuestChain_MainBase> GetCurrentMainGuideThread() const;
+
 	/**
 	 * @return 所有拥有的支线任务
 	 */
-	TArray<TSubclassOf<AQuestChain_BranchBase>> GetGuideThreadAry()const;
+	TArray<TSubclassOf<AQuestChain_BranchBase>> GetGuideThreadAry() const;
 
 	/**
 	 * 查询该类型的任务是否被激活，如查询是否处于挑战模式
@@ -118,10 +120,12 @@ public:
 	 * @param GuideClass 
 	 * @return 
 	 */
-	TObjectPtr<AQuestChainBase> IsActivedGuideThread(const TSubclassOf<AQuestChain_ImmediateBase>& GuideClass)const;
+	TObjectPtr<AQuestChainBase> IsActivedGuideThread(
+		const TSubclassOf<AQuestChain_ImmediateBase>& GuideClass
+		) const;
 
-	const TArray<TObjectPtr<AQuestChainBase>> &GetActivedGuideThreadsAry()const;
-	
+	const TArray<TObjectPtr<AQuestChainBase>>& GetActivedGuideThreadsAry() const;
+
 	FOnStartGuide& GetOnStartGuide();
 
 	FOnStopGuide& GetOnStopGuide();
@@ -131,25 +135,33 @@ public:
 	 * @param GuideID 
 	 * @param TaskId 
 	 */
-	void AddGuidePostion(const FGuid &CurrentGuideID, const FGuid& CurrentTaskID);
-	
+	void AddGuidePostion(
+		const FGuid& CurrentGuideID,
+		const FGuid& CurrentTaskID
+		);
+
 	/**
 	 * 消耗引导已执行到的子节点的记录
 	 * @param GuideID 
 	 * @return 
 	 */
-	bool ConsumeGuidePostion(const FGuid &CurrentGuideID, FGuid& CurrentTaskID);
-	
-	void RemoveGuidePostion(const FGuid &CurrentGuideID);
-	
+	bool ConsumeGuidePostion(
+		const FGuid& CurrentGuideID,
+		FGuid& CurrentTaskID
+		);
+
+	void RemoveGuidePostion(
+		const FGuid& CurrentGuideID
+		);
+
 private:
-	virtual TArray<TSubclassOf<AQuestChain_MainBase>> GetMainGuideThreadChaptersAry()const;
-	
-	virtual TSubclassOf<AQuestChain_MainBase> GetToBeContinueGuideThread()const;
-	
+	virtual TArray<TSubclassOf<AQuestChain_MainBase>> GetMainGuideThreadChaptersAry() const;
+
+	virtual TSubclassOf<AQuestChain_MainBase> GetToBeContinueGuideThread() const;
+
 	void ActiveTargetGuideThread(
 		const TSubclassOf<AQuestChainBase>& GuideClass
-	);
+		);
 
 	FOnStartGuide OnStartGuide;
 

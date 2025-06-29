@@ -178,20 +178,10 @@ void UInputProcessorSubSystemBase::SwitchShowCursor(
 	bool bIsShowCursor
 	)
 {
-	const auto OldValue = ShowCursorCount >= 0;
-	
-	ShowCursorCount += bIsShowCursor ? 1 : -1;
-
-	const auto Value = ShowCursorCount >= 0;
-	if (Value == OldValue)
-	{
-		return;
-	}
-
 	auto PlayerPCPtr = GEngine->GetFirstLocalPlayerController(GetWorld());
 	if (PlayerPCPtr)
 	{
-		if (Value)
+		if (bIsShowCursor)
 		{
 			PlayerPCPtr->SetShowMouseCursor(true);
 

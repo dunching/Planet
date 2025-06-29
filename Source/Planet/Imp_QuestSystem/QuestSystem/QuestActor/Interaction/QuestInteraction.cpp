@@ -204,7 +204,10 @@ bool UStateTreeGuideInteraction_ChallengeEntry_ComponentSchema::SetContextRequir
 	auto OwnerPtr = BrainComponent.GetOwner<FOwnerType>();
 	if (OwnerPtr)
 	{
-		Context.SetContextDataByName(ChallengeEntryTarget, FStateTreeDataView(OwnerPtr->ChallengeEntryPtr));
+		if (OwnerPtr->ChallengeEntryPtr.IsValid())
+		{
+			Context.SetContextDataByName(ChallengeEntryTarget, FStateTreeDataView(OwnerPtr->ChallengeEntryPtr.Get()));
+		}
 	}
 
 	return Super::SetContextRequirements(BrainComponent, Context, bLogErrors);

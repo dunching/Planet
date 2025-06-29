@@ -414,16 +414,16 @@ TArray<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistanceByNearestCha
 	{
 		const auto TargetDir = (Iter->GetActorLocation() - CharacterLocation).
 			GetSafeNormal();
-		
+
 		const auto DotProduct = FVector::DotProduct(TargetDir, Dir);
 
 		auto CurAngle = FMath::RadiansToDegrees(FMath::Acos(DotProduct));
-		
+
 		if (Angle > 0 && CurAngle > Angle)
 		{
 			continue;
 		}
-		
+
 		Map.emplace(DotProduct, Iter);
 	}
 
@@ -457,7 +457,7 @@ FGameplayEffectSpecHandle USkill_Base::MakeDamageToTargetSpecHandle(
 				                         CharacterAttributes->GetMetalValue() * Elemental_Damage_Magnification);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal,
-			                                               BaseDamage
+			                                               -BaseDamage
 			                                              );
 		}
 		break;
@@ -467,7 +467,7 @@ FGameplayEffectSpecHandle USkill_Base::MakeDamageToTargetSpecHandle(
 				                         CharacterAttributes->GetWoodValue() * Elemental_Damage_Magnification);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood,
-			                                               BaseDamage
+			                                               -BaseDamage
 			                                              );
 		}
 		break;
@@ -477,7 +477,7 @@ FGameplayEffectSpecHandle USkill_Base::MakeDamageToTargetSpecHandle(
 				                         CharacterAttributes->GetWaterValue() * Elemental_Damage_Magnification);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Water,
-			                                               BaseDamage
+			                                               -BaseDamage
 			                                              );
 		}
 		break;
@@ -487,7 +487,7 @@ FGameplayEffectSpecHandle USkill_Base::MakeDamageToTargetSpecHandle(
 				                         CharacterAttributes->GetFireValue() * Elemental_Damage_Magnification);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Fire,
-			                                               BaseDamage
+			                                               -BaseDamage
 			                                              );
 		}
 		break;
@@ -497,7 +497,7 @@ FGameplayEffectSpecHandle USkill_Base::MakeDamageToTargetSpecHandle(
 				                         CharacterAttributes->GetEarthValue() * Elemental_Damage_Magnification);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth,
-			                                               BaseDamage
+			                                               -BaseDamage
 			                                              );
 		}
 		break;

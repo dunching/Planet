@@ -31,28 +31,49 @@ float IGameplayEffectDataModifyInterface::GetBaseValueMaps(
 	return Result;
 }
 
-void IGameplayEffectDataModifyInterface::UpdateValueMap()
+void IGameplayEffectDataModifyInterface::UpdateValueMap(
+	const FGameplayAttributeData* GameplayAttributeDataPtr
+	)
 {
+	if (ValueMap.Contains(GameplayAttributeDataPtr))
+	{
+		auto & Ref = ValueMap[GameplayAttributeDataPtr];
+		for (auto SecondIter = Ref.DataMap.CreateIterator(); SecondIter; ++SecondIter)
+		{
+			if (SecondIter->Key == FGameplayTag::EmptyTag)
+			{
+			}
+			else
+			{
+				if (SecondIter->Value <= 0)
+				{
+					SecondIter.RemoveCurrent();
+				}
+			}
+		}
+		
+		for (auto SecondIter = Ref.MagnitudeMap.CreateIterator(); SecondIter; ++SecondIter)
+		{
+			if (SecondIter->Key == FGameplayTag::EmptyTag)
+			{
+			}
+			else
+			{
+				if (SecondIter->Value <= 0)
+				{
+					SecondIter.RemoveCurrent();
+				}
+			}
+		}
+		
+		if (Ref.DataMap.IsEmpty() && Ref.MagnitudeMap.IsEmpty())
+		{
+			ValueMap.Remove(GameplayAttributeDataPtr);
+		}
+	}
+	
 	for (auto Iter = ValueMap.CreateIterator(); Iter; ++Iter)
 	{
-		for (auto SecondIter = Iter->Value.DataMap.CreateIterator(); SecondIter; ++SecondIter)
-		{
-			if (SecondIter->Value <= 0)
-			{
-				SecondIter.RemoveCurrent();
-			}
-		}
-		for (auto SecondIter = Iter->Value.MagnitudeMap.CreateIterator(); SecondIter; ++SecondIter)
-		{
-			if (SecondIter->Value <= 0)
-			{
-				SecondIter.RemoveCurrent();
-			}
-		}
-		if (Iter->Value.DataMap.IsEmpty() && Iter->Value.MagnitudeMap.IsEmpty())
-		{
-			Iter.RemoveCurrent();
-		}
 	}
 }
 
@@ -459,7 +480,7 @@ void IGameplayEffectDataModifyInterface::UpdatePermanentValue(
 		break;
 	}
 
-	UpdateValueMap();
+	UpdateValueMap(GameplayAttributeDataPtr);
 }
 
 void IGameplayEffectDataModifyInterface::UpdateTemporaryValue(
@@ -674,5 +695,5 @@ void IGameplayEffectDataModifyInterface::UpdateTemporaryValue(
 		}
 	}
 
-	UpdateValueMap();
+	UpdateValueMap(GameplayAttributeDataPtr);
 }

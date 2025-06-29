@@ -87,9 +87,9 @@ void UQuestSubSystem::StartParallelGuideThread(
 	FActorSpawnParameters SpawnParameters;
 
 	auto GuideThreadPtr = GetWorld()->SpawnActor<AQuestChainBase>(
-	                                                           GuideClass,
-	                                                           SpawnParameters
-	                                                          );
+	                                                              GuideClass,
+	                                                              SpawnParameters
+	                                                             );
 
 	GuideThreadPtr->ActiveGuide();
 
@@ -144,6 +144,20 @@ void UQuestSubSystem::OnGuideThreadStoped(
 
 TObjectPtr<AQuestChainBase> UQuestSubSystem::GetCurrentGuideThread() const
 {
+	// 优先返回临时的任务
+	for (auto Iter : ActivedGuideThreadsAry)
+	{
+		if (Iter == CurrentLineGuidePtr)
+		{
+			continue;
+		}
+		else
+		{
+			return Iter;
+		}
+	}
+
+	// 若没有临时的任务，则返回主线或者支线
 	return CurrentLineGuidePtr;
 }
 
@@ -264,9 +278,9 @@ void UQuestSubSystem::ActiveTargetGuideThread(
 	FActorSpawnParameters SpawnParameters;
 
 	auto GuideThreadPtr = GetWorld()->SpawnActor<AQuestChainBase>(
-	                                                           GuideClass,
-	                                                           SpawnParameters
-	                                                          );
+	                                                              GuideClass,
+	                                                              SpawnParameters
+	                                                             );
 
 	CurrentLineGuidePtr = GuideThreadPtr;
 
