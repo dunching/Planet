@@ -2,10 +2,12 @@
 
 #include <NavigationSystem.h>
 
+#include "AIComponent.h"
 #include "AITask_DashToLeader.h"
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
+#include "GameOptions.h"
 #include "HumanCharacter_AI.h"
 #include "STE_Assistance.h"
 #include "ProxyProcessComponent.h"
@@ -57,6 +59,14 @@ void FSTT_UpdateQueryDistance::PerformAction(
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	InstanceData.GloabVariable->QueryDistance =
-		InstanceData.CharacterPtr->GetProxyProcessComponent()->GetCurrentWeaponAttackDistance();
+	if (InstanceData.CharacterPtr->GetAIComponent()->GetCheerOn())
+	{
+		InstanceData.GloabVariable->QueryDistance = UGameOptions::GetInstance()->CheerOnDistance;
+	}
+	else
+	{
+	
+		InstanceData.GloabVariable->QueryDistance =
+			InstanceData.CharacterPtr->GetProxyProcessComponent()->GetCurrentWeaponAttackDistance();
+	}
 }

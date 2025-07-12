@@ -13,7 +13,7 @@
 
 #include "STT_ReleaseSkill.generated.h"
 
-class AHumanCharacter;
+class AHumanCharacter_AI;
 class AHumanAIController;
 class UAITask_ReleaseSkill;
 class UGloabVariable_Character;
@@ -24,7 +24,7 @@ struct PLANET_API FStateTreeReleaseSkillTaskInstanceData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter> CharacterPtr = nullptr;
+	TObjectPtr<AHumanCharacter_AI> CharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;

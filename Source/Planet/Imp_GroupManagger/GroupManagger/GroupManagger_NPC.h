@@ -26,9 +26,10 @@ class PLANET_API AGroupManagger_NPC :
 	GENERATED_BODY()
 
 public:
+	void AddSpwanedCharacter(
+		const TObjectPtr<AHumanCharacter_AI>& SpwanedCharacter
+		);
 
-	void AddSpwanedCharacter(const TObjectPtr<AHumanCharacter_AI>&SpwanedCharacter);
-	
 	/**
 	 * 既定的巡逻路线
 	 */
@@ -42,10 +43,23 @@ public:
 	TObjectPtr<ABuildingArea> BuildingAreaPtr = nullptr;
 
 private:
-
 	UFUNCTION()
-	void OnSpwanedCharacterDestroyed(AActor* DestroyedActor);
-	
-	TSet<TObjectPtr<AHumanCharacter_AI>>SpwanedCharactersSet;
-	
+	void OnSpwanedCharacterDestroyed(
+		AActor* DestroyedActor
+		);
+
+	void OnCloseCombatChanged(
+		ACharacterBase* CharacterPtr,
+		bool bIsCloseCombat
+		) ;
+
+	/**
+	 * 已生成的Character
+	 */
+	TSet<TObjectPtr<AHumanCharacter_AI>> SpwanedCharactersSet;
+
+	/**
+	 * 近战的Character
+	 */
+	TSet<TObjectPtr<AHumanCharacter_AI>> CloseCombatCharactersSet;
 };

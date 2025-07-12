@@ -955,8 +955,6 @@ void UCharacterAbilitySystemComponent::ModifyType_Permanent(
 		                     Spec,
 		                     Attribute.GetGameplayAttributeData(TargetSet)
 		                    );
-
-		ReceivedEventModifyDataCallback.TherapeuticalDose = Iter.Value;
 	};
 
 	for (const auto& Iter : CustomMagnitudes)
@@ -976,6 +974,15 @@ void UCharacterAbilitySystemComponent::ModifyType_Permanent(
 			       UpdateValueType,
 			       UAS_Character::GetHPAttribute()
 			      );
+
+			if (Iter.Value > 0)
+			{
+				ReceivedEventModifyDataCallback.TherapeuticalDose = Iter.Value;
+			}
+			else
+			{
+				ReceivedEventModifyDataCallback.Damage = FMath::Abs( Iter.Value);
+			}
 		}
 		else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina))
 		{

@@ -2,6 +2,7 @@
 
 #include "AITask_ReleaseSkill.h"
 
+#include "AIComponent.h"
 #include "UObject/Package.h"
 #include "TimerManager.h"
 #include "AISystem.h"
@@ -17,6 +18,7 @@
 #include "AssetRefMap.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAbilitySystemComponent.h"
+#include "HumanCharacter_AI.h"
 #include "ItemProxy_Skills.h"
 #include "ItemProxy_Weapon.h"
 
@@ -47,11 +49,21 @@ void UAITask_ReleaseSkill::TickTask(
 		GameplayTagContainer.AddTag(UGameplayTagsLibrary::State_ReleasingSkill_Continuous);
 		GameplayTagContainer.AddTag(UGameplayTagsLibrary::State_MoveToLocation);
 
+		// 特殊状态时不释放技能
 		if (GASPtr->MatchesGameplayTagQuery(FGameplayTagQuery::MakeQuery_MatchAnyTags(GameplayTagContainer)))
 		{
-			// 
+			//
+			return;
 		}
-		else
+
+		// 掠阵时不释放技能
+		if (CharacterPtr->GetAIComponent()->GetCheerOn())
+		{
+			//
+			return;
+		}
+
+		
 		{
 			const auto CanbeActivedInfo = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveSocket();
 			{
@@ -125,7 +137,7 @@ void UAITask_ReleaseSkill::ConditionalPerformTask()
 {
 }
 
-void UAITask_ReleaseSkill::SetUp(ACharacterBase* InChracterPtr)
+void UAITask_ReleaseSkill::SetUp(AHumanCharacter_AI* InChracterPtr)
 {
 	CharacterPtr = InChracterPtr;
 }

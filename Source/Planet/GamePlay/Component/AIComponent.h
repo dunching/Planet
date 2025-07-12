@@ -39,27 +39,41 @@ public:
 
 	static FName ComponentName;
 
-	UAIComponent(const FObjectInitializer& ObjectInitializer);
+	UAIComponent(
+		const FObjectInitializer& ObjectInitializer
+		);
 
 	virtual void BeginPlay() override;
-	
-	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)override;
 
-	void AddTemporaryTaskNode(UTaskNode_Temporary*TaskNodePtr);
+	virtual void OnGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
+
+	void AddTemporaryTaskNode(
+		UTaskNode_Temporary* TaskNodePtr
+		);
 
 	void InitialAllocationsRowName();
 
 	void InitialAllocationsByProxy();
 
-	void DisplayTaskPromy(TSubclassOf<UTaskPromt> TaskPromtClass);
-	
+	void DisplayTaskPromy(
+		TSubclassOf<UTaskPromt> TaskPromtClass
+		);
+
 	void StopDisplayTaskPromy();
 
-	TMap<FGameplayTag, FProductsForSale> GetSaleItemsInfo()const;
+	TMap<FGameplayTag, FProductsForSale> GetSaleItemsInfo() const;
+
+	void SetIsCheerOn(
+		bool IsCheerOn
+		);
+
+	bool GetCheerOn() const;
 	
 #pragma region RPC
 #pragma endregion
-	
+
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn")
 	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
@@ -75,18 +89,17 @@ public:
 	 * 是否是单个的NPC，如地图上的商家
 	 */
 	bool bIsSingle = true;
-	
+
 	/**
 	 * 是否是玩家的队友
 	 */
 	bool bIsTeammate = false;
-	
+
 protected:
-	
 #pragma region Allocation
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Allocation")
 	FGameplayTag FirstWeaponSocketInfo;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Allocation")
 	FGameplayTag SecondWeaponSocketInfo;
 
@@ -97,9 +110,15 @@ protected:
 	FGameplayTag ActiveSkillSet_2;
 #pragma endregion
 
+	/**
+	 * 是否处于掠阵状态
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bIsCheerOn = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FGameplayTag, FProductsForSale> ProxyMap;
-	
+
 	UPROPERTY(Transient)
 	UTaskPromt* TaskPromtPtr = nullptr;
 };

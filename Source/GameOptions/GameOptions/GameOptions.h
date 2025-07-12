@@ -86,6 +86,25 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
 	int32 CharacterTitleDisplayRange = 3000;
 	
+	/**
+	 * 低于这个值时则为近战状态
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
+	int32 CloseCombatAttackDistance = 150;
+	
+	/**
+	 * 近战角色处于“掠阵”时的查询距离
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
+	int32 CheerOnDistance = 550;
+	
+	/**
+	 * 最多同时有几个 近战角色 可以同时处于攻击状态
+	 * 避免出现互相挤压的情况
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
+	int32 MaxCloseCombat = 3;
+	
 #pragma region 按键映射
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey ActiveSkill_1_Key = EKeys::Q;

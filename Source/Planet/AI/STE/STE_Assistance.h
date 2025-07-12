@@ -77,6 +77,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	ETeammateOption TeammateOption = ETeammateOption::kInitialize;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bIsCheerOn = false;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int32 CheerOnDistance = 150;
+	
 	/**
 	 * 既定的巡逻路线
 	 */

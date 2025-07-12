@@ -29,7 +29,7 @@ public:
 
 	void ConditionalPerformTask();
 
-	void SetUp(ACharacterBase* InChracterPtr);
+	void SetUp(AHumanCharacter_AI* InChracterPtr);
 
 protected:
 
@@ -45,7 +45,7 @@ protected:
 
 	TMap<UGameplayAbility*, FGameplayTag>ReleasingSkillMap;
 
-	ACharacterBase* CharacterPtr = nullptr;
+	AHumanCharacter_AI* CharacterPtr = nullptr;
 
 	const float Frequency = 1.f;
 

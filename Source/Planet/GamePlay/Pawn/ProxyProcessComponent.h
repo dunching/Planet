@@ -50,6 +50,9 @@ public:
 	using FOnCanAciveSkillChanged =
 	TCallbackHandleContainer<void()>;
 
+	using FOnCloseCombatChanged =
+	TCallbackHandleContainer<void(ACharacterBase*, bool)>;
+
 	UProxyProcessComponent(const FObjectInitializer& ObjectInitializer);
 
 	virtual void InitializeComponent() override;
@@ -112,6 +115,12 @@ public:
 
 	int32 GetCurrentWeaponAttackDistance() const;
 
+	/**
+	 * 是否是近战状态
+	 * @return 
+	 */
+	bool GetIsCloseCombat() const;
+
 	void GetWeaponSocket(
 		FCharacterSocket& FirstWeaponSocketInfoSPtr,
 		FCharacterSocket& SecondWeaponSocketInfoSPtr
@@ -142,6 +151,8 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentActivedSocketChanged)
 	FCharacterSocket CurrentWeaponSocket;
 
+	FOnCloseCombatChanged OnCloseCombatChanged;
+	
 protected:
 	
 	void Add(const FCharacterSocket& Socket);
@@ -198,5 +209,17 @@ protected:
 
 	UFUNCTION()
 	void OnRep_CurrentActivedSocketChanged();
+
+	UFUNCTION()
+	void OnRep_IsCloseCombat();
 #pragma endregion
+
+	void SetCloseCombat(bool bIsCloseCombat_);
+	
+	/**
+	 * 是否处于近战状态
+	 */
+	UPROPERTY(ReplicatedUsing = OnRep_IsCloseCombat)
+	bool bIsCloseCombat = false;
+
 };

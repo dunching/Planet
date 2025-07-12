@@ -86,6 +86,9 @@ void USTE_Assistance::Tick(
 	)
 {
 	Super::Tick(Context, DeltaTime);
+
+	bIsCheerOn = HumanCharacterPtr->GetAIComponent()->GetCheerOn();
+	CheerOnDistance = UGameOptions::GetInstance()->CheerOnDistance;
 }
 
 void USTE_Assistance::OnTeamOptionChanged(

@@ -201,6 +201,18 @@ TMap<FGameplayTag, FProductsForSale> UAIComponent::GetSaleItemsInfo() const
 	return ProxyMap;
 }
 
+void UAIComponent::SetIsCheerOn(
+	bool IsCheerOn
+	)
+{
+	bIsCheerOn = IsCheerOn;
+}
+
+bool UAIComponent::GetCheerOn() const
+{
+	return bIsCheerOn;
+}
+
 void UAIComponent::DisplayTaskPromy(
 	TSubclassOf<UTaskPromt> TaskPromtClass
 	)

@@ -60,6 +60,7 @@ void UProxyProcessComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	Params.bIsPushBased = true;
 
 	DOREPLIFETIME_CONDITION(ThisClass, CurrentWeaponSocket, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, bIsCloseCombat, COND_None);
 }
 
 void UProxyProcessComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
@@ -236,6 +237,11 @@ int32 UProxyProcessComponent::GetCurrentWeaponAttackDistance() const
 	return 100;
 }
 
+bool UProxyProcessComponent::GetIsCloseCombat() const
+{
+	return GetCurrentWeaponAttackDistance() < UGameOptions::GetInstance()->CloseCombatAttackDistance;
+}
+
 void UProxyProcessComponent::GetWeaponSocket(
 	FCharacterSocket& FirstWeaponSocketInfoSPtr,
 	FCharacterSocket& SecondWeaponSocketInfoSPtr
@@ -398,6 +404,22 @@ void UProxyProcessComponent::OnRep_CurrentActivedSocketChanged()
 	}
 }
 
+void UProxyProcessComponent::OnRep_IsCloseCombat()
+{
+	SetCloseCombat(bIsCloseCombat);
+}
+
+void UProxyProcessComponent::SetCloseCombat(
+	bool bIsCloseCombat_
+	)
+{
+	bIsCloseCombat = bIsCloseCombat_;
+	
+	auto CharacterPtr = GetOwner<FOwnerType>();
+
+	OnCloseCombatChanged(CharacterPtr, bIsCloseCombat);
+}
+
 bool UProxyProcessComponent::SwitchWeaponImpAndCheck(const FCharacterSocket& NewWeaponSocket)
 {
 	if (NewWeaponSocket == CurrentWeaponSocket)
@@ -436,6 +458,13 @@ bool UProxyProcessComponent::SwitchWeaponImp(const FCharacterSocket& NewWeaponSo
 
 	CurrentWeaponSocket = NewWeaponSocket;
 
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		SetCloseCombat(GetIsCloseCombat());
+	}
+#endif
+	
 	OnCurrentWeaponChanged();
 
 	return true;
