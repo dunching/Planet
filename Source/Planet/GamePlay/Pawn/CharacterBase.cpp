@@ -220,7 +220,7 @@ void ACharacterBase::PossessedBy(
 	if (NewController->IsA(APlanetPlayerController::StaticClass()))
 	{
 		GroupManaggerPtr = Cast<APlanetPlayerController>(NewController)->GetGroupManagger();
-		OnGroupManaggerReady(GroupManaggerPtr);
+		OnSelfGroupManaggerReady(GroupManaggerPtr);
 	}
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{
@@ -231,7 +231,7 @@ void ACharacterBase::PossessedBy(
 		// 	ControllerPtr->SetGroupSharedInfo(GetGroupManagger());
 		// }
 
-		// OnGroupManaggerReady(GetGroupManagger());
+		// OnSelfGroupManaggerReady(GetGroupManagger());
 	}
 }
 
@@ -318,9 +318,14 @@ UCharacterTitleComponent* ACharacterBase::GetCharacterTitleComponent() const
 
 TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterProxy() const
 {
-	return GetInventoryComponent()->FindProxy<FModifyItemProxyStrategy_Character>(
-		 GetCharacterAttributesComponent()->GetCharacterID()
-		);
+	if (GetInventoryComponent())
+	{
+		return GetInventoryComponent()->FindProxy<FModifyItemProxyStrategy_Character>(
+			 GetCharacterAttributesComponent()->GetCharacterID()
+			);
+	}
+	
+	return nullptr;
 }
 
 USkeletalMeshComponent* ACharacterBase::GetCopyPoseMesh() const
@@ -444,7 +449,7 @@ void ACharacterBase::SetActorHiddenInGame(
 	Super::SetActorHiddenInGame(bNewHidden);
 }
 
-void ACharacterBase::OnGroupManaggerReady(
+void ACharacterBase::OnSelfGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
 	)
 {
@@ -468,10 +473,16 @@ void ACharacterBase::OnGroupManaggerReady(
 		                 auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
 		                 if (GroupSharedInterfacePtr)
 		                 {
-			                 GroupSharedInterfacePtr->OnGroupManaggerReady(GroupManaggerPtr);
+			                 GroupSharedInterfacePtr->OnSelfGroupManaggerReady(GroupManaggerPtr);
 		                 }
 	                 }
 	                );
+}
+
+void ACharacterBase::OnPlayerGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
+{
 }
 
 void ACharacterBase::OnMoveSpeedChanged(
@@ -522,7 +533,7 @@ void ACharacterBase::OnRep_GroupManagger()
 #if UE_EDITOR || UE_SERVER
 	if (GetLocalRole() > ROLE_SimulatedProxy)
 	{
-		OnGroupManaggerReady(GroupManaggerPtr);
+		OnSelfGroupManaggerReady(GroupManaggerPtr);
 	}
 #endif
 
@@ -532,7 +543,7 @@ void ACharacterBase::OnRep_GroupManagger()
 		// if (GetCharacterAttributesComponent()->bCharacterIDIsReplicated)
 		// {
 		// }
-		OnGroupManaggerReady(GroupManaggerPtr);
+		OnSelfGroupManaggerReady(GroupManaggerPtr);
 	}
 #endif
 }

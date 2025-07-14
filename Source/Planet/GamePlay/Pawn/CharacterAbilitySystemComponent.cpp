@@ -572,7 +572,7 @@ void UCharacterAbilitySystemComponent::OnReceivedOhterCharacter_Implementation(
 	ReceivedDamageDelegate(ReceivedEventModifyDataCallback);
 }
 
-void UCharacterAbilitySystemComponent::OnGroupManaggerReady(
+void UCharacterAbilitySystemComponent::OnSelfGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
 	)
 {
@@ -587,6 +587,12 @@ void UCharacterAbilitySystemComponent::OnGroupManaggerReady(
 		InitialBaseGAs();
 	}
 #endif
+}
+
+void UCharacterAbilitySystemComponent::OnPlayerGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
+{
 }
 
 void UCharacterAbilitySystemComponent::AddReceivedBaseModify()

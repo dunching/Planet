@@ -40,7 +40,11 @@ public:
 
 	virtual void BeginPlay() override;
 
-	virtual void OnGroupManaggerReady(
+	virtual void OnSelfGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
+
+	virtual void OnPlayerGroupManaggerReady(
 		AGroupManagger* NewGroupSharedInfoPtr
 		) override;
 

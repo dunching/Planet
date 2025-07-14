@@ -164,13 +164,24 @@ public:
 
 #pragma region RPC
 
+	/**
+	 * 生成一个PlayerCharacter的复制体
+	 * @param Transform 
+	 */
 	UFUNCTION(Server, Reliable)
-	void ServerSpawnGeneratorActor(
+	void CloneCharacter_Server(
+		const FGuid& ID,
+		const FTransform& Transform,
+		ETeammateOption TeammateOption
+		);
+
+	UFUNCTION(Server, Reliable)
+	void SpawnGeneratorActor_Server(
 		const TSoftObjectPtr<AGeneratorColony_ByInvoke>& GeneratorBasePtr
 		);
 
 	UFUNCTION(Server, Reliable)
-	void ServerSpawnCharacterAry(
+	void SpawnCharacterAry_Server(
 		const TArray<TSubclassOf<AHumanCharacter_AI>>& CharacterClassAry,
 		const TArray<FGuid>& IDAry,
 		const TArray<FTransform>& TransformAry,
@@ -178,7 +189,7 @@ public:
 		);
 
 	UFUNCTION(Server, Reliable)
-	void ServerSpawnCharacter(
+	void SpawnCharacter_Server(
 		TSubclassOf<AHumanCharacter_AI> CharacterClass,
 		const FGuid& ID,
 		const FTransform& Transform,
@@ -186,13 +197,13 @@ public:
 		);
 
 	UFUNCTION(Server, Reliable)
-	void ServerSpawnCharacterByProxyType(
+	void SpawnCharacterByProxyType_Server(
 		const FGameplayTag& CharacterProxyType,
 		const FTransform& Transform
 		);
 
 	UFUNCTION(Server, Reliable)
-	void ServerDestroyActor(
+	void DestroyActor_Server(
 		AActor* ActorPtr
 		);
 
@@ -335,7 +346,11 @@ protected:
 
 	virtual void OnRep_PlayerState() override;
 
-	virtual void OnGroupManaggerReady(
+	virtual void OnSelfGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
+
+	virtual void OnPlayerGroupManaggerReady(
 		AGroupManagger* NewGroupSharedInfoPtr
 		) override;
 

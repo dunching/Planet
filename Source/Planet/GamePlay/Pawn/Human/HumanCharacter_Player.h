@@ -195,7 +195,7 @@ protected:
 
 	virtual void OnRep_GroupManagger() override;
 
-	virtual void OnGroupManaggerReady(
+	virtual void OnSelfGroupManaggerReady(
 		AGroupManagger* NewGroupSharedInfoPtr
 		) override;
 

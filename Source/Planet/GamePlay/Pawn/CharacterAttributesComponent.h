@@ -51,6 +51,8 @@ public:
 
 	FGuid GetCharacterID() const;
 
+	void UpdateCampType();
+	
 	// Character的类别
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag CharacterCategory;
@@ -68,7 +70,11 @@ protected:
 		FActorComponentTickFunction* ThisTickFunction
 		) override;
 
-	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
+	virtual void OnSelfGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
+
+	virtual void OnPlayerGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
 
 	// 初始化GE
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")

@@ -17,6 +17,21 @@
 #include "OpenWorldSystem.h"
 #include "TeamMatesHelperComponent.h"
 #include "TeamMatesHelperComponentBase.h"
+#include "PlanetLocalPlayer.h"
+
+void GameplayCommand::CloneCharacter()
+{
+	auto PlanetLocalPlayerPtr = Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorldImp()));
+
+	if (PlanetLocalPlayerPtr)
+	{
+		auto PCPtr = PlanetLocalPlayerPtr;
+		auto Rot = PCPtr->GetControlRotation().Quaternion();
+		auto Transform = PCPtr->GetPawn()->GetTransform();
+		Transform.AddToTranslation( Rot.GetAxisY() * 100);
+		PlanetLocalPlayerPtr->CloneCharacter_Server(FGuid::NewGuid(), Transform,ETeammateOption::kAssistance);
+	}
+}
 
 void GameplayCommand::ActiveGuideMainThread()
 {
@@ -127,7 +142,7 @@ void GameplayCommand::ServerSpawnCharacterByProxyType(
 			UKismetMathLibrary::MakeRotFromZX(FVector::UpVector, -PCPtr->GetPawn()->GetActorForwardVector()).Quaternion()
 			                     );
 
-			PCPtr->ServerSpawnCharacterByProxyType(FGameplayTag::RequestGameplayTag(*Args[0]), Transform);
+			PCPtr->SpawnCharacterByProxyType_Server(FGameplayTag::RequestGameplayTag(*Args[0]), Transform);
 		}
 	}
 }

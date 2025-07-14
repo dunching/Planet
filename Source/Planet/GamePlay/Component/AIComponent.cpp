@@ -63,7 +63,7 @@ void UAIComponent::BeginPlay()
 	OnwerActorPtr->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
 
-void UAIComponent::OnGroupManaggerReady(
+void UAIComponent::OnSelfGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
 	)
 {
@@ -86,12 +86,18 @@ void UAIComponent::OnGroupManaggerReady(
 #endif
 
 #if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_Client)
+	if (GetNetMode() == NM_DedicatedServer)
 	{
 		auto OnwerActorPtr = GetOwner<FOwnerType>();
 		OnwerActorPtr->GetProxyProcessComponent()->ActiveWeapon();
 	}
 #endif
+}
+
+void UAIComponent::OnPlayerGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
+{
 }
 
 void UAIComponent::AddTemporaryTaskNode(
@@ -158,8 +164,8 @@ void UAIComponent::InitialAllocationsRowName()
 				if (ActiveSkillSet_1.IsValid())
 				{
 					auto SkillProxyPtr = InventoryComponentPtr->AddProxy<FModifyItemProxyStrategy_ActiveSkill>(
-					                                                           ActiveSkillSet_1
-					                                                          );
+						 ActiveSkillSet_1
+						);
 					if (SkillProxyPtr)
 					{
 						FCharacterSocket SkillsSocketInfo;
@@ -211,6 +217,18 @@ void UAIComponent::SetIsCheerOn(
 bool UAIComponent::GetCheerOn() const
 {
 	return bIsCheerOn;
+}
+
+void UAIComponent::SetCustomCustomTeammateOption(
+	ETeammateOption InCustomTeammateOption
+	)
+{
+	CustomTeammateOption = InCustomTeammateOption;
+}
+
+ETeammateOption UAIComponent::GetCustomCustomTeammateOption() const
+{
+	return CustomTeammateOption;
 }
 
 void UAIComponent::DisplayTaskPromy(

@@ -935,7 +935,7 @@ EStateTreeRunStatus FSTT_GuideThread_SpawnNPC::EnterState(
 		                                                       ).Quaternion()
 		                     );
 
-		PCPtr->ServerSpawnCharacter(
+		PCPtr->SpawnCharacter_Server(
 		                            InstanceData.NPCClass,
 		                            InstanceData.NPC_ID,
 		                            Transform,
@@ -1098,7 +1098,7 @@ void FSTT_GuideThread_AttckCharacter::ExitState(
 			APlanetPlayerController>(UGameplayStatics::GetPlayerController(InstanceData.GuideThreadActorPtr, 0));
 		if (PCPtr)
 		{
-			PCPtr->ServerDestroyActor(InstanceData.HumanCharacterAI);
+			PCPtr->DestroyActor_Server(InstanceData.HumanCharacterAI);
 		}
 	}
 

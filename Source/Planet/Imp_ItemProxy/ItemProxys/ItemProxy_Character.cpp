@@ -10,7 +10,10 @@
 #include "ItemProxy_Skills.h"
 #include "ItemProxy_Weapon.h"
 #include "AIComponent.h"
+#include "CharacterTitleComponent.h"
 #include "DataTableCollection.h"
+#include "PlanetPlayerController.h"
+#include "TeamMatesHelperComponent.h"
 
 UItemProxy_Description_Character::UItemProxy_Description_Character(
 	const FObjectInitializer& ObjectInitializer
@@ -94,7 +97,7 @@ void FCharacterProxy::UpdateByRemote(
 	)
 {
 	Super::UpdateByRemote(RemoteSPtr);
-	
+
 	ProxyPtr = this;
 	UpdateByRemote_Allocationble(RemoteSPtr);
 
@@ -119,6 +122,17 @@ void FCharacterProxy::UpdateByRemote(
 	{
 		Experience = RemoteSPtr->Experience;
 		ExperienceChangedDelegate.ValueChanged(OldExperience, Experience);
+	}
+
+	// 是否有生成的Character？
+	if (ProxyCharacterPtr.IsValid())
+	{
+		auto GroupSharedInfoPtr = GetInventoryComponent()->GetOwner<AGroupManagger>();
+		if (GroupSharedInfoPtr)
+		{
+			ProxyCharacterPtr->GetCharacterTitleComponent()->UpdateTitle();
+			ProxyCharacterPtr->GetCharacterAttributesComponent()->UpdateCampType();
+		}
 	}
 }
 
@@ -237,6 +251,7 @@ void FCharacterProxy::RelieveRootBind()
 }
 
 AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(
+	const TObjectPtr<APlanetPlayerController> PCPtr,
 	const FTransform& Transform
 	)
 {
@@ -248,6 +263,7 @@ AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(
 	{
 		FActorSpawnParameters SpawnParameters;
 
+		SpawnParameters.Owner = PCPtr;
 		SpawnParameters.CustomPreSpawnInitalization = [this](
 			auto ActorPtr
 			)

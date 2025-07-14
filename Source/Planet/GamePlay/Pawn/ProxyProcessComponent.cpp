@@ -63,7 +63,7 @@ void UProxyProcessComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	DOREPLIFETIME_CONDITION(ThisClass, bIsCloseCombat, COND_None);
 }
 
-void UProxyProcessComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
+void UProxyProcessComponent::OnSelfGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 {
 // #if UE_EDITOR || UE_SERVER
 // 	if (GetNetMode() == NM_Client)
@@ -75,6 +75,12 @@ void UProxyProcessComponent::OnGroupManaggerReady(AGroupManagger* NewGroupShared
 // 		}
 // 	}
 // #endif
+}
+
+void UProxyProcessComponent::OnPlayerGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
+{
 }
 
 void UProxyProcessComponent::ActiveWeapon_Server_Implementation()

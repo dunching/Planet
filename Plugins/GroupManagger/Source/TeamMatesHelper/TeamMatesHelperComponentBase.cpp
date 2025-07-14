@@ -90,6 +90,10 @@ void UTeamMatesHelperComponentBase::GetLifetimeReplicatedProps(
 	DOREPLIFETIME_CONDITION(ThisClass, MembersIDSet, COND_None);
 }
 
+void UTeamMatesHelperComponentBase::OnRep_MembersIDSet()
+{
+}
+
 void UTeamMatesHelperComponentBase::OnRep_TeamConfigure()
 {
 	TeamHelperChangedDelegateContainer();

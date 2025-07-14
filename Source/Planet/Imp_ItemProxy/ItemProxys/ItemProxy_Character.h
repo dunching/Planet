@@ -34,6 +34,7 @@ struct FBasicProxy;
 class UItemProxy_Description_Character;
 class UInventoryComponent;
 class AHumanCharacter_AI;
+class APlanetPlayerController;
 
 #pragma region 人物
 
@@ -245,6 +246,7 @@ public:
 	 * @return 
 	 */
 	AHumanCharacter_AI* SpwanCharacter(
+		const TObjectPtr<APlanetPlayerController>PCPtr,
 		const FTransform& Transform
 		);
 

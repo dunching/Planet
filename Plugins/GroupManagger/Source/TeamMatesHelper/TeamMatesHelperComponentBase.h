@@ -78,16 +78,22 @@ protected:
 		TArray<FLifetimeProperty>& OutLifetimeProps
 		) const override;
 
+	UFUNCTION()
+	virtual void OnRep_MembersIDSet();
 
-	UPROPERTY(Replicated)
-	TArray<FGuid> MembersIDSet;
-	
 	UFUNCTION()
 	void OnRep_TeamConfigure();
 
 	UFUNCTION()
 	void OnRep_TeammateOptionChanged();
 
+	/**
+	 * 组内Character信息
+	 * 包括玩家生成的AI队友和召唤物
+	 */
+	UPROPERTY(ReplicatedUsing = OnRep_MembersIDSet, meta = (AllowPrivateAccess = "true"))
+	TArray<FGuid> MembersIDSet;
+	
 	UPROPERTY(ReplicatedUsing = OnRep_TeammateOptionChanged, meta = (AllowPrivateAccess = "true"))
 	ETeammateOption TeammateOption = ETeammateOption::kEnemy;
 

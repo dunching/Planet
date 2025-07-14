@@ -124,6 +124,10 @@ public:
 		AGroupManagger* GroupManaggerPtr
 	);
 
+	virtual void OnPlayerGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
+
 	void SetCharacterID(
 		const FGuid& InCharacterID
 	);
@@ -139,7 +143,7 @@ protected:
 
 	// virtual TSharedPtr<FCharacterProxy> GetCharacterProxy()const override;
 
-	virtual void OnGroupManaggerReady(
+	virtual void OnSelfGroupManaggerReady(
 		AGroupManagger* NewGroupSharedInfoPtr
 	) override;
 

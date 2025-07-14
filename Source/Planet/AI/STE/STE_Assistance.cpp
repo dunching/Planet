@@ -95,14 +95,11 @@ void USTE_Assistance::OnTeamOptionChanged(
 	ETeammateOption NewTeammateOption
 	)
 {
-#if WITH_EDITOR
-	// TODO. 满足测试
-	auto DefaultTeammateOption = HumanCharacterPtr->GetAIComponent()->DefaultTeammateOption;
-	if (DefaultTeammateOption == ETeammateOption::kTest)
+	auto CustomCustomTeammateOption = HumanCharacterPtr->GetAIComponent()->GetCustomCustomTeammateOption();
+	if (CustomCustomTeammateOption != ETeammateOption::kNone)
 	{
-		NewTeammateOption = DefaultTeammateOption;
+		NewTeammateOption = CustomCustomTeammateOption;
 	}
-#endif
 
 	TeammateOption = NewTeammateOption;
 

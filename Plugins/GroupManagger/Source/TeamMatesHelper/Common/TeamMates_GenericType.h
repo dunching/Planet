@@ -32,4 +32,6 @@ enum class ETeammateOption : uint8
 	// 说话状态
 	kConversation,
 
+	kNone,
+
 };

@@ -23,84 +23,116 @@ class USplineComponent;
 
 
 UCLASS()
-class PLANET_API APlanetAIController : 
-	public AGravityAIController, 
+class PLANET_API APlanetAIController :
+	public AGravityAIController,
 	public IPlanetControllerInterface,
 	public IGroupManaggerInterface
 {
 	GENERATED_BODY()
 
 public:
-
 	using FPawnType = ACharacterBase;
 
-	APlanetAIController(const FObjectInitializer& ObjectInitializer);
+	APlanetAIController(
+		const FObjectInitializer& ObjectInitializer
+		);
 
-	virtual void OnPossess(APawn* InPawn)override;
+	virtual void OnPossess(
+		APawn* InPawn
+		) override;
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+		) const override;
 
 	virtual AGroupManagger* GetGroupManagger() const override;
 
-	virtual void SetGroupSharedInfo(AGroupManagger*GroupManaggerPtr) override;
+	virtual void SetGroupSharedInfo(
+		AGroupManagger* GroupManaggerPtr
+		) override;
 
-	virtual UInventoryComponent* GetInventoryComponent()const override;
+	virtual UInventoryComponent* GetInventoryComponent() const override;
 
-	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent()const override;
+	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent() const override;
 
-	virtual UTalentAllocationComponent* GetTalentAllocationComponent()const override;
+	virtual UTalentAllocationComponent* GetTalentAllocationComponent() const override;
 
 	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy() override;
 
-	virtual ACharacterBase* GetRealCharacter()const override;
-	
+	virtual ACharacterBase* GetRealCharacter() const override;
+
 	virtual TWeakObjectPtr<ACharacterBase> GetTeamFocusTarget() const;
-	
+
 	virtual bool CheckIsFarawayOriginal() const;
 
-	virtual bool IsGroupmate(ACharacterBase* TargetCharacterPtr)const;
+	virtual bool IsGroupmate(
+		ACharacterBase* TargetCharacterPtr
+		) const;
 
-	virtual bool IsTeammate(ACharacterBase* TargetCharacterPtr)const;
+	virtual bool IsTeammate(
+		ACharacterBase* TargetCharacterPtr
+		) const;
 
-	void OnHPChanged(int32 CurrentValue);
+	void OnHPChanged(
+		int32 CurrentValue
+		);
 
 	virtual FPathFollowingRequestResult MoveAlongSPline(
 		USplineComponent* SplineComponentPtr,
 		const FAIMoveRequest& MoveRequest,
-		FNavPathSharedPtr* OutPath = nullptr);
+		FNavPathSharedPtr* OutPath = nullptr
+		);
 
 protected:
-
 	virtual void BeginPlay() override;
 
 	virtual void PostInitializeComponents() override;
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void EndPlay(
+		const EEndPlayReason::Type EndPlayReason
+		) override;
 
-	virtual void ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr)override;
+	virtual void ResetGroupmateProxy(
+		FCharacterProxy* NewGourpMateProxyPtr
+		) override;
 
-	virtual void BindPCWithCharacter()override;
+	virtual void BindPCWithCharacter() override;
 
-	virtual TSharedPtr<FCharacterProxy> InitialCharacterProxy(ACharacterBase* CharaterPtr)override;
-	
-	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
+	virtual TSharedPtr<FCharacterProxy> InitialCharacterProxy(
+		ACharacterBase* CharaterPtr
+		) override;
+
+	virtual void OnSelfGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
+
+	virtual void OnPlayerGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
 
 	UFUNCTION()
 	void OnRep_GroupManagger();
 
 	UFUNCTION()
-	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
+	void OnPerceptionUpdated(
+		const TArray<AActor*>& UpdatedActors
+		);
 
 	UFUNCTION()
-	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+	void OnTargetPerceptionUpdated(
+		AActor* Actor,
+		FAIStimulus Stimulus
+		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_GroupManagger)
 	TObjectPtr<AGroupManagger> GroupManaggerPtr = nullptr;
 
 private:
-
-	void LimitViewYaw(FRotator& ViewRotation, float InViewYawMin, float InViewYawMax);
-
+	void LimitViewYaw(
+		FRotator& ViewRotation,
+		float InViewYawMin,
+		float InViewYawMax
+		);
 };

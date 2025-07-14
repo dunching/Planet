@@ -45,7 +45,11 @@ public:
 
 	virtual void BeginPlay() override;
 
-	virtual void OnGroupManaggerReady(
+	virtual void OnSelfGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
+
+	virtual void OnPlayerGroupManaggerReady(
 		AGroupManagger* NewGroupSharedInfoPtr
 		) override;
 
@@ -70,14 +74,13 @@ public:
 		);
 
 	bool GetCheerOn() const;
+
+	void SetCustomCustomTeammateOption(ETeammateOption InCustomTeammateOption );
+	
+	ETeammateOption GetCustomCustomTeammateOption()const;
 	
 #pragma region RPC
 #pragma endregion
-
-#if WITH_EDITORONLY_DATA
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn")
-	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
-#endif
 
 	/**
 	 * 跟随前进的点
@@ -109,6 +112,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Allocation")
 	FGameplayTag ActiveSkillSet_2;
 #pragma endregion
+
+	/**
+	 * 这个AI的行为模式
+	 * 若为kNone则使用UTeamMatesHelperComponent上的类型
+	 */
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pawn")
+	ETeammateOption CustomTeammateOption = ETeammateOption::kNone;
 
 	/**
 	 * 是否处于掠阵状态

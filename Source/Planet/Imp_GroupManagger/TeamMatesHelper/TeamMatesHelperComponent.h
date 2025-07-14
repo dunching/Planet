@@ -157,6 +157,8 @@ protected:
 		) const override;
 
 private:
+	virtual void OnRep_MembersIDSet() override;
+
 	/**
 	 * 更新感知到的目标
 	 * 移除无效的感知到的目标

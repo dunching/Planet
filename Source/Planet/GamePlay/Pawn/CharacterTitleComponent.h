@@ -47,8 +47,14 @@ public:
 		FActorComponentTickFunction* ThisTickFunction
 	) override;
 
-	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
+	virtual void OnSelfGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
+	virtual void OnPlayerGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
+
+	void UpdateTitle();
+	
 	void SetCampType(ECharacterCampType CharacterCampType);
 
 	virtual void DisplaySentence(

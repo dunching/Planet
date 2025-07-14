@@ -241,6 +241,14 @@ public:
 #pragma endregion
 
 public:
+	virtual void OnSelfGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
+
+	virtual void OnPlayerGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
+
 	// 对“其他”角色造成的影响（伤害、控制）
 	UFUNCTION(NetMulticast, Reliable)
 	void OnEffectOhterCharacter(
@@ -252,10 +260,6 @@ public:
 	void OnReceivedOhterCharacter(
 		const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 		);
-
-	virtual void OnGroupManaggerReady(
-		AGroupManagger* NewGroupSharedInfoPtr
-		) override;
 
 	void OnGEAppliedDelegateToTarget(
 		UAbilitySystemComponent*,

@@ -43,7 +43,7 @@ EStateTreeRunStatus FSTT_GuideThreadSpwanNPCColony::EnterState(
 		);
 		if (PCPtr)
 		{
-			PCPtr->ServerSpawnGeneratorActor(
+			PCPtr->SpawnGeneratorActor_Server(
 				PAD->ActorPtr
 			);
 		}

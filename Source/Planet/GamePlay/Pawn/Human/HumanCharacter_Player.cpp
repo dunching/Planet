@@ -345,11 +345,11 @@ void AHumanCharacter_Player::OnRep_GroupManagger()
 #endif
 }
 
-void AHumanCharacter_Player::OnGroupManaggerReady(
+void AHumanCharacter_Player::OnSelfGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
 	)
 {
-	Super::OnGroupManaggerReady(NewGroupSharedInfoPtr);
+	Super::OnSelfGroupManaggerReady(NewGroupSharedInfoPtr);
 
 	GetPlayerComponent()->OnPlayerDataIsOk();
 	GetPlayerComponent()->OnLocalPlayerDataIsOk();

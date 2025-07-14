@@ -93,7 +93,13 @@ void UInventoryComponent::BeginPlay()
 #endif
 }
 
-void UInventoryComponent::OnGroupManaggerReady(
+void UInventoryComponent::OnSelfGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
+{
+}
+
+void UInventoryComponent::OnPlayerGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
 	)
 {

@@ -50,8 +50,6 @@ public:
 
 	void SetCampType(ECharacterCampType CharacterCampType);
 
-	virtual UAIPerceptionComponent* GetAIPerceptionComponent() ;
-
 	UCharacterTitle* AIHumanInfoPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)

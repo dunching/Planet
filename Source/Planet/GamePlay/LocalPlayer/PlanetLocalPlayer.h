@@ -24,4 +24,8 @@ public:
 	
 	virtual void PlayerAdded(class UGameViewportClient* InViewportClient, FPlatformUserId InUserId) override;
 	
+#pragma region RPC
+
+#pragma endregion
+
 };

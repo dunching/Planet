@@ -39,45 +39,62 @@ class PLANET_API AHumanAIController :
 	GENERATED_BODY()
 
 public:
-
 	using FCharacterProxyType = FCharacterProxy;
 
 	using FPawnType = AHumanCharacter_AI;
 
 	using FTeamHelperChangedDelegate =
-		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+	TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
-	using FTeammateOptionChangedDelegate = 
-		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr < FCharacterProxyType>&)>::FCallbackHandleSPtr;
+	using FTeammateOptionChangedDelegate =
+	TCallbackHandleContainer<void(
+		ETeammateOption,
+		const TSharedPtr<FCharacterProxyType>&
+		)>::FCallbackHandleSPtr;
 
-	AHumanAIController(const FObjectInitializer& ObjectInitializer);
+	AHumanAIController(
+		const FObjectInitializer& ObjectInitializer
+		);
 
-	virtual void SetGroupSharedInfo(AGroupManagger*GroupManaggerPtr) override;
+	virtual void SetGroupSharedInfo(
+		AGroupManagger* GroupManaggerPtr
+		) override;
 
-	virtual UAIPerceptionComponent* GetAIPerceptionComponent();
-
-	virtual TObjectPtr<UAIControllerStateTreeAIComponent> GetStateTreeAIComponent()const;
+	virtual TObjectPtr<UAIControllerStateTreeAIComponent> GetStateTreeAIComponent() const;
 
 protected:
-
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+		) const override;
 
 	void OnTeammateOptionChangedImp(
 		ETeammateOption TeammateOption,
-		const TSharedPtr < FCharacterProxyType>& LeaderCharacterProxyPtr
-	);
+		const TSharedPtr<FCharacterProxyType>& LeaderCharacterProxyPtr
+		);
 
-	virtual void OnConstruction(const FTransform& Transform)override;
+	virtual void OnConstruction(
+		const FTransform& Transform
+		) override;
 
 	virtual void BeginPlay() override;
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void EndPlay(
+		const EEndPlayReason::Type EndPlayReason
+		) override;
 
-	virtual void OnPossess(APawn* InPawn)override;
+	virtual void OnPossess(
+		APawn* InPawn
+		) override;
 
 	virtual void OnUnPossess() override;
 
-	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
+	virtual void OnSelfGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
+
+	virtual void OnPlayerGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
 
 	void OnGroupChanged();
 
@@ -99,8 +116,4 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TObjectPtr<UAIControllerStateTreeAIComponent> StateTreeAIComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-	TObjectPtr<UAIPerceptionComponent> AIPerceptionComponentPtr = nullptr;
-
 };

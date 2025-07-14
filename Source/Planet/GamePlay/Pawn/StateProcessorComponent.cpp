@@ -103,7 +103,7 @@ void UStateProcessorComponent::GetLifetimeReplicatedProps(
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
-void UStateProcessorComponent::OnGroupManaggerReady(
+void UStateProcessorComponent::OnSelfGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
 	)
 {
@@ -121,6 +121,12 @@ void UStateProcessorComponent::OnGroupManaggerReady(
 			 &ThisClass::OnGameplayEffectTagCountChanged
 			);
 	}
+}
+
+void UStateProcessorComponent::OnPlayerGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
+{
 }
 
 void UStateProcessorComponent::RemoveGetOrientFunc(

@@ -31,6 +31,7 @@ public class Planet : ModuleRules
 		PublicIncludePaths.Add("Planet");
 		PublicIncludePaths.Add("Planet/OpenWorld");
 		PublicIncludePaths.Add("Planet/GamePlay");
+		PublicIncludePaths.Add("Planet/GamePlay/LocalPlayer");
 		PublicIncludePaths.Add("Planet/GamePlay/GameplayCamera");
 		PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem");
 		PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/GameplayEffectDataModify");

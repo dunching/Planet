@@ -6,6 +6,7 @@
 #include <IXRTrackingSystem.h>
 #include <IXRCamera.h>
 
+#include "AIComponent.h"
 #include "AssetRefMap.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
@@ -30,6 +31,7 @@
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
 #include "CharacterAbilitySystemComponent.h"
+#include "CharacterTitleComponent.h"
 #include "HumanCharacter_Player.h"
 #include "KismetGravityLibrary.h"
 #include "CollisionDataStruct.h"
@@ -83,14 +85,49 @@ APlanetPlayerController::APlanetPlayerController(
 	bAutoManageActiveCameraTarget = false;
 }
 
-void APlanetPlayerController::ServerSpawnGeneratorActor_Implementation(
+void APlanetPlayerController::CloneCharacter_Server_Implementation(
+	const FGuid& ID,
+	const FTransform& Transform,
+	ETeammateOption TeammateOption
+	)
+{
+	FActorSpawnParameters SpawnParameters;
+
+	SpawnParameters.Owner = this;
+	SpawnParameters.CustomPreSpawnInitalization = [this, ID, TeammateOption](
+		auto ActorPtr
+		)
+		{
+			auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
+			if (AICharacterPtr)
+			{
+				AICharacterPtr->GetAIComponent()->SetCustomCustomTeammateOption(TeammateOption);
+				
+				AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(ID);
+
+				AICharacterPtr->SetGroupSharedInfo(GroupManaggerPtr);
+			}
+		};
+
+	auto Result =
+		GetWorld()->SpawnActor<AHumanCharacter_AI>(
+		                                           UAssetRefMap::GetInstance()->CopyCharacterClass,
+		                                           Transform,
+		                                           SpawnParameters
+		                                          );
+	if (Result)
+	{
+	}
+}
+
+void APlanetPlayerController::SpawnGeneratorActor_Server_Implementation(
 	const TSoftObjectPtr<AGeneratorColony_ByInvoke>& GeneratorBasePtr
 	)
 {
 	GeneratorBasePtr->SpawnGeneratorActor();
 }
 
-void APlanetPlayerController::ServerDestroyActor_Implementation(
+void APlanetPlayerController::DestroyActor_Server_Implementation(
 	AActor* ActorPtr
 	)
 {
@@ -100,7 +137,7 @@ void APlanetPlayerController::ServerDestroyActor_Implementation(
 	}
 }
 
-void APlanetPlayerController::ServerSpawnCharacterAry_Implementation(
+void APlanetPlayerController::SpawnCharacterAry_Server_Implementation(
 	const TArray<TSubclassOf<AHumanCharacter_AI>>& CharacterClassAry,
 	const TArray<FGuid>& IDAry,
 	const TArray<FTransform>& TransformAry,
@@ -166,7 +203,7 @@ void APlanetPlayerController::ServerSpawnCharacterAry_Implementation(
 	}
 }
 
-void APlanetPlayerController::ServerSpawnCharacter_Implementation(
+void APlanetPlayerController::SpawnCharacter_Server_Implementation(
 	TSubclassOf<AHumanCharacter_AI> CharacterClass,
 	const FGuid& ID,
 	const FTransform& Transform,
@@ -182,7 +219,9 @@ void APlanetPlayerController::ServerSpawnCharacter_Implementation(
 			auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
 			if (AICharacterPtr)
 			{
+				AICharacterPtr->GetAIComponent()->bIsTeammate = true;
 				AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(ID);
+				AICharacterPtr->SetGroupSharedInfo(GetGroupManagger());
 			}
 		};
 
@@ -198,7 +237,7 @@ void APlanetPlayerController::ServerSpawnCharacter_Implementation(
 	}
 }
 
-inline void APlanetPlayerController::ServerSpawnCharacterByProxyType_Implementation(
+inline void APlanetPlayerController::SpawnCharacterByProxyType_Server_Implementation(
 	const FGameplayTag& CharacterProxyType,
 	const FTransform& Transform
 	)
@@ -646,7 +685,7 @@ void APlanetPlayerController::OnRep_PlayerState()
 	GetPawn<FPawnType>()->GetPlayerComponent()->OnLocalPlayerDataIsOk();
 }
 
-void APlanetPlayerController::OnGroupManaggerReady(
+void APlanetPlayerController::OnSelfGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
 	)
 {
@@ -663,6 +702,30 @@ void APlanetPlayerController::OnGroupManaggerReady(
 	}
 #endif
 
+	// 确认现有的NPC与Player的关系
+	TArray<AActor*> OutActors;
+	UGameplayStatics::GetAllActorsOfClass(this, AHumanCharacter_AI::StaticClass(), OutActors);
+	for (auto Iter : OutActors)
+	{
+		auto CharacterPtr = Cast<AHumanCharacter_AI>(Iter);
+		if (CharacterPtr)
+		{
+			CharacterPtr->ForEachComponent(
+							 false,
+							 [this](
+							 UActorComponent* ComponentPtr
+							 )
+							 {
+								 auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
+								 if (GroupSharedInterfacePtr)
+								 {
+									 GroupSharedInterfacePtr->OnPlayerGroupManaggerReady(GroupManaggerPtr);
+								 }
+							 }
+							);
+		}
+	}
+	
 	ForEachComponent(
 	                 false,
 	                 [this](
@@ -672,10 +735,16 @@ void APlanetPlayerController::OnGroupManaggerReady(
 		                 auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
 		                 if (GroupSharedInterfacePtr)
 		                 {
-			                 GroupSharedInterfacePtr->OnGroupManaggerReady(GroupManaggerPtr);
+			                 GroupSharedInterfacePtr->OnSelfGroupManaggerReady(GroupManaggerPtr);
 		                 }
 	                 }
 	                );
+}
+
+void APlanetPlayerController::OnPlayerGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
+{
 }
 
 void APlanetPlayerController::ResetGroupmateProxy(
@@ -809,18 +878,18 @@ void APlanetPlayerController::SetCharacterAttributeTemporaryValue_Implementation
 	auto GASPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 	auto SpecHandle = GASPtr->MakeOutgoingSpec(
-											   UAssetRefMap::GetInstance()->OnceGEClass,
-											   1,
-											   GASPtr->MakeEffectContext()
-											  );
+	                                           UAssetRefMap::GetInstance()->OnceGEClass,
+	                                           1,
+	                                           GASPtr->MakeEffectContext()
+	                                          );
 
 	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary_Data_Override);
 	SpecHandle.Data.Get()->AddDynamicAssetTag(FGameplayTag::RequestGameplayTag(*Args[0]));
 
 	SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-												  UGameplayTagsLibrary::DataSource_Character ,
-												   UKismetStringLibrary::Conv_StringToInt(Args[1])
-												  );
+	                                               UGameplayTagsLibrary::DataSource_Character,
+	                                               UKismetStringLibrary::Conv_StringToInt(Args[1])
+	                                              );
 
 	const auto GEHandle = GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	if (!GEHandle.IsValid())
@@ -1444,7 +1513,7 @@ void APlanetPlayerController::InitialGroupSharedInfo()
 		                                                                 SpawnParameters
 		                                                                );
 
-		OnGroupManaggerReady(GroupManaggerPtr);
+		OnSelfGroupManaggerReady(GroupManaggerPtr);
 	}
 #endif
 }
@@ -1540,8 +1609,8 @@ void APlanetPlayerController::MakeTrueDamegeInArea_Implementation(
 	                                         Params
 	                                        ))
 	{
-		TSet<AHumanCharacter*>TargetSet;
-		
+		TSet<AHumanCharacter*> TargetSet;
+
 		for (const auto& Iter : OutHit)
 		{
 			auto TargetCharacterPtr = Cast<AHumanCharacter>(Iter.GetActor());
@@ -1550,17 +1619,17 @@ void APlanetPlayerController::MakeTrueDamegeInArea_Implementation(
 				TargetSet.Add(TargetCharacterPtr);
 			}
 		}
-		
+
 		for (const auto& Iter : TargetSet)
 		{
 			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 			auto ASCPtr = Iter->GetCharacterAbilitySystemComponent();
 			FGameplayEffectSpecHandle SpecHandle =
 				ICPtr->MakeOutgoingSpec(
-										UAssetRefMap::GetInstance()->OnceGEClass,
-										1,
-										ICPtr->MakeEffectContext()
-									   );
+				                        UAssetRefMap::GetInstance()->OnceGEClass,
+				                        1,
+				                        ICPtr->MakeEffectContext()
+				                       );
 
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Permanent_Addtive);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
@@ -1569,9 +1638,9 @@ void APlanetPlayerController::MakeTrueDamegeInArea_Implementation(
 			int32 Damege = 0;
 			LexFromString(Damege, *Args[0]);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-														   UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal,
-														   Damege
-														  );
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal,
+			                                               Damege
+			                                              );
 
 			CharacterPtr->GetCharacterAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(
 				 *SpecHandle.Data.Get(),
@@ -1684,7 +1753,7 @@ void APlanetPlayerController::OnRep_GroupManagger()
 		return;
 	}
 
-	OnGroupManaggerReady(GroupManaggerPtr);
+	OnSelfGroupManaggerReady(GroupManaggerPtr);
 
 	// auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	// if (PlayerCharacterPtr)
@@ -1696,6 +1765,12 @@ void APlanetPlayerController::OnRep_GroupManagger()
 }
 
 void APlanetPlayerController::OnRep_WolrdProcess()
+{
+}
+
+void APlanetPlayerController::BindOnFocusRemove(
+	AActor* Actor
+	)
 {
 }
 

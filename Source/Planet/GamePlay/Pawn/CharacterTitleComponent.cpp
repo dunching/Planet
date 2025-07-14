@@ -51,15 +51,35 @@ void UCharacterTitleComponent::TickComponent(
 #endif
 }
 
-void UCharacterTitleComponent::OnGroupManaggerReady(
+void UCharacterTitleComponent::OnSelfGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
 	)
 {
 #if UE_EDITOR || UE_CLIENT
 	if (GetOwnerRole() < ROLE_Authority)
 	{
-		auto OwnerCharacterOtr = GetOwner<FOwnerType>();
+		UpdateTitle();
+	}
+#endif
+}
 
+void UCharacterTitleComponent::OnPlayerGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetOwnerRole() < ROLE_Authority)
+	{
+		UpdateTitle();
+	}
+#endif
+}
+
+void UCharacterTitleComponent::UpdateTitle()
+{
+	auto OwnerCharacterOtr = GetOwner<FOwnerType>();
+	if (OwnerCharacterOtr->GetCharacterProxy())
+	{
 		float Radius = 0.f;
 		OwnerCharacterOtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
 
@@ -77,7 +97,10 @@ void UCharacterTitleComponent::OnGroupManaggerReady(
 			// }
 		}
 	}
-#endif
+	else
+	{
+		// checkNoEntry()
+	}
 }
 
 void UCharacterTitleComponent::SetCampType(

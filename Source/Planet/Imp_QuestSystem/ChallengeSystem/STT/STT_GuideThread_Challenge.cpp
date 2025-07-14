@@ -226,7 +226,7 @@ void FSTT_GuideThread_Challenge_SpawnNPCs::ExitState(
 			{
 				if (Iter)
 				{
-					PCPtr->ServerDestroyActor(Iter);
+					PCPtr->DestroyActor_Server(Iter);
 				}
 			}
 			InstanceData.GloabVariable_Challenge->TemporaryActorAry.Empty();
@@ -260,7 +260,7 @@ bool FSTT_GuideThread_Challenge_SpawnNPCs::SpawnNPC(
 				{
 					InstanceData.CharacterIDAry[Index] = FGuid::NewGuid();
 				}
-				PCPtr->ServerSpawnCharacterAry(
+				PCPtr->SpawnCharacterAry_Server(
 											NPCAry,
 											InstanceData.CharacterIDAry,
 											Pts,

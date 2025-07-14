@@ -311,7 +311,14 @@ void AHumanCharacter_AI::SetGroupSharedInfo(
 	// 	ControllerPtr->SetGroupSharedInfo(InGroupSharedInfoPtr);
 	// }
 
-	// OnGroupManaggerReady(GroupManaggerPtr);
+	// OnSelfGroupManaggerReady(GroupManaggerPtr);
+}
+
+void AHumanCharacter_AI::OnPlayerGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
+{
+	Super::OnPlayerGroupManaggerReady(NewGroupSharedInfoPtr);
 }
 
 void AHumanCharacter_AI::SetCharacterID(
@@ -343,11 +350,11 @@ void AHumanCharacter_AI::OnRep_GroupManagger()
 // 	return GetGroupManagger()->GetInventoryComponent()->FindProxy_Character(CharacterID);
 // }
 
-void AHumanCharacter_AI::OnGroupManaggerReady(
+void AHumanCharacter_AI::OnSelfGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
 )
 {
-	Super::OnGroupManaggerReady(NewGroupSharedInfoPtr);
+	Super::OnSelfGroupManaggerReady(NewGroupSharedInfoPtr);
 
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)

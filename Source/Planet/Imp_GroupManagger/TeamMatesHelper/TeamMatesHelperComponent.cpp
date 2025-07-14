@@ -11,6 +11,7 @@
 #include "CharacterBase.h"
 #include "HumanCharacter.h"
 #include "CharacterTitle.h"
+#include "CharacterTitleComponent.h"
 #include "HumanAIController.h"
 #include "PlanetControllerInterface.h"
 #include "PlanetPlayerState.h"
@@ -26,6 +27,7 @@
 #include "GroupManagger.h"
 #include "ItemProxy_Character.h"
 #include "ModifyItemProxyStrategy.h"
+#include "PlanetPlayerController.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> GroupMnaggerComponent_KnowCharaterChanged(
@@ -117,7 +119,12 @@ void UTeamMatesHelperComponent::UpdateTeammateConfig_Server_Implementation(
 
 void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 {
-	auto PlayerCharacterPtr = UGameplayStatics::GetPlayerCharacter(this, 0);
+	const auto OwnerPtr = GetOwner<FOwnerType>();
+
+	// 挂载在PlayerController上的
+	auto PCPtr = Cast<APlanetPlayerController>(OwnerPtr->GetOwner());
+
+	auto PlayerCharacterPtr = PCPtr->GetCharacter();
 	if (!PlayerCharacterPtr)
 	{
 		return;
@@ -128,7 +135,6 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 
 	FTransform Transform;
 
-	const auto OwnerPtr = GetOwner<FOwnerType>();
 	const auto CharactersAry = TeamConfigure.GetCharactersAry();
 	for (int32 Index = 0; Index < CharactersAry.Num(); Index++)
 	{
@@ -141,7 +147,7 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 			if (CharacterProxySPtr)
 			{
 				Transform.SetLocation(PlayerCharacterLocation + (PlayerCharacterRotation.Vector() * 100));
-				auto AICharacterPtr = CharacterProxySPtr->SpwanCharacter(Transform);
+				auto AICharacterPtr = CharacterProxySPtr->SpwanCharacter(PCPtr, Transform);
 				if (AICharacterPtr)
 				{
 					// AICharacterPtr->SetGroupSharedInfo(OwnerPtr);
@@ -345,6 +351,24 @@ void UTeamMatesHelperComponent::GetLifetimeReplicatedProps(
 
 	DOREPLIFETIME_CONDITION(ThisClass, ForceKnowCharater, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, MembersIDSet, COND_None);
+}
+
+void UTeamMatesHelperComponent::OnRep_MembersIDSet()
+{
+	Super::OnRep_MembersIDSet();
+
+	// 确认现有的NPC与Player的关系
+	TArray<AActor*> OutActors;
+	UGameplayStatics::GetAllActorsOfClass(this, AHumanCharacter_AI::StaticClass(), OutActors);
+	for (auto Iter : OutActors)
+	{
+		auto CharacterPtr = Cast<AHumanCharacter_AI>(Iter);
+		if (CharacterPtr)
+		{
+			CharacterPtr->GetCharacterTitleComponent()->UpdateTitle();
+			CharacterPtr->GetCharacterAttributesComponent()->UpdateCampType();
+		}
+	}
 }
 
 void UTeamMatesHelperComponent::TeammateCharacter_ActiveWeapon_Server_Implementation()

@@ -44,11 +44,6 @@ void AHorseAIController::SetCampType(ECharacterCampType CharacterCampType)
 	}
 }
 
-UAIPerceptionComponent* AHorseAIController::GetAIPerceptionComponent()
-{
-	return AIPerceptionComponentPtr;
-}
-
 void AHorseAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
 	const TSharedPtr<FCharacterProxyType>& LeaderPCPtr

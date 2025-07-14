@@ -51,38 +51,55 @@ public:
 	TCallbackHandleContainer<void()>;
 
 	using FOnCloseCombatChanged =
-	TCallbackHandleContainer<void(ACharacterBase*, bool)>;
+	TCallbackHandleContainer<void(
+		ACharacterBase*,
+		bool
+		)>;
 
-	UProxyProcessComponent(const FObjectInitializer& ObjectInitializer);
+	UProxyProcessComponent(
+		const FObjectInitializer& ObjectInitializer
+		);
 
 	virtual void InitializeComponent() override;
 
 	virtual void BeginPlay() override;
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void EndPlay(
+		const EEndPlayReason::Type EndPlayReason
+		) override;
 
 	virtual void TickComponent(
 		float DeltaTime,
 		enum ELevelTick TickType,
 		FActorComponentTickFunction* ThisTickFunction
-	) override;
+		) override;
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+		) const override;
 
-	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)override;
+	virtual void OnSelfGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
+
+	virtual void OnPlayerGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
 
 	bool ActiveAction(
 		const FGameplayTag& CanbeActivedInfoSPtr,
 		bool bIsAutomaticStop = false
-	);
+		);
 
 	virtual void CancelAction(
 		const FGameplayTag& CanbeActivedInfoSPtr
-	);
+		);
 
 	TMap<FGameplayTag, FCharacterSocket> GetAllSocket() const;
 
-	FCharacterSocket FindSocket(const FGameplayTag& SocketTag) const;
+	FCharacterSocket FindSocket(
+		const FGameplayTag& SocketTag
+		) const;
 
 	TMap<FCharacterSocket, FKey> GetCanbeActiveSocket() const;
 
@@ -92,13 +109,19 @@ public:
 
 	void UpdateCanbeActiveSkills_UsePassiveSocket(
 		const TMap<FGameplayTag, FCharacterSocket>& CanActiveSocketMap
-	);
+		);
 
-	TSharedPtr<FActiveSkillProxy> FindActiveSkillBySocket(const FGameplayTag& SocketTag) const;
+	TSharedPtr<FActiveSkillProxy> FindActiveSkillBySocket(
+		const FGameplayTag& SocketTag
+		) const;
 
-	TSharedPtr<FPassiveSkillProxy> FindPassiveSkillBySocket(const FGameplayTag& SocketTag) const;
+	TSharedPtr<FPassiveSkillProxy> FindPassiveSkillBySocket(
+		const FGameplayTag& SocketTag
+		) const;
 
-	FCharacterSocket FindActiveSkillByType(const FGameplayTag& TypeTag) const;
+	FCharacterSocket FindActiveSkillByType(
+		const FGameplayTag& TypeTag
+		) const;
 #pragma endregion
 
 #pragma region Weapon
@@ -124,24 +147,28 @@ public:
 	void GetWeaponSocket(
 		FCharacterSocket& FirstWeaponSocketInfoSPtr,
 		FCharacterSocket& SecondWeaponSocketInfoSPtr
-	);
+		);
 
 	void GetWeaponProxy(
 		TSharedPtr<FWeaponProxy>& FirstWeaponProxySPtr,
 		TSharedPtr<FWeaponProxy>& SecondWeaponProxySPtr
-	);
+		);
 
 	TSharedPtr<FWeaponSkillProxy> GetWeaponSkillByType(
 		const FGameplayTag& TypeTag
-	);
+		);
 
 	TSharedPtr<FWeaponProxy> GetActivedWeapon() const;
 
-	TSharedPtr<FWeaponProxy> FindWeaponSocket(const FGameplayTag& SocketTag) const;
+	TSharedPtr<FWeaponProxy> FindWeaponSocket(
+		const FGameplayTag& SocketTag
+		) const;
 #pragma endregion
 
 #pragma region Consumables
-	TSharedPtr<FConsumableProxy> FindConsumablesBySocket(const FGameplayTag& SocketTag) const;
+	TSharedPtr<FConsumableProxy> FindConsumablesBySocket(
+		const FGameplayTag& SocketTag
+		) const;
 #pragma endregion
 
 	FOnCurrentWeaponChanged OnCurrentWeaponChanged;
@@ -152,30 +179,49 @@ public:
 	FCharacterSocket CurrentWeaponSocket;
 
 	FOnCloseCombatChanged OnCloseCombatChanged;
-	
+
 protected:
-	
-	void Add(const FCharacterSocket& Socket);
+	void Add(
+		const FCharacterSocket& Socket
+		);
 
-	void Update(const FCharacterSocket& Socket);
+	void Update(
+		const FCharacterSocket& Socket
+		);
 
-	bool Active(const FCharacterSocket& Socket);
+	bool Active(
+		const FCharacterSocket& Socket
+		);
 
-	bool Active(const FGameplayTag& Socket);
+	bool Active(
+		const FGameplayTag& Socket
+		);
 
-	void Cancel(const FCharacterSocket& Socket);
+	void Cancel(
+		const FCharacterSocket& Socket
+		);
 
-	void Cancel(const FGameplayTag& Socket);
+	void Cancel(
+		const FGameplayTag& Socket
+		);
 
-	bool SwitchWeaponImpAndCheck(const FCharacterSocket& NewWeaponSocket);
+	bool SwitchWeaponImpAndCheck(
+		const FCharacterSocket& NewWeaponSocket
+		);
 
-	bool SwitchWeaponImp(const FCharacterSocket& NewWeaponSocket);
+	bool SwitchWeaponImp(
+		const FCharacterSocket& NewWeaponSocket
+		);
 
-	bool ActivedCorrespondingWeapon(const FGameplayTag& ActiveSkillSocketTag);
+	bool ActivedCorrespondingWeapon(
+		const FGameplayTag& ActiveSkillSocketTag
+		);
 
 #pragma region RPC
 	UFUNCTION(Server, Reliable)
-	void ActivedCorrespondingWeapon_Server(const FGameplayTag& ActiveSkillSocketTag);
+	void ActivedCorrespondingWeapon_Server(
+		const FGameplayTag& ActiveSkillSocketTag
+		);
 
 	UFUNCTION(Server, Reliable)
 	void ActiveWeapon_Server();
@@ -192,17 +238,17 @@ protected:
 	void ActiveAction_Server(
 		const FGameplayTag& SocketTag,
 		bool bIsAutomaticStop
-	);
+		);
 
 	bool ActiveActionImp(
 		const FGameplayTag& SocketTag,
 		bool bIsAutomaticStop
-	);
+		);
 
 	UFUNCTION(Server, Reliable)
 	void CancelAction_Server(
 		const FGameplayTag& SocketTag
-	);
+		);
 
 	UFUNCTION()
 	void OnRep_AllocationChanged();
@@ -214,12 +260,13 @@ protected:
 	void OnRep_IsCloseCombat();
 #pragma endregion
 
-	void SetCloseCombat(bool bIsCloseCombat_);
-	
+	void SetCloseCombat(
+		bool bIsCloseCombat_
+		);
+
 	/**
 	 * 是否处于近战状态
 	 */
 	UPROPERTY(ReplicatedUsing = OnRep_IsCloseCombat)
 	bool bIsCloseCombat = false;
-
 };

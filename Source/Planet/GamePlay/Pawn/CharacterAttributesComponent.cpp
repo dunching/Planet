@@ -14,6 +14,7 @@
 #include "AS_Character.h"
 #include "GroupManagger.h"
 #include "LogWriter.h"
+#include "PlanetPlayerController.h"
 #include "TeamMatesHelperComponent.h"
 #include "TeamMatesHelperComponentBase.h"
 
@@ -46,52 +47,26 @@ void UCharacterAttributesComponent::TickComponent(
 #endif
 }
 
-void UCharacterAttributesComponent::OnGroupManaggerReady(
+void UCharacterAttributesComponent::OnSelfGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
 	)
 {
 #if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
+	if (GetOwnerRole() < ROLE_Authority)
 	{
-		auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-		if (PlayerCharacterPtr )
-		{
-			// TODO. 这里失败时，等待这个值有了再进行一次刷新
-			if (!PlayerCharacterPtr->GetGroupManagger())
-			{
-				return;
-			}
-			
-			if (CharacterCategory.MatchesTag(UGameplayTagsLibrary::Proxy_Character_Player))
-			{
-				// 确认跟当前玩家的关系
-				const auto bIsMember = PlayerCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->IsMember(
-					 CharacterID
-					);
+		UpdateCampType();
+	}
+#endif
+}
 
-				auto CharacterPtr = GetOwner<FOwnerType>();
-				CharacterPtr->SetCampType(
-				                          bIsMember ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
-				                         );
-			}
-			else if (CharacterCategory.MatchesTag(UGameplayTagsLibrary::Proxy_Character_NPC_Functional))
-			{
-				auto CharacterPtr = GetOwner<FOwnerType>();
-				CharacterPtr->SetCampType(ECharacterCampType::kNeutral);
-			}
-			else if (CharacterCategory.MatchesTag(UGameplayTagsLibrary::Proxy_Character_NPC_Assistional))
-			{
-				// 确认跟当前玩家的关系
-				const auto bIsMember = PlayerCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->IsMember(
-					 CharacterID
-					);
-
-				auto CharacterPtr = GetOwner<FOwnerType>();
-				CharacterPtr->SetCampType(
-				                          bIsMember ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
-				                         );
-			}
-		}
+void UCharacterAttributesComponent::OnPlayerGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetOwnerRole() < ROLE_Authority)
+	{
+		UpdateCampType();
 	}
 #endif
 }
@@ -146,6 +121,56 @@ void UCharacterAttributesComponent::SetCharacterID(
 FGuid UCharacterAttributesComponent::GetCharacterID() const
 {
 	return CharacterID;
+}
+
+void UCharacterAttributesComponent::UpdateCampType()
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		auto PCPtr = Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
+		if (PCPtr )
+		{
+			auto GroupManagger = PCPtr->GetGroupManagger();
+			
+			// TODO. 这里失败时，等待这个值有了再进行一次刷新
+			if (!GroupManagger)
+			{
+				return;
+			}
+			
+			if (CharacterCategory.MatchesTag(UGameplayTagsLibrary::Proxy_Character_Player))
+			{
+				// 确认跟当前玩家的关系
+				const auto bIsMember = GroupManagger->GetTeamMatesHelperComponent()->IsMember(
+					 CharacterID
+					);
+
+				auto CharacterPtr = GetOwner<FOwnerType>();
+				CharacterPtr->SetCampType(
+										  bIsMember ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+										 );
+			}
+			else if (CharacterCategory.MatchesTag(UGameplayTagsLibrary::Proxy_Character_NPC_Functional))
+			{
+				auto CharacterPtr = GetOwner<FOwnerType>();
+				CharacterPtr->SetCampType(ECharacterCampType::kNeutral);
+			}
+			else if (CharacterCategory.MatchesTag(UGameplayTagsLibrary::Proxy_Character_NPC_Assistional))
+			{
+				// 确认跟当前玩家的关系
+				const auto bIsMember = GroupManagger->GetTeamMatesHelperComponent()->IsMember(
+					 CharacterID
+					);
+
+				auto CharacterPtr = GetOwner<FOwnerType>();
+				CharacterPtr->SetCampType(
+										  bIsMember ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+										 );
+			}
+		}
+	}
+#endif
 }
 
 FName UCharacterAttributesComponent::ComponentName = TEXT("CharacterAttributesComponent");

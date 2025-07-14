@@ -36,7 +36,7 @@ AHumanAIController::AHumanAIController(
 	StateTreeAIComponentPtr = CreateDefaultSubobject<UAIControllerStateTreeAIComponent>(
 		UAIControllerStateTreeAIComponent::ComponentName
 	);
-	AIPerceptionComponentPtr = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
+	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 
 	// 设置这个之后BP不能保存？
 	InitialSenseConfig();
@@ -61,7 +61,7 @@ void AHumanAIController::InitialSenseConfig()
 	SightConfig->DetectionByAffiliation.bDetectEnemies = 1;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = 1;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = 1;
-	AIPerceptionComponentPtr->ConfigureSense(*SightConfig);
+	PerceptionComponent->ConfigureSense(*SightConfig);
 }
 
 void AHumanAIController::InitialAllocations()
@@ -71,11 +71,6 @@ void AHumanAIController::InitialAllocations()
 	{
 		return;
 	}
-}
-
-UAIPerceptionComponent* AHumanAIController::GetAIPerceptionComponent()
-{
-	return AIPerceptionComponentPtr;
 }
 
 TObjectPtr<UAIControllerStateTreeAIComponent> AHumanAIController::GetStateTreeAIComponent() const
@@ -226,9 +221,16 @@ void AHumanAIController::InitialAIConony()
 	}
 }
 
-void AHumanAIController::OnGroupManaggerReady(
+void AHumanAIController::OnSelfGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
 )
 {
-	Super::OnGroupManaggerReady(NewGroupSharedInfoPtr);
+	Super::OnSelfGroupManaggerReady(NewGroupSharedInfoPtr);
+}
+
+void AHumanAIController::OnPlayerGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
+{
+	Super::OnPlayerGroupManaggerReady(NewGroupSharedInfoPtr);
 }

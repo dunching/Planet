@@ -73,7 +73,7 @@ void APlanetAIController::SetGroupSharedInfo(
 {
 	GroupManaggerPtr = InGroupSharedInfoPtr;
 
-	OnGroupManaggerReady(GroupManaggerPtr);
+	OnSelfGroupManaggerReady(GroupManaggerPtr);
 }
 
 UInventoryComponent* APlanetAIController::GetInventoryComponent() const
@@ -152,7 +152,7 @@ TSharedPtr<FCharacterProxy> APlanetAIController::InitialCharacterProxy(
 	return CharaterPtr->GetCharacterProxy();
 }
 
-void APlanetAIController::OnGroupManaggerReady(
+void APlanetAIController::OnSelfGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
 	)
 {
@@ -165,15 +165,21 @@ void APlanetAIController::OnGroupManaggerReady(
 		                 auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
 		                 if (GroupSharedInterfacePtr)
 		                 {
-			                 GroupSharedInterfacePtr->OnGroupManaggerReady(GroupManaggerPtr);
+			                 GroupSharedInterfacePtr->OnSelfGroupManaggerReady(GroupManaggerPtr);
 		                 }
 	                 }
 	                );
 }
 
+void APlanetAIController::OnPlayerGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
+{
+}
+
 void APlanetAIController::OnRep_GroupManagger()
 {
-	OnGroupManaggerReady(GroupManaggerPtr);
+	OnSelfGroupManaggerReady(GroupManaggerPtr);
 }
 
 void APlanetAIController::OnTargetPerceptionUpdated(

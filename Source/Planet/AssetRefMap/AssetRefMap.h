@@ -67,6 +67,12 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "PawnClass")
 	TSubclassOf<AHumanCharacter>HumanClass;
 	
+	/**
+	 * 复制体的类型
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "PawnClass")
+	TSubclassOf<AHumanCharacter_AI>CopyCharacterClass;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "PawnClass")
 	TSubclassOf<AHumanCharacter>TestNPC_HumanClass;
 
