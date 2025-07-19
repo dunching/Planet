@@ -22,7 +22,7 @@ class PLANET_API AGeneratorColony_ByInvoke : public APlanetGenerator
 	GENERATED_BODY()
 
 public:
-
+	
 	AGeneratorColony_ByInvoke(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;

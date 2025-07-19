@@ -18,6 +18,7 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GameOptions.h"
+#include "GroupManagger_Player.h"
 #include "InputProcessorSubSystem_Imp.h"
 #include "MainHUDLayout.h"
 #include "OpenWorldDataLayer.h"
@@ -935,7 +936,7 @@ EStateTreeRunStatus FSTT_GuideThread_SpawnNPC::EnterState(
 		                                                       ).Quaternion()
 		                     );
 
-		PCPtr->SpawnCharacter_Server(
+		PCPtr->GetGroupManagger_Player()->SpawnCharacter_Server(
 		                            InstanceData.NPCClass,
 		                            InstanceData.NPC_ID,
 		                            Transform,
@@ -1098,7 +1099,7 @@ void FSTT_GuideThread_AttckCharacter::ExitState(
 			APlanetPlayerController>(UGameplayStatics::GetPlayerController(InstanceData.GuideThreadActorPtr, 0));
 		if (PCPtr)
 		{
-			PCPtr->DestroyActor_Server(InstanceData.HumanCharacterAI);
+			PCPtr->GetGroupManagger_Player()->DestroyActor_Server(InstanceData.HumanCharacterAI);
 		}
 	}
 

@@ -45,6 +45,8 @@ class GROUPMANAGGER_API AGroupManaggerBase:
 
 public:
 
+	static FName ComponentName;
+
 	AGroupManaggerBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;

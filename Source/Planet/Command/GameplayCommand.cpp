@@ -9,6 +9,7 @@
 #include "PlanetPlayerController.h"
 #include "ChallengeSystem.h"
 #include "GroupManagger.h"
+#include "GroupManagger_Player.h"
 #include "QuestSubSystem.h"
 #include "HumanViewSetting.h"
 #include "HumanViewTalentAllocation.h"
@@ -29,7 +30,8 @@ void GameplayCommand::CloneCharacter()
 		auto Rot = PCPtr->GetControlRotation().Quaternion();
 		auto Transform = PCPtr->GetPawn()->GetTransform();
 		Transform.AddToTranslation( Rot.GetAxisY() * 100);
-		PlanetLocalPlayerPtr->CloneCharacter_Server(FGuid::NewGuid(), Transform,ETeammateOption::kAssistance);
+
+		PlanetLocalPlayerPtr->GetGroupManagger_Player()->CloneCharacter_Server(FGuid::NewGuid(), Transform,ETeammateOption::kAssistance);
 	}
 }
 
@@ -142,7 +144,7 @@ void GameplayCommand::ServerSpawnCharacterByProxyType(
 			UKismetMathLibrary::MakeRotFromZX(FVector::UpVector, -PCPtr->GetPawn()->GetActorForwardVector()).Quaternion()
 			                     );
 
-			PCPtr->SpawnCharacterByProxyType_Server(FGameplayTag::RequestGameplayTag(*Args[0]), Transform);
+			PCPtr->GetGroupManagger_Player()->SpawnCharacterByProxyType_Server(FGameplayTag::RequestGameplayTag(*Args[0]), Transform);
 		}
 	}
 }

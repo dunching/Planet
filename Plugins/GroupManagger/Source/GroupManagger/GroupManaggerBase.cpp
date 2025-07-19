@@ -4,6 +4,9 @@
 #include "TeamMatesHelperComponentBase.h"
 #include "UGSAbilitySystemComponent.h"
 
+
+FName AGroupManaggerBase::ComponentName = TEXT("GroupManagger");
+
 AGroupManaggerBase::AGroupManaggerBase(
 	const FObjectInitializer& ObjectInitializer
 ):

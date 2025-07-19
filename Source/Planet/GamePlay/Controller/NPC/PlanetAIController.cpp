@@ -16,6 +16,7 @@
 #include "GameplayTagsLibrary.h"
 #include "KismetGravityLibrary.h"
 #include "GroupManagger.h"
+#include "GroupManagger_Player.h"
 #include "LogWriter.h"
 #include "TeamMatesHelperComponent.h"
 #include "Components/SplineComponent.h"

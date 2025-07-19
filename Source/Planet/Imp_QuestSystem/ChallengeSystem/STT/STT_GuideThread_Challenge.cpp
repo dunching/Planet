@@ -3,6 +3,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "CharacterAbilitySystemComponent.h"
+#include "GroupManagger_Player.h"
 #include "GuideThreadChallenge.h"
 #include "HumanCharacter_AI.h"
 #include "HumanCharacter_Player.h"
@@ -226,7 +227,7 @@ void FSTT_GuideThread_Challenge_SpawnNPCs::ExitState(
 			{
 				if (Iter)
 				{
-					PCPtr->DestroyActor_Server(Iter);
+					PCPtr->GetGroupManagger_Player()->DestroyActor_Server(Iter);
 				}
 			}
 			InstanceData.GloabVariable_Challenge->TemporaryActorAry.Empty();
@@ -260,7 +261,7 @@ bool FSTT_GuideThread_Challenge_SpawnNPCs::SpawnNPC(
 				{
 					InstanceData.CharacterIDAry[Index] = FGuid::NewGuid();
 				}
-				PCPtr->SpawnCharacterAry_Server(
+				PCPtr->GetGroupManagger_Player()->SpawnCharacterAry_Server(
 											NPCAry,
 											InstanceData.CharacterIDAry,
 											Pts,

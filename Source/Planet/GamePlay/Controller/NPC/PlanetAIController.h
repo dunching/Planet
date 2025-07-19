@@ -19,6 +19,7 @@ class UInventoryComponent;
 class UTalentAllocationComponent;
 class UTeamMatesHelperComponent;
 class AGroupManagger;
+class AGroupManagger_Player;
 class USplineComponent;
 
 

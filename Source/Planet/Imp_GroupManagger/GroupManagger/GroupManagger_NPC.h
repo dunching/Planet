@@ -18,6 +18,7 @@ class AGeneratorNPCs_Patrol;
 class ABuildingArea;
 
 /*
+ * 
  */
 UCLASS()
 class PLANET_API AGroupManagger_NPC :

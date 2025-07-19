@@ -27,6 +27,7 @@ class UTalentAllocationComponent;
 class UTeamMatesHelperComponent;
 class UEventSubjectComponent;
 class AGroupManagger;
+class AGroupManagger_Player;
 class AGeneratorColony_ByTime;
 class AGeneratorBase;
 class AGeneratorColony_ByInvoke;
@@ -55,6 +56,8 @@ public:
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	virtual AGroupManagger* GetGroupManagger() const override;
+
+	virtual AGroupManagger_Player* GetGroupManagger_Player() const;
 
 	virtual void SetGroupSharedInfo(
 		AGroupManagger* GroupManaggerPtr
@@ -163,49 +166,6 @@ public:
 #pragma endregion
 
 #pragma region RPC
-
-	/**
-	 * 生成一个PlayerCharacter的复制体
-	 * @param Transform 
-	 */
-	UFUNCTION(Server, Reliable)
-	void CloneCharacter_Server(
-		const FGuid& ID,
-		const FTransform& Transform,
-		ETeammateOption TeammateOption
-		);
-
-	UFUNCTION(Server, Reliable)
-	void SpawnGeneratorActor_Server(
-		const TSoftObjectPtr<AGeneratorColony_ByInvoke>& GeneratorBasePtr
-		);
-
-	UFUNCTION(Server, Reliable)
-	void SpawnCharacterAry_Server(
-		const TArray<TSubclassOf<AHumanCharacter_AI>>& CharacterClassAry,
-		const TArray<FGuid>& IDAry,
-		const TArray<FTransform>& TransformAry,
-		ETeammateOption TeammateOption
-		);
-
-	UFUNCTION(Server, Reliable)
-	void SpawnCharacter_Server(
-		TSubclassOf<AHumanCharacter_AI> CharacterClass,
-		const FGuid& ID,
-		const FTransform& Transform,
-		ETeammateOption TeammateOption
-		);
-
-	UFUNCTION(Server, Reliable)
-	void SpawnCharacterByProxyType_Server(
-		const FGameplayTag& CharacterProxyType,
-		const FTransform& Transform
-		);
-
-	UFUNCTION(Server, Reliable)
-	void DestroyActor_Server(
-		AActor* ActorPtr
-		);
 
 	UFUNCTION(Server, Reliable)
 	void BuyProxys(

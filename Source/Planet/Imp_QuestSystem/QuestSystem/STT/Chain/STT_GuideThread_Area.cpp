@@ -22,6 +22,7 @@
 #include "SceneActor.h"
 #include "STE_GuideThread.h"
 #include "GeneratorColony_ByInvoke.h"
+#include "GroupManagger_Player.h"
 
 EStateTreeRunStatus FSTT_GuideThreadSpwanNPCColony::EnterState(
 	FStateTreeExecutionContext& Context,
@@ -43,7 +44,7 @@ EStateTreeRunStatus FSTT_GuideThreadSpwanNPCColony::EnterState(
 		);
 		if (PCPtr)
 		{
-			PCPtr->SpawnGeneratorActor_Server(
+			PCPtr->GetGroupManagger_Player()->SpawnGeneratorActor_Server(
 				PAD->ActorPtr
 			);
 		}
